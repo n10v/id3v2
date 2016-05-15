@@ -108,8 +108,30 @@ func main() {
     log.Fatal("Error while closing a tag: ", err)
   }
 }
-
 ```
+
+**Available picture types:**
+* Other
+* File icon
+* Other file icon
+* Cover (front)
+* Cover (back)
+* Leaflet page
+* Media
+* Lead artist
+* Artist
+* Conductor
+* Band/Orchestra
+* Composer
+* Lyricist/text writer
+* Recording Location
+* During recording
+* During performance
+* Movie/video screen capture
+* A bright coloured fish
+* Illustration
+* Band/artist logotype
+* Publisher/Studio logotype
 
 ## TODO
 
