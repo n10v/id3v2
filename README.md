@@ -45,7 +45,7 @@ import (
 func main() {
   tag, err := id3v2.Open("file.mp3")
   if err != nil {
-   fmt.Println("Error while opening mp3 file: ", err)
+   log.Fatal("Error while opening mp3 file: ", err)
   }
 
   tag.SetArtist("Artist")
@@ -55,7 +55,7 @@ func main() {
 
 
   if err = tag.Close(); err != nil {
-    fmt.Println("Error while closing a tag: ", err)
+    log.Fatal("Error while closing a tag: ", err)
   }
 }
 
@@ -78,6 +78,7 @@ package main
 import (
   "github.com/bogem/id3v2"
   "log"
+  "os"
 )
 
 func main() {
