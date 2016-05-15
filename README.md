@@ -1,4 +1,4 @@
-# ID3V2
+# ID3v2
 
 ## IMHO
 I think **ID3v2** is a very overwhelmed standard: it does **more than it really should do**. There are a lot of aspects, which developer should take into consideration. And that's why it's pretty complicated to write a **good library**. So if you have some thoughts about writing a **new simply standard** for providing information for digital music tracks, just write me. I think, it's a good time to write an appropriate standard for it 😉
@@ -10,6 +10,7 @@ This library can only set and write tags, but can't read them. So if you only wa
 
 What it **can** do:
 * Set artist, album, year, genre and **attached pictures** (e.g. album covers) and write all to file
+* Set several attached pictures
 * Work with only one encoding (UTF-8)
 
 What it **can't** do:
@@ -46,13 +47,13 @@ func main() {
 		if err != nil {
 			fmt.Println("Error while opening mp3 file: ", err)
 		}
-        
+
 		tag.SetArtist("Artist")
 		tag.SetTitle("Title")
 		tag.SetYear("2016")
         ...
 
-		
+
 		if err = tag.Close(); err != nil {
 			fmt.Println("Error while closing a tag: ", err)
 		}
@@ -99,7 +100,7 @@ func main() {
 		if err = pic.SetPictureFromFile(artwork); err != nil {
 			log.Fatal("Error while setting a picture: ", err)
 		}
-        
+
 		tag.SetAttachedPicture(pic)
 
 		if err = tag.Close(); err != nil {
