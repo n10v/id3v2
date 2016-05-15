@@ -43,20 +43,20 @@ import (
 )
 
 func main() {
-		tag, err := id3v2.Open("file.mp3")
-		if err != nil {
-			fmt.Println("Error while opening mp3 file: ", err)
-		}
+  tag, err := id3v2.Open("file.mp3")
+  if err != nil {
+   fmt.Println("Error while opening mp3 file: ", err)
+  }
 
-		tag.SetArtist("Artist")
-		tag.SetTitle("Title")
-		tag.SetYear("2016")
-        ...
+  tag.SetArtist("Artist")
+  tag.SetTitle("Title")
+  tag.SetYear("2016")
+  ...
 
 
-		if err = tag.Close(); err != nil {
-			fmt.Println("Error while closing a tag: ", err)
-		}
+  if err = tag.Close(); err != nil {
+    fmt.Println("Error while closing a tag: ", err)
+  }
 }
 
 ```
@@ -81,31 +81,31 @@ import (
 )
 
 func main() {
-		tag, err := id3v2.Open("file.mp3")
-		if err != nil {
-			log.Fatal("Error while opening mp3 file: ", err)
-		}
+  tag, err := id3v2.Open("file.mp3")
+  if err != nil {
+    log.Fatal("Error while opening mp3 file: ", err)
+  }
 
-		pic := id3v2.NewAttachedPicture()
-		pic.SetMimeType("image/jpeg")
-		pic.SetDescription("Cover")
-		pic.SetPictureType("Cover (front)")
+  pic := id3v2.NewAttachedPicture()
+  pic.SetMimeType("image/jpeg")
+  pic.SetDescription("Cover")
+  pic.SetPictureType("Cover (front)")
 
-		artwork, err := os.Open("artwork.jpg")
-		if err != nil {
-			log.Fatal("Error while opening an artwork file: ", err)
-		}
-        defer artwork.Close()
+  artwork, err := os.Open("artwork.jpg")
+  if err != nil {
+    log.Fatal("Error while opening an artwork file: ", err)
+  }
+  defer artwork.Close()
 
-		if err = pic.SetPictureFromFile(artwork); err != nil {
-			log.Fatal("Error while setting a picture: ", err)
-		}
+  if err = pic.SetPictureFromFile(artwork); err != nil {
+    log.Fatal("Error while setting a picture: ", err)
+  }
 
-		tag.SetAttachedPicture(pic)
+  tag.SetAttachedPicture(pic)
 
-		if err = tag.Close(); err != nil {
-			log.Fatal("Error while closing a tag: ", err)
-		}
+  if err = tag.Close(); err != nil {
+    log.Fatal("Error while closing a tag: ", err)
+  }
 }
 
 ```
