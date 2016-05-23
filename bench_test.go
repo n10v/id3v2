@@ -31,11 +31,11 @@ func Benchmark(b *testing.B) {
 			b.Error("Error while setting a picture to picture frame: ", err)
 		}
 		t.SetAttachedPicture(pic)
-		if err = t.Close(); err != nil {
-			b.Error("Error while closing a tag: ", err)
-		}
 		if err = artwork.Close(); err != nil {
 			b.Error("Error while closing an artwork file: ", err)
+		}
+		if err = t.Close(); err != nil {
+			b.Error("Error while closing a tag: ", err)
 		}
 	}
 }
