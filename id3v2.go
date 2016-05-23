@@ -22,7 +22,7 @@ func NewAttachedPicture() *frame.PictureFrame {
 }
 
 func (t *Tag) Close() error {
-	t.Header.FramesSize = t.CalcualteSizeOfAllFrames()
+	t.Header.FramesSize = t.CalculateSizeOfAllFrames()
 
 	f := t.File
 	defer f.Close()
