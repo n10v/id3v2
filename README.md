@@ -63,11 +63,11 @@ func main() {
 
 #### Available functions for setting text frames:
 ```go
-tag.SetTitle(string)
-tag.SetArtist(string)
-tag.SetAlbum(string)
-tag.SetYear(string)
-tag.SetGenre(string)
+tag.SetTitle(title string)
+tag.SetArtist(artist string)
+tag.SetAlbum(album string)
+tag.SetYear(year string)
+tag.SetGenre(genre string)
 ```
 
 #### Setting a picture:
