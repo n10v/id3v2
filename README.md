@@ -24,9 +24,9 @@ What it **can't** do:
 
 ## Benchmarks
 
-Set title, artist, album, year, genre and 50KB picture to 4,5MB MP3:
+Set title, artist, album, year, genre and 50KB picture to 4,6MB MP3:
 ```
-Benchmark-4	     100	  10209383 ns/op	  383363 B/op	      77 allocs/op
+Benchmark-4	     200	   9609579 ns/op	  385010 B/op	      79 allocs/op
 ```
 
 ## Installation
