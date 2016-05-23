@@ -5,6 +5,8 @@ import (
 	"errors"
 	"github.com/bogem/id3v2/frame"
 	"os"
+	"sync"
+	"sync/atomic"
 )
 
 type Tag struct {
@@ -109,11 +111,19 @@ func ParseTag(file *os.File) (*Tag, error) {
 	return tag, nil
 }
 
-func (t Tag) CalcualteSizeOfAllFrames() (size uint32) {
-	for _, f := range t.frames {
-		size += frame.FrameHeaderSize + f.Size()
+func (t Tag) CalculateSizeOfAllFrames() uint32 {
+	var wg sync.WaitGroup
+	wg.Add(len(t.frames))
+
+	var size uint32
+	for _, v := range t.frames {
+		go func(f frame.Framer) {
+			atomic.AddUint32(&size, frame.FrameHeaderSize+f.Size())
+			wg.Done()
+		}(v)
 	}
-	return
+	wg.Wait()
+	return atomic.LoadUint32(&size)
 }
 
 func (t Tag) FormFrames() ([]byte, error) {
