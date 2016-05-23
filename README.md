@@ -70,7 +70,7 @@ tag.SetYear(string)
 tag.SetGenre(string)
 ```
 
-#### Setting a picture
+#### Setting a picture:
 
 ```go
 package main
