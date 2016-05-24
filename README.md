@@ -56,7 +56,7 @@ func main() {
   ...
 
 
-  if err = tag.Close(); err != nil {
+  if err = tag.Flush(); err != nil {
     log.Fatal("Error while closing a tag: ", err)
   }
 }
@@ -106,7 +106,7 @@ func main() {
 
   tag.SetAttachedPicture(pic)
 
-  if err = tag.Close(); err != nil {
+  if err = tag.Flush(); err != nil {
     log.Fatal("Error while closing a tag: ", err)
   }
 }
