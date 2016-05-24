@@ -34,7 +34,7 @@ func Benchmark(b *testing.B) {
 		if err = artwork.Close(); err != nil {
 			b.Error("Error while closing an artwork file: ", err)
 		}
-		if err = t.Close(); err != nil {
+		if err = t.Flush(); err != nil {
 			b.Error("Error while closing a tag: ", err)
 		}
 	}
