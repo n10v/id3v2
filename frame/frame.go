@@ -6,9 +6,8 @@ import (
 )
 
 const (
-	FrameHeaderSize  = 10
-	IDSize           = 4
-	BytesInFrameSize = 4
+	FrameHeaderSize = 10
+	EncodingSize    = 1
 )
 
 type Framer interface {

@@ -38,8 +38,7 @@ func (tf *TextFrame) SetID(id string) {
 }
 
 func (tf TextFrame) Size() uint32 {
-	encodingSize := 1
-	size := uint32(encodingSize + tf.textBuffer.Len())
+	size := uint32(EncodingSize + tf.textBuffer.Len())
 	return size
 }
 

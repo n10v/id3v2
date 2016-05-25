@@ -33,6 +33,8 @@ var (
 	}
 )
 
+const PictureTypeSize = 1
+
 type PictureFramer interface {
 	Framer
 
@@ -89,8 +91,7 @@ func (pf *PictureFrame) SetID(id string) {
 }
 
 func (pf PictureFrame) Size() uint32 {
-	encodingSize, pictureTypeSize := 1, 1
-	size := uint32(encodingSize + len(pf.mimeType) + 1 + pictureTypeSize + len(pf.description) + 1 + pf.picture.Len())
+	size := uint32(EncodingSize + len(pf.mimeType) + 1 + PictureTypeSize + len(pf.description) + 1 + pf.picture.Len())
 	return size
 }
 
