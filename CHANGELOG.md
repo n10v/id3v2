@@ -1,5 +1,8 @@
 # ID3v2 Changelog
 
+## 0.2.1
+* Add check of unsupported picture type while setting picture frame to tag
+
 ## 0.2
 * Noticeably decrease allocating memory space
 
