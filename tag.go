@@ -165,14 +165,14 @@ func (t *Tag) Flush() error {
 func setSize(f *os.File, size uint32) (err error) {
 	sizeBytes, err := util.FormSize(size)
 	if err != nil {
-		return err
+		return
 	}
 
 	if _, err = f.WriteAt(sizeBytes, 6); err != nil {
-		return err
+		return
 	}
 
-	return nil
+	return
 }
 
 func (t Tag) FormFrames() ([]byte, error) {
