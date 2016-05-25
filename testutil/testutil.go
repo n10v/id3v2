@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 )
 
@@ -12,7 +13,7 @@ func AreByteSlicesEqual(expected []byte, got []byte) error {
 
 	for i := 0; i < len(expected); i++ {
 		if expected[i] != got[i] {
-			return errors.New("At " + strconv.Itoa(i) + " byte: expected " + strconv.Itoa(int(expected[i])) + ", got " + strconv.Itoa(int(got[i])))
+			return errors.New("At " + strconv.Itoa(i) + " byte: expected " + fmt.Sprint(expected[i:]) + ", got " + fmt.Sprint(got[i:]))
 		}
 	}
 
