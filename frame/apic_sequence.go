@@ -26,16 +26,15 @@ func NewAPICSequence() *APICSequence {
 	}
 }
 
-func (as APICSequence) Form() ([]byte, error) {
-	var b bytes.Buffer
+func (as APICSequence) Form() []byte {
+	b := bytesBufPool.Get().(*bytes.Buffer)
+	b.Reset()
 	for _, pf := range as.sequence {
-		if frame, err := pf.Form(); err != nil {
-			return nil, err
-		} else {
-			b.Write(frame)
-		}
+		frame := pf.Form()
+		b.Write(frame)
 	}
-	return b.Bytes(), nil
+	bytesBufPool.Put(b)
+	return b.Bytes()
 }
 
 func (as APICSequence) ID() string {
@@ -46,13 +45,7 @@ func (as *APICSequence) SetID(id string) {
 	as.id = id
 }
 
-func (as APICSequence) Size() (size uint32) {
-	for _, pf := range as.sequence {
-		size += pf.Size()
-	}
-	return
-}
-
+//TODO: if PictureType not found
 func (as *APICSequence) AddPicture(pic PictureFramer) {
 	for k, v := range PictureTypes {
 		if v == pic.PictureType() {

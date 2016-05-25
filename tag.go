@@ -5,10 +5,9 @@ import (
 	"bytes"
 	"errors"
 	"github.com/bogem/id3v2/frame"
+	"github.com/bogem/id3v2/util"
 	"io/ioutil"
 	"os"
-	"sync"
-	"sync/atomic"
 )
 
 type Tag struct {
@@ -114,8 +113,6 @@ func ParseTag(file *os.File) (*Tag, error) {
 }
 
 func (t *Tag) Flush() error {
-	t.Header.FramesSize = t.CalculateSizeOfAllFrames()
-
 	f := t.File
 	defer f.Close()
 
@@ -123,8 +120,8 @@ func (t *Tag) Flush() error {
 		return err
 	}
 
-	originalFile := bufio.NewReader(f)
-	if _, err := originalFile.Discard(int(t.OriginalSize)); err != nil {
+	originalFileBuf := bufio.NewReader(f)
+	if _, err := originalFileBuf.Discard(int(t.OriginalSize)); err != nil {
 		return err
 	}
 
@@ -135,7 +132,8 @@ func (t *Tag) Flush() error {
 	defer os.Remove(newFile.Name())
 	newFileBuf := bufio.NewWriter(newFile)
 
-	var newTag bytes.Buffer
+	newTag := bytesBufPool.Get().(*bytes.Buffer)
+	newTag.Reset()
 	if header, err := FormTagHeader(*t.Header); err != nil {
 		return err
 	} else {
@@ -147,43 +145,48 @@ func (t *Tag) Flush() error {
 		newTag.Write(frames)
 	}
 
-	if _, err = newFileBuf.ReadFrom(&newTag); err != nil {
+	tagSize, err := newFileBuf.ReadFrom(newTag)
+	if err != nil {
 		return err
 	}
-	if _, err = newFileBuf.ReadFrom(originalFile); err != nil {
+	bytesBufPool.Put(newTag)
+	if _, err = newFileBuf.ReadFrom(originalFileBuf); err != nil {
 		return err
 	}
 	if err = newFileBuf.Flush(); err != nil {
 		return err
 	}
+	setSize(f, uint32(tagSize))
 
 	os.Rename(newFile.Name(), f.Name())
 	return nil
 }
 
-func (t Tag) CalculateSizeOfAllFrames() uint32 {
-	var wg sync.WaitGroup
-	wg.Add(len(t.frames))
-
-	var size uint32
-	for _, v := range t.frames {
-		go func(f frame.Framer) {
-			atomic.AddUint32(&size, frame.FrameHeaderSize+f.Size())
-			wg.Done()
-		}(v)
+func setSize(f *os.File, size uint32) (err error) {
+	sizeBytes, err := util.FormSize(size)
+	if err != nil {
+		return err
 	}
-	wg.Wait()
-	return atomic.LoadUint32(&size)
+
+	if _, err = f.WriteAt(sizeBytes, 6); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (t Tag) FormFrames() ([]byte, error) {
-	var b bytes.Buffer
-	for _, frame := range t.frames {
-		formedFrame, err := frame.Form()
+	b := bytesBufPool.Get().(*bytes.Buffer)
+	b.Reset()
+	for _, f := range t.frames {
+		formedFrame := f.Form()
+		frameHeader, err := frame.FormFrameHeader(f, uint32(len(formedFrame)))
 		if err != nil {
 			return nil, err
 		}
+		b.Write(frameHeader)
 		b.Write(formedFrame)
 	}
+	bytesBufPool.Put(b)
 	return b.Bytes(), nil
 }

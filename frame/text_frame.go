@@ -17,16 +17,13 @@ type TextFrame struct {
 	textBuffer bytes.Buffer
 }
 
-func (tf TextFrame) Form() ([]byte, error) {
-	var b bytes.Buffer
-	if header, err := FormFrameHeader(&tf); err != nil {
-		return nil, err
-	} else {
-		b.Write(header)
-	}
+func (tf TextFrame) Form() []byte {
+	b := bytesBufPool.Get().(*bytes.Buffer)
+	b.Reset()
 	b.WriteByte(util.NativeEncoding)
 	b.WriteString(tf.Text())
-	return b.Bytes(), nil
+	bytesBufPool.Put(b)
+	return b.Bytes()
 }
 
 func (tf TextFrame) ID() string {
@@ -35,11 +32,6 @@ func (tf TextFrame) ID() string {
 
 func (tf *TextFrame) SetID(id string) {
 	tf.id = id
-}
-
-func (tf TextFrame) Size() uint32 {
-	size := uint32(EncodingSize + tf.textBuffer.Len())
-	return size
 }
 
 func (tf *TextFrame) SetText(text string) {

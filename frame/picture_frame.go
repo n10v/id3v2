@@ -33,8 +33,6 @@ var (
 	}
 )
 
-const PictureTypeSize = 1
-
 type PictureFramer interface {
 	Framer
 
@@ -65,13 +63,9 @@ func NewPictureFrame() *PictureFrame {
 	return pf
 }
 
-func (pf PictureFrame) Form() ([]byte, error) {
-	var b bytes.Buffer
-	if header, err := FormFrameHeader(&pf); err != nil {
-		return nil, err
-	} else {
-		b.Write(header)
-	}
+func (pf PictureFrame) Form() []byte {
+	b := bytesBufPool.Get().(*bytes.Buffer)
+	b.Reset()
 	b.WriteByte(util.NativeEncoding)
 	b.WriteString(pf.mimeType)
 	b.WriteByte(0)
@@ -79,7 +73,8 @@ func (pf PictureFrame) Form() ([]byte, error) {
 	b.WriteString(pf.description)
 	b.WriteByte(0)
 	b.Write(pf.Picture())
-	return b.Bytes(), nil
+	bytesBufPool.Put(b)
+	return b.Bytes()
 }
 
 func (pf PictureFrame) ID() string {
@@ -88,11 +83,6 @@ func (pf PictureFrame) ID() string {
 
 func (pf *PictureFrame) SetID(id string) {
 	pf.id = id
-}
-
-func (pf PictureFrame) Size() uint32 {
-	size := uint32(EncodingSize + len(pf.mimeType) + 1 + PictureTypeSize + len(pf.description) + 1 + pf.picture.Len())
-	return size
 }
 
 func (pf PictureFrame) Description() string {

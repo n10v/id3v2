@@ -50,7 +50,8 @@ func isID3Tag(data []byte) bool {
 }
 
 func FormTagHeader(h TagHeader) ([]byte, error) {
-	var b bytes.Buffer
+	b := bytesBufPool.Get().(*bytes.Buffer)
+	b.Reset()
 
 	// Identifier
 	for i := 0; i < 3; i++ {
@@ -74,5 +75,6 @@ func FormTagHeader(h TagHeader) ([]byte, error) {
 		b.WriteByte(s[i-6])
 	}
 
+	bytesBufPool.Put(b)
 	return b.Bytes(), nil
 }
