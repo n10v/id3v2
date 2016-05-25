@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func Benchmark(b *testing.B) {
+func BenchmarkSet(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		t, err := Open("test.mp3")
 		if t == nil || err != nil {
