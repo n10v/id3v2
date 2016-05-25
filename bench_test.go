@@ -30,7 +30,9 @@ func BenchmarkSet(b *testing.B) {
 		if err = pic.SetPictureFromFile(artwork); err != nil {
 			b.Error("Error while setting a picture to picture frame: ", err)
 		}
-		t.SetAttachedPicture(pic)
+		if err = t.SetAttachedPicture(pic); err != nil {
+			b.Error("Error while setting a picture frame to tag: ", err)
+		}
 		if err = artwork.Close(); err != nil {
 			b.Error("Error while closing an artwork file: ", err)
 		}

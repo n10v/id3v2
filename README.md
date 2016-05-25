@@ -101,10 +101,11 @@ func main() {
   defer artwork.Close()
 
   if err = pic.SetPictureFromFile(artwork); err != nil {
-    log.Fatal("Error while setting a picture: ", err)
+    log.Fatal("Error while setting a picture from file: ", err)
   }
-
-  tag.SetAttachedPicture(pic)
+  if err = tag.SetAttachedPicture(pic); err != nil {
+		t.Error("Error while setting a picture frame to tag: ", err)
+  }
 
   if err = tag.Flush(); err != nil {
     log.Fatal("Error while closing a tag: ", err)

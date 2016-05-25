@@ -8,7 +8,7 @@ import (
 type APICSequencer interface {
 	Framer
 
-	AddPicture(PictureFramer)
+	AddPicture(PictureFramer) error
 	Picture(picType string) (PictureFramer, error)
 }
 
@@ -37,13 +37,14 @@ func (as APICSequence) Form() []byte {
 }
 
 //TODO: if PictureType not found
-func (as *APICSequence) AddPicture(pic PictureFramer) {
+func (as *APICSequence) AddPicture(pic PictureFramer) error {
 	for k, v := range PictureTypes {
 		if v == pic.PictureType() {
 			as.sequence[k] = pic
-			break
+			return nil
 		}
 	}
+	return errors.New("Unsupported picture type")
 }
 
 func (as APICSequence) Picture(picType string) (PictureFramer, error) {

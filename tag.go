@@ -19,7 +19,7 @@ type Tag struct {
 	OriginalSize uint32
 }
 
-func (t *Tag) SetAttachedPicture(pf frame.PictureFramer) {
+func (t *Tag) SetAttachedPicture(pf frame.PictureFramer) error {
 	var f frame.APICSequencer
 	id := t.commonIDs["Attached Picture"]
 
@@ -30,8 +30,12 @@ func (t *Tag) SetAttachedPicture(pf frame.PictureFramer) {
 		f = existingFrame.(frame.APICSequencer)
 	}
 
-	f.AddPicture(pf)
+	if err := f.AddPicture(pf); err != nil {
+		return err
+	}
+
 	t.frames[id] = f
+	return nil
 }
 
 func (t *Tag) SetTextFrame(id string, text string) {

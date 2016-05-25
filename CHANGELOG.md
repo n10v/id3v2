@@ -1,7 +1,7 @@
 # ID3v2 Changelog
 
 ## 0.2
-* Noticeably decrease allocating space
+* Noticeably decrease allocating memory space
 
 ## 0.1.2
 * Rename tag.Close() to tag.Flush()

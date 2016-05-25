@@ -40,7 +40,9 @@ func TestSetTags(t *testing.T) {
 	if err = pic.SetPictureFromFile(artwork); err != nil {
 		t.Error("Error while setting a picture to picture frame: ", err)
 	}
-	tag.SetAttachedPicture(pic)
+	if err = tag.SetAttachedPicture(pic); err != nil {
+		t.Error("Error while setting a picture frame to tag:", err)
+	}
 	if err = artwork.Close(); err != nil {
 		t.Error("Error while closing an artwork file: ", err)
 	}
