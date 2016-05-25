@@ -18,7 +18,7 @@ const (
 
 func TestSetTags(t *testing.T) {
 	tag, err := Open(mp3Name)
-	if err != nil {
+	if tag == nil || err != nil {
 		t.Error("Error while opening mp3 file: ", err)
 	}
 	tag.SetTitle("Title")

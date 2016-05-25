@@ -8,7 +8,7 @@ import (
 func Benchmark(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		t, err := Open("test.mp3")
-		if err != nil {
+		if t == nil || err != nil {
 			b.Error("Error while opening mp3 file: ", err)
 		}
 		t.SetTitle("Title")
