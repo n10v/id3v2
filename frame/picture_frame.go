@@ -51,16 +51,9 @@ type PictureFramer interface {
 
 type PictureFrame struct {
 	description string
-	id          string
 	mimeType    string
 	picture     bytes.Buffer
 	pictureType byte
-}
-
-func NewPictureFrame() *PictureFrame {
-	pf := new(PictureFrame)
-	pf.SetID("APIC")
-	return pf
 }
 
 func (pf PictureFrame) Form() []byte {
@@ -75,14 +68,6 @@ func (pf PictureFrame) Form() []byte {
 	b.Write(pf.Picture())
 	bytesBufPool.Put(b)
 	return b.Bytes()
-}
-
-func (pf PictureFrame) ID() string {
-	return pf.id
-}
-
-func (pf *PictureFrame) SetID(id string) {
-	pf.id = id
 }
 
 func (pf PictureFrame) Description() string {

@@ -21,5 +21,5 @@ func Open(name string) (*Tag, error) {
 }
 
 func NewAttachedPicture() *frame.PictureFrame {
-	return frame.NewPictureFrame()
+	return new(frame.PictureFrame)
 }

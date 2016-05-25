@@ -11,6 +11,4 @@ var bytesBufPool = sync.Pool{
 
 type Framer interface {
 	Form() []byte
-	ID() string
-	SetID(string)
 }

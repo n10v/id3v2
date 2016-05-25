@@ -17,7 +17,6 @@ type APICSequencer interface {
 // so there is only one picture with the same picture type
 type APICSequence struct {
 	sequence map[int]PictureFramer
-	id       string
 }
 
 func NewAPICSequence() *APICSequence {
@@ -35,14 +34,6 @@ func (as APICSequence) Form() []byte {
 	}
 	bytesBufPool.Put(b)
 	return b.Bytes()
-}
-
-func (as APICSequence) ID() string {
-	return as.id
-}
-
-func (as *APICSequence) SetID(id string) {
-	as.id = id
 }
 
 //TODO: if PictureType not found

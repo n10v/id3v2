@@ -13,7 +13,6 @@ type TextFramer interface {
 }
 
 type TextFrame struct {
-	id         string
 	textBuffer bytes.Buffer
 }
 
@@ -24,14 +23,6 @@ func (tf TextFrame) Form() []byte {
 	b.WriteString(tf.Text())
 	bytesBufPool.Put(b)
 	return b.Bytes()
-}
-
-func (tf TextFrame) ID() string {
-	return tf.id
-}
-
-func (tf *TextFrame) SetID(id string) {
-	tf.id = id
 }
 
 func (tf *TextFrame) SetText(text string) {

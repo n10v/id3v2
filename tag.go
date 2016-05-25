@@ -26,7 +26,6 @@ func (t *Tag) SetAttachedPicture(pf frame.PictureFramer) {
 	existingFrame := t.frames[id]
 	if existingFrame == nil {
 		f = frame.NewAPICSequence()
-		f.SetID(id)
 	} else {
 		f = existingFrame.(frame.APICSequencer)
 	}
@@ -41,7 +40,6 @@ func (t *Tag) SetTextFrame(id string, text string) {
 	existingFrame := t.frames[id]
 	if existingFrame == nil {
 		f = new(frame.TextFrame)
-		f.SetID(id)
 	} else {
 		f = existingFrame.(frame.TextFramer)
 	}
@@ -192,9 +190,9 @@ func (t Tag) FormFrames() ([]byte, error) {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
 
-	for _, f := range t.frames {
+	for id, f := range t.frames {
 		formedFrame := f.Form()
-		frameHeader, err := formFrameHeader(f, uint32(len(formedFrame)))
+		frameHeader, err := formFrameHeader(f, id, uint32(len(formedFrame)))
 		if err != nil {
 			return nil, err
 		}
@@ -206,11 +204,11 @@ func (t Tag) FormFrames() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func formFrameHeader(f frame.Framer, frameSize uint32) ([]byte, error) {
+func formFrameHeader(f frame.Framer, id string, frameSize uint32) ([]byte, error) {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
 
-	b.WriteString(f.ID())
+	b.WriteString(id)
 	if size, err := util.FormSize(frameSize); err != nil {
 		return nil, err
 	} else {
