@@ -113,18 +113,7 @@ func ParseTag(file *os.File) (*Tag, error) {
 }
 
 func (t *Tag) Flush() error {
-	f := t.File
-	defer f.Close()
-
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
-		return err
-	}
-
-	originalFileBuf := bufio.NewReader(f)
-	if _, err := originalFileBuf.Discard(int(t.OriginalSize)); err != nil {
-		return err
-	}
-
+	// Creating a temp file for mp3 file, which will contain new tag
 	newFile, err := ioutil.TempFile("", "")
 	if err != nil {
 		return err
@@ -132,37 +121,61 @@ func (t *Tag) Flush() error {
 	defer os.Remove(newFile.Name())
 	newFileBuf := bufio.NewWriter(newFile)
 
-	newTag := bytesBufPool.Get().(*bytes.Buffer)
-	newTag.Reset()
-	if header, err := FormTagHeader(*t.Header); err != nil {
-		return err
-	} else {
-		newTag.Write(header)
-	}
-	if frames, err := t.FormFrames(); err != nil {
-		return err
-	} else {
-		newTag.Write(frames)
-	}
-
-	tagSize, err := newFileBuf.ReadFrom(newTag)
+	// Writing to new file new header
+	tagHeader, err := FormTagHeader(*t.Header)
 	if err != nil {
 		return err
 	}
-	bytesBufPool.Put(newTag)
+	if _, err := newFileBuf.Write(tagHeader); err != nil {
+		return err
+	}
+
+	// Writing to new file new frames
+	// And getting size of new frames
+	frames, err := t.FormFrames()
+	if err != nil {
+		return err
+	}
+	framesSize, err := newFileBuf.Write(frames)
+	if err != nil {
+		return err
+	}
+
+	// Getting a music part of mp3
+	// (Discarding an original tag of mp3)
+	f := t.File
+	defer f.Close()
+	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+		return err
+	}
+	originalFileBuf := bufio.NewReader(f)
+	if _, err := originalFileBuf.Discard(int(t.OriginalSize)); err != nil {
+		return err
+	}
+
+	// Writing to new file the music part
 	if _, err = newFileBuf.ReadFrom(originalFileBuf); err != nil {
 		return err
 	}
+
+	// Flushing the buffered to new file
 	if err = newFileBuf.Flush(); err != nil {
 		return err
 	}
-	setSize(f, uint32(tagSize))
 
+	// Setting size of frames to new file
+	setSize(newFile, uint32(framesSize))
+
+	// Replacing original file with new file
 	os.Rename(newFile.Name(), f.Name())
 	return nil
 }
 
 func setSize(f *os.File, size uint32) (err error) {
+	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
+		return err
+	}
+
 	sizeBytes, err := util.FormSize(size)
 	if err != nil {
 		return
@@ -178,15 +191,34 @@ func setSize(f *os.File, size uint32) (err error) {
 func (t Tag) FormFrames() ([]byte, error) {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
+
 	for _, f := range t.frames {
 		formedFrame := f.Form()
-		frameHeader, err := frame.FormFrameHeader(f, uint32(len(formedFrame)))
+		frameHeader, err := formFrameHeader(f, uint32(len(formedFrame)))
 		if err != nil {
 			return nil, err
 		}
 		b.Write(frameHeader)
 		b.Write(formedFrame)
 	}
+
+	bytesBufPool.Put(b)
+	return b.Bytes(), nil
+}
+
+func formFrameHeader(f frame.Framer, frameSize uint32) ([]byte, error) {
+	b := bytesBufPool.Get().(*bytes.Buffer)
+	b.Reset()
+
+	b.WriteString(f.ID())
+	if size, err := util.FormSize(frameSize); err != nil {
+		return nil, err
+	} else {
+		b.Write(size)
+	}
+	b.WriteByte(0)
+	b.WriteByte(0)
+
 	bytesBufPool.Put(b)
 	return b.Bytes(), nil
 }
