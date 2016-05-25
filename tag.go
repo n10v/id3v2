@@ -131,7 +131,7 @@ func (t *Tag) Flush() error {
 	}
 
 	// Writing to new file new frames
-	// And getting size of new frames
+	// And getting size of them
 	frames, err := t.FormFrames()
 	if err != nil {
 		return err
@@ -158,7 +158,7 @@ func (t *Tag) Flush() error {
 		return err
 	}
 
-	// Flushing the buffered to new file
+	// Flushing the buffered data to new file
 	if err = newFileBuf.Flush(); err != nil {
 		return err
 	}
