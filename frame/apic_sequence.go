@@ -36,7 +36,6 @@ func (as APICSequence) Form() []byte {
 	return b.Bytes()
 }
 
-//TODO: if PictureType not found
 func (as *APICSequence) AddPicture(pic PictureFramer) error {
 	for k, v := range PictureTypes {
 		if v == pic.PictureType() {
