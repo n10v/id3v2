@@ -11,7 +11,6 @@ import (
 )
 
 type Tag struct {
-	Header    *TagHeader
 	frames    map[string]frame.Framer
 	commonIDs map[string]string
 
@@ -73,13 +72,7 @@ func (t *Tag) SetGenre(genre string) {
 }
 
 func NewTag(file *os.File) *Tag {
-	header := &TagHeader{
-		Version:    4,
-		FramesSize: 0,
-	}
-
 	return &Tag{
-		Header:    header,
 		frames:    make(map[string]frame.Framer),
 		commonIDs: frame.V24CommonIDs,
 
@@ -103,7 +96,6 @@ func ParseTag(file *os.File) (*Tag, error) {
 	}
 
 	tag := &Tag{
-		Header:    header,
 		frames:    make(map[string]frame.Framer),
 		commonIDs: frame.V24CommonIDs,
 
