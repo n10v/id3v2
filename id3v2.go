@@ -12,7 +12,7 @@ var bytesBufPool = sync.Pool{
 }
 
 func Open(name string) (*Tag, error) {
-	file, err := os.OpenFile(name, os.O_RDWR, 0666)
+	file, err := os.Open(name)
 	if err != nil {
 		return nil, err
 	}
