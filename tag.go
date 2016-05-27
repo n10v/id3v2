@@ -115,12 +115,8 @@ func (t *Tag) Flush() error {
 	defer os.Remove(newFile.Name())
 	newFileBuf := bufio.NewWriter(newFile)
 
-	// Writing to new file new header
-	tagHeader, err := FormTagHeader(*t.Header)
-	if err != nil {
-		return err
-	}
-	if _, err := newFileBuf.Write(tagHeader); err != nil {
+	// Writing to new file new tag header
+	if _, err := newFileBuf.Write(FormTagHeader()); err != nil {
 		return err
 	}
 
