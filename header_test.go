@@ -8,10 +8,10 @@ import (
 
 var (
 	th = TagHeader{
-		FramesSize: 77,
+		FramesSize: 0,
 		Version:    4,
 	}
-	thb = []byte{73, 68, 51, 4, 0, 0, 0, 0, 0, 77}
+	thb = []byte{73, 68, 51, 4, 0, 0, 0, 0, 0, 0}
 )
 
 func TestParseHeader(t *testing.T) {
@@ -24,19 +24,9 @@ func TestParseHeader(t *testing.T) {
 	}
 }
 
-func TestIsID3Tag(t *testing.T) {
-	if !isID3Tag([]byte(ID3Identifier)) {
-		t.Fail()
-	}
-}
-
 func TestFormTagHeader(t *testing.T) {
-	formed, err := FormTagHeader(th)
-	if err != nil {
-		t.Fail()
-	}
-
+	formed := FormTagHeader()
 	if err := testutil.AreByteSlicesEqual(formed, thb); err != nil {
-		t.Errorf("Expected: %v, got: %v", thb, formed)
+		t.Error(err)
 	}
 }

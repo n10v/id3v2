@@ -49,7 +49,7 @@ func isID3Tag(data []byte) bool {
 	return string(data[0:3]) == ID3Identifier
 }
 
-func FormTagHeader(h TagHeader) ([]byte, error) {
+func FormTagHeader() []byte {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
 
@@ -59,7 +59,7 @@ func FormTagHeader(h TagHeader) ([]byte, error) {
 	}
 
 	// Version
-	b.WriteByte(h.Version)
+	b.WriteByte(4)
 
 	// Revision
 	b.WriteByte(0)
@@ -67,14 +67,12 @@ func FormTagHeader(h TagHeader) ([]byte, error) {
 	// Flags
 	b.WriteByte(0)
 
-	s, err := util.FormSize(h.FramesSize)
-	if err != nil {
-		return nil, err
-	}
-	for i := 6; i < 10; i++ {
-		b.WriteByte(s[i-6])
+	// Size
+	// Function setSize in tag.go writes actual size of tag
+	for i := 0; i < 4; i++ {
+		b.WriteByte(0)
 	}
 
 	bytesBufPool.Put(b)
-	return b.Bytes(), nil
+	return b.Bytes()
 }
