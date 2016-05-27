@@ -104,7 +104,7 @@ func main() {
     log.Fatal("Error while setting a picture from file: ", err)
   }
   if err = tag.SetAttachedPicture(pic); err != nil {
-		t.Error("Error while setting a picture frame to tag: ", err)
+		log.Fatal("Error while setting a picture frame to tag: ", err)
   }
 
   if err = tag.Flush(); err != nil {
