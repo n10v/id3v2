@@ -19,7 +19,7 @@ type Tag struct {
 	OriginalSize uint32
 }
 
-func (t *Tag) SetAttachedPicture(pf frame.PictureFramer) {
+func (t *Tag) AddAttachedPicture(pf frame.PictureFramer) {
 	var f frame.PictureSequencer
 	id := t.commonIDs["Attached Picture"]
 
@@ -34,7 +34,7 @@ func (t *Tag) SetAttachedPicture(pf frame.PictureFramer) {
 	t.sequences[id] = f
 }
 
-func (t *Tag) SetTextFrame(id string, text string) {
+func (t *Tag) AddTextFrame(id string, text string) {
 	var f frame.TextFramer
 
 	existingFrame := t.frames[id]
@@ -48,24 +48,38 @@ func (t *Tag) SetTextFrame(id string, text string) {
 	t.frames[id] = f
 }
 
+func (t *Tag) AddUnsynchronisedLyricsFrame(uslt frame.UnsynchronisedLyricsFramer) {
+	// var f frame.UnsynchronisedLyricsFramer
+	id := t.commonIDs["Unsynchronised Lyrics/Text"]
+
+	// existingFrame := t.frames[id]
+	// if existingFrame == nil {
+	// 	f = new(frame.UnsynchronisedLyricsFrame)
+	// } else {
+	// 	f = existingFrame.(frame.UnsynchronisedLyricsFramer)
+	// }
+
+	t.frames[id] = uslt
+}
+
 func (t *Tag) SetTitle(title string) {
-	t.SetTextFrame(t.commonIDs["Title"], title)
+	t.AddTextFrame(t.commonIDs["Title"], title)
 }
 
 func (t *Tag) SetArtist(artist string) {
-	t.SetTextFrame(t.commonIDs["Artist"], artist)
+	t.AddTextFrame(t.commonIDs["Artist"], artist)
 }
 
 func (t *Tag) SetAlbum(album string) {
-	t.SetTextFrame(t.commonIDs["Album"], album)
+	t.AddTextFrame(t.commonIDs["Album"], album)
 }
 
 func (t *Tag) SetYear(year string) {
-	t.SetTextFrame(t.commonIDs["Year"], year)
+	t.AddTextFrame(t.commonIDs["Year"], year)
 }
 
 func (t *Tag) SetGenre(genre string) {
-	t.SetTextFrame(t.commonIDs["Genre"], genre)
+	t.AddTextFrame(t.commonIDs["Genre"], genre)
 }
 
 func NewTag(file *os.File) *Tag {
