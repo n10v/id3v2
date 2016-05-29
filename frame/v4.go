@@ -9,5 +9,6 @@ var (
 		"Genre":                      "TCON",
 		"Attached Picture":           "APIC",
 		"Unsynchronised Lyrics/Text": "USLT",
+		"Comment":                    "COMM",
 	}
 )
