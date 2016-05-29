@@ -18,10 +18,9 @@ func TestByteSlicesEquality(t *testing.T) {
 	}
 
 	for _, testData := range ByteSlicesTests {
-		got := AreByteSlicesEqual(testData.A, testData.B)
-		if got != testData.Expected {
-			t.Errorf("For %v and %v expected %v, got %v", testData.A, testData.B, testData.Expected, got)
+		err := AreByteSlicesEqual(testData.A, testData.B)
+		if (err != nil) && (testData.Expected != false) {
+			t.Error(err)
 		}
-
 	}
 }
