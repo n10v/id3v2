@@ -94,7 +94,6 @@ func main() {
   if err = pic.SetPictureFromFile("artwork.jpg"); err != nil {
     log.Fatal("Error while setting a picture from file: ", err)
   }
-
   if err = tag.SetAttachedPicture(pic); err != nil {
 		log.Fatal("Error while setting a picture frame to tag: ", err)
   }
