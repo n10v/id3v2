@@ -193,7 +193,7 @@ func (t Tag) FormFrames() ([]byte, error) {
 
 	for id, f := range t.frames {
 		formedFrame := f.Form()
-		frameHeader, err := formFrameHeader(f, id, uint32(len(formedFrame)))
+		frameHeader, err := formFrameHeader(id, uint32(len(formedFrame)))
 		if err != nil {
 			return nil, err
 		}
@@ -205,7 +205,7 @@ func (t Tag) FormFrames() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func formFrameHeader(f frame.Framer, id string, frameSize uint32) ([]byte, error) {
+func formFrameHeader(id string, frameSize uint32) ([]byte, error) {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
 
