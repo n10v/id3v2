@@ -24,42 +24,42 @@ type UnsynchronisedLyricsFrame struct {
 	lyrics            bytes.Buffer
 }
 
-func (uslt UnsynchronisedLyricsFrame) Form() []byte {
+func (uslf UnsynchronisedLyricsFrame) Form() []byte {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
 
 	b.WriteByte(util.NativeEncoding)
-	b.WriteString(uslt.language)
-	b.WriteString(uslt.ContentDescriptor())
+	b.WriteString(uslf.language)
+	b.WriteString(uslf.ContentDescriptor())
 	b.WriteByte(0)
-	b.WriteString(uslt.Lyrics())
+	b.WriteString(uslf.Lyrics())
 
 	bytesBufPool.Put(b)
 	return b.Bytes()
 }
 
-func (uslt UnsynchronisedLyricsFrame) Language() string {
-	return uslt.language
+func (uslf UnsynchronisedLyricsFrame) Language() string {
+	return uslf.language
 }
 
-func (uslt *UnsynchronisedLyricsFrame) SetLanguage(lang string) {
-	uslt.language = lang
+func (uslf *UnsynchronisedLyricsFrame) SetLanguage(lang string) {
+	uslf.language = lang
 }
 
-func (uslt UnsynchronisedLyricsFrame) ContentDescriptor() string {
-	return uslt.contentDescriptor.String()
+func (uslf UnsynchronisedLyricsFrame) ContentDescriptor() string {
+	return uslf.contentDescriptor.String()
 }
 
-func (uslt *UnsynchronisedLyricsFrame) SetContentDescriptor(cd string) {
-	uslt.contentDescriptor.Reset()
-	uslt.contentDescriptor.WriteString(cd)
+func (uslf *UnsynchronisedLyricsFrame) SetContentDescriptor(cd string) {
+	uslf.contentDescriptor.Reset()
+	uslf.contentDescriptor.WriteString(cd)
 }
 
-func (uslt UnsynchronisedLyricsFrame) Lyrics() string {
-	return uslt.lyrics.String()
+func (uslf UnsynchronisedLyricsFrame) Lyrics() string {
+	return uslf.lyrics.String()
 }
 
-func (uslt *UnsynchronisedLyricsFrame) SetLyrics(lyrics string) {
-	uslt.lyrics.Reset()
-	uslt.lyrics.WriteString(lyrics)
+func (uslf *UnsynchronisedLyricsFrame) SetLyrics(lyrics string) {
+	uslf.lyrics.Reset()
+	uslf.lyrics.WriteString(lyrics)
 }
