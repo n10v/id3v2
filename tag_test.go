@@ -12,7 +12,7 @@ const (
 	mp3Name        = "test.mp3"
 	frontCoverName = "front_cover.jpg"
 	backCoverName  = "back_cover.png"
-	framesSize     = 62801
+	framesSize     = 62845
 	tagSize        = TagHeaderSize + framesSize
 	musicSize      = 273310
 )
@@ -28,6 +28,7 @@ func TestSetTags(t *testing.T) {
 	tag.SetYear("2016")
 	tag.SetGenre("Genre")
 
+	// Setting front cover
 	pic := NewAttachedPicture()
 	pic.SetMimeType("image/jpeg")
 	pic.SetDescription("Front cover")
@@ -35,8 +36,9 @@ func TestSetTags(t *testing.T) {
 	if err = pic.SetPictureFromFile(frontCoverName); err != nil {
 		t.Error("Error while setting a front cover from file")
 	}
-	tag.SetAttachedPicture(pic)
+	tag.AddAttachedPicture(pic)
 
+	// Setting back cover
 	pic = NewAttachedPicture()
 	pic.SetMimeType("image/png")
 	pic.SetDescription("Back cover")
@@ -44,7 +46,14 @@ func TestSetTags(t *testing.T) {
 	if err = pic.SetPictureFromFile(backCoverName); err != nil {
 		t.Error("Error while setting a back cover from file")
 	}
-	tag.SetAttachedPicture(pic)
+	tag.AddAttachedPicture(pic)
+
+	// Setting USLT
+	uslt := NewUnsynchronisedLyricsFrame()
+	uslt.SetLanguage("eng")
+	uslt.SetContentDescriptor("Content descriptor")
+	uslt.SetLyrics("bogem/id3v2")
+	tag.AddUnsynchronisedLyricsFrame(uslt)
 
 	if err = tag.Flush(); err != nil {
 		t.Error("Error while closing a tag: ", err)

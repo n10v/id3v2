@@ -14,6 +14,7 @@ func BenchmarkSet(b *testing.B) {
 		t.SetYear("2016")
 		t.SetGenre("Genre")
 
+		// Setting front cover
 		pic := NewAttachedPicture()
 		pic.SetMimeType("image/jpeg")
 		pic.SetDescription("Cover")
@@ -21,7 +22,14 @@ func BenchmarkSet(b *testing.B) {
 		if err = pic.SetPictureFromFile("front_cover.jpg"); err != nil {
 			b.Error("Error while setting a picture from file")
 		}
-		t.SetAttachedPicture(pic)
+		t.AddAttachedPicture(pic)
+
+		// Setting USLT
+		uslt := NewUnsynchronisedLyricsFrame()
+		uslt.SetLanguage("eng")
+		uslt.SetContentDescriptor("Content descriptor")
+		uslt.SetLyrics("bogem/id3v2")
+		t.AddUnsynchronisedLyricsFrame(uslt)
 
 		if err = t.Flush(); err != nil {
 			b.Error("Error while closing a tag: ", err)
