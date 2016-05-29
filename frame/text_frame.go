@@ -19,8 +19,10 @@ type TextFrame struct {
 func (tf TextFrame) Form() []byte {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
+
 	b.WriteByte(util.NativeEncoding)
 	b.WriteString(tf.Text())
+
 	bytesBufPool.Put(b)
 	return b.Bytes()
 }

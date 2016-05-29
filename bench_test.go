@@ -21,8 +21,8 @@ func BenchmarkSet(b *testing.B) {
 		if err = pic.SetPictureFromFile("front_cover.jpg"); err != nil {
 			b.Error("Error while setting a picture from file")
 		}
-
 		t.SetAttachedPicture(pic)
+
 		if err = t.Flush(); err != nil {
 			b.Error("Error while closing a tag: ", err)
 		}

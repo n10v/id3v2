@@ -17,11 +17,14 @@ type TagHeader struct {
 	Version    byte
 }
 
-func ParseHeader(r io.Reader) (*TagHeader, error) {
+func ParseHeader(rd io.Reader) (*TagHeader, error) {
 	data := make([]byte, TagHeaderSize)
-	n, err := r.Read(data)
+	n, err := rd.Read(data)
 	if n < TagHeaderSize {
 		err = errors.New("Size of tag header is less than expected")
+		return nil, err
+	}
+	if err != nil {
 		return nil, err
 	}
 
@@ -54,9 +57,7 @@ func FormTagHeader() []byte {
 	b.Reset()
 
 	// Identifier
-	for i := 0; i < 3; i++ {
-		b.WriteByte(ID3Identifier[i])
-	}
+	b.WriteString(ID3Identifier)
 
 	// Version
 	b.WriteByte(4)
@@ -67,7 +68,7 @@ func FormTagHeader() []byte {
 	// Flags
 	b.WriteByte(0)
 
-	// Size
+	// Set blank size
 	// Function setSize in tag.go writes actual size of tag
 	b.Write([]byte{0, 0, 0, 0})
 
