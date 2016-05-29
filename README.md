@@ -9,7 +9,7 @@ I think, **ID3** is a very overwhelmed standard: it does **more than it really s
 This library can only set and write tags, but can't read them. So if you only want to set tags, it fits you. And if there is a tag of version 3 or 4, this library will just delete it. If version of the tag is small than 3, this library will return an error.
 
 What it **can** do:
-* Set artist, album, year, genre and **attached pictures** (e.g. album covers) and write all to file
+* Set artist, album, year, genre, unsynchronised lyrics/text and **attached pictures** (e.g. album covers) and write all to file
 * Set several attached pictures
 
 What it **can't** do:
@@ -25,7 +25,7 @@ What it **can't** do:
 
 All benchmarks run on **MacBook Air 13" (early 2013, 1,4GHz Intel Core i5, 4GB 1600MHz DDR3)**
 
-#### Set title, artist, album, year, genre and 50KB picture to 4,6MB MP3:
+#### Set title, artist, album, year, genre, unsynchronised lyrics and 50KB picture to 4,6MB MP3:
 ```
 BenchmarkSet-4	     100	  15646308 ns/op	   13777 B/op	      43 allocs/op
 ```
@@ -34,7 +34,7 @@ BenchmarkSet-4	     100	  15646308 ns/op	   13777 B/op	      43 allocs/op
   	$ go get -u github.com/bogem/id3v2
 
 ## Usage
-#### Example:
+### Example:
 ```go
 package main
 
@@ -62,7 +62,7 @@ func main() {
 
 ```
 
-#### Available functions for setting text frames:
+### Available functions for setting text frames:
 ```go
 tag.SetTitle(title string)
 tag.SetArtist(artist string)
@@ -71,7 +71,9 @@ tag.SetYear(year string)
 tag.SetGenre(genre string)
 ```
 
-#### Setting a picture:
+___
+
+### Setting a picture:
 ```go
 package main
 
@@ -93,7 +95,7 @@ func main() {
   if err = pic.SetPictureFromFile("artwork.jpg"); err != nil {
     log.Fatal("Error while setting a picture from file: ", err)
   }
-  tag.SetAttachedPicture(pic)
+  tag.AddAttachedPicture(pic)
 
   if err = tag.Flush(); err != nil {
     log.Fatal("Error while closing a tag: ", err)
@@ -123,6 +125,23 @@ func main() {
 * `PTIllustration`
 * `PTBandArtistLogotype`
 * `PTPublisherStudioLogotype`
+
+___
+
+### Setting unsynchronised lyrics/text:
+``` go
+  ...
+  uslt := id3v2.NewUnsynchronisedLyricsFrame()
+  uslt.SetLanguage("eng")
+  uslt.SetContentDescriptor("Content descriptor")
+  uslt.SetLyrics("Lyrics")
+  tag.AddUnsynchronisedLyricsFrame(uslt)
+  ...
+```
+
+**You should choose a language code from [ISO 639-2 code list](https://www.loc.gov/standards/iso639-2/php/code_list.php)**
+
+___
 
 ## TODO
 
