@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"github.com/bogem/id3v2/util"
+	"io"
 	"os"
 )
 
@@ -42,8 +43,8 @@ type PictureFramer interface {
 	MimeType() string
 	SetMimeType(string)
 
-	Picture() []byte
-	SetPicture([]byte) error
+	Picture() io.Reader
+	SetPicture(io.Reader)
 
 	PictureType() string
 	SetPictureType(string) error
@@ -52,7 +53,7 @@ type PictureFramer interface {
 type PictureFrame struct {
 	description string
 	mimeType    string
-	picture     bytes.Buffer
+	picture     io.Reader
 	pictureType byte
 }
 
@@ -65,7 +66,12 @@ func (pf PictureFrame) Form() []byte {
 	b.WriteByte(pf.pictureType)
 	b.WriteString(pf.description)
 	b.WriteByte(0)
-	b.Write(pf.Picture())
+
+	b.ReadFrom(pf.picture)
+	if v, ok := pf.picture.(*os.File); ok {
+		v.Close()
+	}
+
 	bytesBufPool.Put(b)
 	return b.Bytes()
 }
@@ -86,24 +92,23 @@ func (pf *PictureFrame) SetMimeType(mt string) {
 	pf.mimeType = mt
 }
 
-func (pf PictureFrame) Picture() []byte {
-	return pf.picture.Bytes()
+func (pf PictureFrame) Picture() io.Reader {
+	return pf.picture
 }
 
-func (pf *PictureFrame) SetPicture(b []byte) error {
-	pf.picture.Reset()
-	if _, err := pf.picture.Write(b); err != nil {
-		return err
-	}
-	return nil
+func (pf *PictureFrame) SetPicture(rd io.Reader) {
+	pf.picture = rd
 }
 
-func (pf *PictureFrame) SetPictureFromFile(file *os.File) error {
-	pf.picture.Reset()
-	if _, err := pf.picture.ReadFrom(file); err != nil {
-		return err
+func (pf *PictureFrame) SetPictureFromFile(name string) error {
+	if pf.picture != nil {
+		if v, ok := pf.picture.(*os.File); ok {
+			v.Close()
+		}
 	}
-	return nil
+	pictureFile, err := os.Open(name)
+	pf.picture = pictureFile
+	return err
 }
 
 func (pf PictureFrame) PictureType() string {
