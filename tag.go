@@ -29,9 +29,7 @@ func (t *Tag) SetAttachedPicture(pf frame.PictureFramer) error {
 		f = existingFrame.(frame.APICSequencer)
 	}
 
-	if err := f.AddPicture(pf); err != nil {
-		return err
-	}
+	f.AddPicture(pf)
 
 	t.frames[id] = f
 	return nil
