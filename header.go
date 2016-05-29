@@ -69,9 +69,7 @@ func FormTagHeader() []byte {
 
 	// Size
 	// Function setSize in tag.go writes actual size of tag
-	for i := 0; i < 4; i++ {
-		b.WriteByte(0)
-	}
+	b.Write([]byte{0, 0, 0, 0})
 
 	bytesBufPool.Put(b)
 	return b.Bytes()
