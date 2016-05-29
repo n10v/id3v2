@@ -1,5 +1,10 @@
 # ID3v2 Changelog
 
+## 0.3
+* Noticeably decrease allocating memory space
+* Some changes in setting pictures to picture frames
+* Major bug fixes
+
 ## 0.2.2
 * Some very small improvement in memory usage
 

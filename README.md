@@ -11,7 +11,6 @@ This library can only set and write tags, but can't read them. So if you only wa
 What it **can** do:
 * Set artist, album, year, genre and **attached pictures** (e.g. album covers) and write all to file
 * Set several attached pictures
-* Work with only one encoding (UTF-8)
 
 What it **can't** do:
 * Parse tags
@@ -28,7 +27,7 @@ All benchmarks run on **MacBook Air 13" (early 2013, 1,4GHz Intel Core i5, 4GB 1
 
 #### Set title, artist, album, year, genre and 50KB picture to 4,6MB MP3:
 ```
-BenchmarkSet-4	     200	   9857336 ns/op	  148739 B/op	      50 allocs/op
+BenchmarkSet-4	     100	  15646308 ns/op	   13777 B/op	      43 allocs/op
 ```
 
 ## Installation
@@ -73,7 +72,6 @@ tag.SetGenre(genre string)
 ```
 
 #### Setting a picture:
-
 ```go
 package main
 
@@ -92,17 +90,11 @@ func main() {
   pic := id3v2.NewAttachedPicture()
   pic.SetMimeType("image/jpeg")
   pic.SetDescription("Cover")
-  pic.SetPictureType("Cover (front)")
-
-  artwork, err := os.Open("artwork.jpg")
-  if err != nil {
-    log.Fatal("Error while opening an artwork file: ", err)
-  }
-  defer artwork.Close()
-
-  if err = pic.SetPictureFromFile(artwork); err != nil {
+  pic.SetPictureType(id3v2.PTFrontCover)
+  if err = pic.SetPictureFromFile("artwork.jpg"); err != nil {
     log.Fatal("Error while setting a picture from file: ", err)
   }
+
   if err = tag.SetAttachedPicture(pic); err != nil {
 		log.Fatal("Error while setting a picture frame to tag: ", err)
   }
@@ -114,33 +106,33 @@ func main() {
 ```
 
 **Available picture types:**
-* Other
-* File icon
-* Other file icon
-* Cover (front)
-* Cover (back)
-* Leaflet page
-* Media
-* Lead artist
-* Artist
-* Conductor
-* Band/Orchestra
-* Composer
-* Lyricist/text writer
-* Recording Location
-* During recording
-* During performance
-* Movie/video screen capture
-* A bright coloured fish
-* Illustration
-* Band/artist logotype
-* Publisher/Studio logotype
+* `PTOther`
+* `PTFileIcon`
+* `PTOtherFileIcon`
+* `PTFrontCover`
+* `PTBackCover`
+* `PTLeafletPage`
+* `PTMedia`
+* `PTLeadArtistSoloist`
+* `PTArtistPerformer`
+* `PTConductor`
+* `PTBandOrchestra`
+* `PTComposer`
+* `PTLyricistTextWriter`
+* `PTRecordingLocation`
+* `PTDuringRecording`
+* `PTDuringPerformance`
+* `PTMovieScreenCapture`
+* `PTBrightColouredFish`
+* `PTIllustration`
+* `PTBandArtistLogotype`
+* `PTPublisherStudioLogotype`
 
 ## TODO
 
-* Parse tags
-* Work with other encodings
-* Work with extended header, flags, padding ***(Does somebody really use it?)***
+- [ ] Parse tags
+- [ ] Work with other encodings
+- [ ] Work with extended header, flags, padding ***(Does somebody really use it?)***
 
 ## License
 MIT
