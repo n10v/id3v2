@@ -112,7 +112,6 @@ func (t *Tag) Flush() error {
 	if err != nil {
 		return err
 	}
-	defer os.Remove(newFile.Name())
 	newFileBuf := bufio.NewWriter(newFile)
 
 	// Writing to new file new tag header
@@ -154,10 +153,20 @@ func (t *Tag) Flush() error {
 	}
 
 	// Setting size of frames to new file
-	setSize(newFile, uint32(framesSize))
+	if err = setSize(newFile, uint32(framesSize)); err != nil {
+		return err
+	}
 
 	// Replacing original file with new file
-	os.Rename(newFile.Name(), f.Name())
+	if err = os.Rename(newFile.Name(), f.Name()); err != nil {
+		return err
+	}
+
+	// And closing it
+	if err = newFile.Close(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
