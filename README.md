@@ -78,7 +78,6 @@ package main
 import (
   "github.com/bogem/id3v2"
   "log"
-  "os"
 )
 
 func main() {
