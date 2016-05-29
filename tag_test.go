@@ -31,20 +31,12 @@ func TestSetTags(t *testing.T) {
 	pic.SetMimeType("image/jpeg")
 	pic.SetDescription("Cover")
 	pic.SetPictureType("Cover (front)")
-
-	artwork, err := os.Open(artworkName)
-	if err != nil {
-		t.Error("Error while opening an artwork file: ", err)
+	if err = pic.SetPictureFromFile(artworkName); err != nil {
+		t.Error("Error while setting a picture from file")
 	}
 
-	if err = pic.SetPictureFromFile(artwork); err != nil {
-		t.Error("Error while setting a picture to picture frame: ", err)
-	}
 	if err = tag.SetAttachedPicture(pic); err != nil {
 		t.Error("Error while setting a picture frame to tag:", err)
-	}
-	if err = artwork.Close(); err != nil {
-		t.Error("Error while closing an artwork file: ", err)
 	}
 	if err = tag.Flush(); err != nil {
 		t.Error("Error while closing a tag: ", err)
