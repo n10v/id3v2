@@ -17,14 +17,12 @@ func BenchmarkSet(b *testing.B) {
 		pic := NewAttachedPicture()
 		pic.SetMimeType("image/jpeg")
 		pic.SetDescription("Cover")
-		pic.SetPictureType("Cover (front)")
+		pic.SetPictureType(PTFrontCover)
 		if err = pic.SetPictureFromFile(artworkName); err != nil {
 			b.Error("Error while setting a picture from file")
 		}
 
-		if err = t.SetAttachedPicture(pic); err != nil {
-			b.Error("Error while setting a picture frame to tag: ", err)
-		}
+		t.SetAttachedPicture(pic)
 		if err = t.Flush(); err != nil {
 			b.Error("Error while closing a tag: ", err)
 		}

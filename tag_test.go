@@ -30,14 +30,12 @@ func TestSetTags(t *testing.T) {
 	pic := NewAttachedPicture()
 	pic.SetMimeType("image/jpeg")
 	pic.SetDescription("Cover")
-	pic.SetPictureType("Cover (front)")
+	pic.SetPictureType(PTFrontCover)
 	if err = pic.SetPictureFromFile(artworkName); err != nil {
 		t.Error("Error while setting a picture from file")
 	}
+	tag.SetAttachedPicture(pic)
 
-	if err = tag.SetAttachedPicture(pic); err != nil {
-		t.Error("Error while setting a picture frame to tag:", err)
-	}
 	if err = tag.Flush(); err != nil {
 		t.Error("Error while closing a tag: ", err)
 	}
