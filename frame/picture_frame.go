@@ -2,36 +2,9 @@ package frame
 
 import (
 	"bytes"
-	"errors"
 	"github.com/bogem/id3v2/util"
 	"io"
 	"os"
-)
-
-var (
-	PictureTypes = [...]string{
-		"Other",
-		"File icon",
-		"Other file icon",
-		"Cover (front)",
-		"Cover (back)",
-		"Leaflet page",
-		"Media",
-		"Lead artist",
-		"Artist",
-		"Conductor",
-		"Band/Orchestra",
-		"Composer",
-		"Lyricist/text writer",
-		"Recording Location",
-		"During recording",
-		"During performance",
-		"Movie/video screen capture",
-		"A bright coloured fish",
-		"Illustration",
-		"Band/artist logotype",
-		"Publisher/Studio logotype",
-	}
 )
 
 type PictureFramer interface {
@@ -46,8 +19,8 @@ type PictureFramer interface {
 	Picture() io.Reader
 	SetPicture(io.Reader)
 
-	PictureType() string
-	SetPictureType(string) error
+	PictureType() byte
+	SetPictureType(byte)
 }
 
 type PictureFrame struct {
@@ -111,16 +84,10 @@ func (pf *PictureFrame) SetPictureFromFile(name string) error {
 	return err
 }
 
-func (pf PictureFrame) PictureType() string {
-	return PictureTypes[pf.pictureType]
+func (pf PictureFrame) PictureType() byte {
+	return pf.pictureType
 }
 
-func (pf *PictureFrame) SetPictureType(pt string) error {
-	for k, v := range PictureTypes {
-		if v == pt {
-			pf.pictureType = byte(k)
-			return nil
-		}
-	}
-	return errors.New("Unsupported picture type")
+func (pf *PictureFrame) SetPictureType(pt byte) {
+	pf.pictureType = pt
 }

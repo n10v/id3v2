@@ -1,15 +1,12 @@
 package frame
 
-import (
-	"bytes"
-	"errors"
-)
+import "bytes"
 
 type APICSequencer interface {
 	Framer
 
-	AddPicture(PictureFramer) error
-	Picture(picType string) (PictureFramer, error)
+	AddPicture(PictureFramer)
+	Picture(pt byte) PictureFramer
 }
 
 // APICSequence stores several APICs and implements interface Framer.
@@ -36,21 +33,11 @@ func (as APICSequence) Form() []byte {
 	return b.Bytes()
 }
 
-func (as *APICSequence) AddPicture(pic PictureFramer) error {
-	for k, v := range PictureTypes {
-		if v == pic.PictureType() {
-			as.sequence[k] = pic
-			return nil
-		}
-	}
-	return errors.New("Unsupported picture type")
+func (as *APICSequence) AddPicture(pic PictureFramer) {
+	pt := pic.PictureType()
+	as.sequence[int(pt)] = pic
 }
 
-func (as APICSequence) Picture(picType string) (PictureFramer, error) {
-	for k, v := range PictureTypes {
-		if v == picType {
-			return as.sequence[k], nil
-		}
-	}
-	return &PictureFrame{}, errors.New("Unsupported picture type")
+func (as APICSequence) Picture(pt byte) PictureFramer {
+	return as.sequence[int(pt)]
 }
