@@ -31,6 +31,13 @@ func BenchmarkSet(b *testing.B) {
 		uslt.SetLyrics("bogem/id3v2")
 		t.AddUnsynchronisedLyricsFrame(uslt)
 
+		// Setting comment
+		cf := NewCommentFrame()
+		cf.SetLanguage("eng")
+		cf.SetDescription("Short description")
+		cf.SetText("The actual text")
+		t.AddCommentFrame(cf)
+
 		if err = t.Flush(); err != nil {
 			b.Error("Error while closing a tag: ", err)
 		}

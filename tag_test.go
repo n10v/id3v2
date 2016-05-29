@@ -12,7 +12,7 @@ const (
 	mp3Name        = "test.mp3"
 	frontCoverName = "front_cover.jpg"
 	backCoverName  = "back_cover.png"
-	framesSize     = 62845
+	framesSize     = 62892
 	tagSize        = TagHeaderSize + framesSize
 	musicSize      = 273310
 )
@@ -54,6 +54,13 @@ func TestSetTags(t *testing.T) {
 	uslt.SetContentDescriptor("Content descriptor")
 	uslt.SetLyrics("bogem/id3v2")
 	tag.AddUnsynchronisedLyricsFrame(uslt)
+
+	// Setting comment
+	cf := NewCommentFrame()
+	cf.SetLanguage("eng")
+	cf.SetDescription("Short description")
+	cf.SetText("The actual text")
+	tag.AddCommentFrame(cf)
 
 	if err = tag.Flush(); err != nil {
 		t.Error("Error while closing a tag: ", err)

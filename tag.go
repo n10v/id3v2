@@ -63,6 +63,21 @@ func (t *Tag) AddUnsynchronisedLyricsFrame(uslf frame.UnsynchronisedLyricsFramer
 	t.sequences[id] = f
 }
 
+func (t *Tag) AddCommentFrame(cf frame.CommentFramer) {
+	var f frame.CommentSequencer
+	id := t.commonIDs["Comment"]
+
+	existingSequence := t.sequences[id]
+	if existingSequence == nil {
+		f = frame.NewCommentSequence()
+	} else {
+		f = existingSequence.(frame.CommentSequencer)
+	}
+
+	f.AddComment(cf)
+	t.sequences[id] = f
+}
+
 func (t *Tag) SetTitle(title string) {
 	t.AddTextFrame(t.commonIDs["Title"], title)
 }

@@ -45,10 +45,14 @@ func Open(name string) (*Tag, error) {
 	return ParseTag(file)
 }
 
+func NewAttachedPicture() *frame.PictureFrame {
+	return new(frame.PictureFrame)
+}
+
 func NewUnsynchronisedLyricsFrame() *frame.UnsynchronisedLyricsFrame {
 	return new(frame.UnsynchronisedLyricsFrame)
 }
 
-func NewAttachedPicture() *frame.PictureFrame {
-	return new(frame.PictureFrame)
+func NewCommentFrame() *frame.CommentFrame {
+	return new(frame.CommentFrame)
 }
