@@ -12,27 +12,26 @@ import (
 
 type Tag struct {
 	frames    map[string]frame.Framer
+	sequences map[string]frame.Sequencer
 	commonIDs map[string]string
 
 	File         *os.File
 	OriginalSize uint32
 }
 
-func (t *Tag) SetAttachedPicture(pf frame.PictureFramer) error {
-	var f frame.APICSequencer
+func (t *Tag) SetAttachedPicture(pf frame.PictureFramer) {
+	var f frame.PictureSequencer
 	id := t.commonIDs["Attached Picture"]
 
-	existingFrame := t.frames[id]
-	if existingFrame == nil {
-		f = frame.NewAPICSequence()
+	existingSequence := t.sequences[id]
+	if existingSequence == nil {
+		f = frame.NewPictureSequence()
 	} else {
-		f = existingFrame.(frame.APICSequencer)
+		f = existingSequence.(frame.PictureSequencer)
 	}
 
 	f.AddPicture(pf)
-
-	t.frames[id] = f
-	return nil
+	t.sequences[id] = f
 }
 
 func (t *Tag) SetTextFrame(id string, text string) {
@@ -72,6 +71,7 @@ func (t *Tag) SetGenre(genre string) {
 func NewTag(file *os.File) *Tag {
 	return &Tag{
 		frames:    make(map[string]frame.Framer),
+		sequences: make(map[string]frame.Sequencer),
 		commonIDs: frame.V24CommonIDs,
 
 		File:         file,
@@ -95,6 +95,7 @@ func ParseTag(file *os.File) (*Tag, error) {
 
 	tag := &Tag{
 		frames:    make(map[string]frame.Framer),
+		sequences: make(map[string]frame.Sequencer),
 		commonIDs: frame.V24CommonIDs,
 
 		File:         file,
@@ -119,7 +120,7 @@ func (t *Tag) Flush() error {
 
 	// Writing to new file new frames
 	// And getting size of them
-	frames, err := t.FormFrames()
+	frames, err := t.FormAllFrames()
 	if err != nil {
 		return err
 	}
@@ -185,22 +186,62 @@ func setSize(f *os.File, size uint32) (err error) {
 	return
 }
 
+func (t Tag) FormAllFrames() ([]byte, error) {
+	frames := bytesBufPool.Get().(*bytes.Buffer)
+	frames.Reset()
+
+	if f, err := t.FormFrames(); err != nil {
+		return nil, err
+	} else {
+		frames.Write(f)
+	}
+
+	if s, err := t.FormSequences(); err != nil {
+		return nil, err
+	} else {
+		frames.Write(s)
+	}
+
+	bytesBufPool.Put(frames)
+	return frames.Bytes(), nil
+}
+
 func (t Tag) FormFrames() ([]byte, error) {
-	b := bytesBufPool.Get().(*bytes.Buffer)
-	b.Reset()
+	frames := bytesBufPool.Get().(*bytes.Buffer)
+	frames.Reset()
 
 	for id, f := range t.frames {
-		formedFrame := f.Form()
-		frameHeader, err := formFrameHeader(id, uint32(len(formedFrame)))
+		frameBody := f.Form()
+		frameHeader, err := formFrameHeader(id, uint32(len(frameBody)))
 		if err != nil {
 			return nil, err
 		}
-		b.Write(frameHeader)
-		b.Write(formedFrame)
+		frames.Write(frameHeader)
+		frames.Write(frameBody)
 	}
 
-	bytesBufPool.Put(b)
-	return b.Bytes(), nil
+	bytesBufPool.Put(frames)
+	return frames.Bytes(), nil
+}
+
+func (t Tag) FormSequences() ([]byte, error) {
+	frames := bytesBufPool.Get().(*bytes.Buffer)
+	frames.Reset()
+
+	for id, s := range t.sequences {
+		for _, f := range s.Frames() {
+			frameBody := f.Form()
+			frameHeader, err := formFrameHeader(id, uint32(len(frameBody)))
+			if err != nil {
+				return nil, err
+			}
+			frames.Write(frameHeader)
+			frames.Write(frameBody)
+		}
+	}
+
+	bytesBufPool.Put(frames)
+	return frames.Bytes(), nil
 }
 
 func formFrameHeader(id string, frameSize uint32) ([]byte, error) {
