@@ -48,18 +48,19 @@ func (t *Tag) AddTextFrame(id string, text string) {
 	t.frames[id] = f
 }
 
-func (t *Tag) AddUnsynchronisedLyricsFrame(uslt frame.UnsynchronisedLyricsFramer) {
-	// var f frame.UnsynchronisedLyricsFramer
+func (t *Tag) AddUnsynchronisedLyricsFrame(uslf frame.UnsynchronisedLyricsFramer) {
+	var f frame.USLFSequencer
 	id := t.commonIDs["Unsynchronised Lyrics/Text"]
 
-	// existingFrame := t.frames[id]
-	// if existingFrame == nil {
-	// 	f = new(frame.UnsynchronisedLyricsFrame)
-	// } else {
-	// 	f = existingFrame.(frame.UnsynchronisedLyricsFramer)
-	// }
+	existingSequence := t.sequences[id]
+	if existingSequence == nil {
+		f = frame.NewUSLFSequence()
+	} else {
+		f = existingSequence.(frame.USLFSequencer)
+	}
 
-	t.frames[id] = uslt
+	f.AddUSLF(uslf)
+	t.sequences[id] = f
 }
 
 func (t *Tag) SetTitle(title string) {
