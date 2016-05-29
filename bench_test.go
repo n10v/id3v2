@@ -18,7 +18,7 @@ func BenchmarkSet(b *testing.B) {
 		pic.SetMimeType("image/jpeg")
 		pic.SetDescription("Cover")
 		pic.SetPictureType(PTFrontCover)
-		if err = pic.SetPictureFromFile(artworkName); err != nil {
+		if err = pic.SetPictureFromFile("front_cover.jpg"); err != nil {
 			b.Error("Error while setting a picture from file")
 		}
 

@@ -9,11 +9,12 @@ import (
 )
 
 const (
-	mp3Name     = "test.mp3"
-	artworkName = "artwork.jpg"
-	framesSize  = 52041
-	tagSize     = TagHeaderSize + framesSize
-	musicSize   = 273310
+	mp3Name        = "test.mp3"
+	frontCoverName = "front_cover.jpg"
+	backCoverName  = "back_cover.png"
+	framesSize     = 62801
+	tagSize        = TagHeaderSize + framesSize
+	musicSize      = 273310
 )
 
 func TestSetTags(t *testing.T) {
@@ -29,10 +30,19 @@ func TestSetTags(t *testing.T) {
 
 	pic := NewAttachedPicture()
 	pic.SetMimeType("image/jpeg")
-	pic.SetDescription("Cover")
+	pic.SetDescription("Front cover")
 	pic.SetPictureType(PTFrontCover)
-	if err = pic.SetPictureFromFile(artworkName); err != nil {
-		t.Error("Error while setting a picture from file")
+	if err = pic.SetPictureFromFile(frontCoverName); err != nil {
+		t.Error("Error while setting a front cover from file")
+	}
+	tag.SetAttachedPicture(pic)
+
+	pic = NewAttachedPicture()
+	pic.SetMimeType("image/png")
+	pic.SetDescription("Back cover")
+	pic.SetPictureType(PTBackCover)
+	if err = pic.SetPictureFromFile(backCoverName); err != nil {
+		t.Error("Error while setting a back cover from file")
 	}
 	tag.SetAttachedPicture(pic)
 
