@@ -133,7 +133,7 @@ func main() {
 
 ___
 
-### Setting unsynchronised lyrics/text:
+### Setting an unsynchronised lyrics/text:
 ```go
   ...
   uslt := id3v2.NewUnsynchronisedLyricsFrame()
@@ -148,7 +148,7 @@ ___
 
 ___
 
-### Setting comment:
+### Setting a comment:
 ```go
   ...
   comment := id3v2.NewCommentFrame()
