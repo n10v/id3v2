@@ -25,9 +25,14 @@ What it **can't** do:
 
 All benchmarks run on **MacBook Air 13" (early 2013, 1,4GHz Intel Core i5, 4GB 1600MHz DDR3)**
 
-#### Set title, artist, album, year, genre, unsynchronised lyrics and 50KB picture to 4,6MB MP3:
+#### Set title, artist, year and 50KB picture to 4,6 MP3:
 ```
-BenchmarkSet-4	     100	  15646308 ns/op	   13777 B/op	      43 allocs/op
+BenchmarkSetCommonCase-4	     100	  15881298 ns/op	   13526 B/op	      34 allocs/op
+```
+
+#### Set title, artist, album, year, genre, unsynchronised lyrics, comment and 50KB picture to 4,6MB MP3:
+```
+BenchmarkSetManyTags-4  	     100	  15251942 ns/op	   15081 B/op	      50 allocs/op
 ```
 
 ## Installation
