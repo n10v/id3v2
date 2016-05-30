@@ -9,8 +9,8 @@ I think, **ID3** is a very overwhelmed standard: it does **more than it really s
 This library can only set and write tags, but can't read them. So if you only want to set tags, it fits you. And if there is a tag of version 3 or 4, this library will just delete it. If version of the tag is small than 3, this library will return an error.
 
 What it **can** do:
-* Set artist, album, year, genre, unsynchronised lyrics/text and **attached pictures** (e.g. album covers) and write all to file
-* Set several attached pictures
+* Set artist, album, year, genre, unsynchronised lyrics/text (USLT), comments and **attached pictures** (e.g. album covers) and write all to file
+* Set several USLT, comments and attached pictures
 
 What it **can't** do:
 * Parse tags
@@ -134,13 +134,28 @@ func main() {
 ___
 
 ### Setting unsynchronised lyrics/text:
-``` go
+```go
   ...
   uslt := id3v2.NewUnsynchronisedLyricsFrame()
   uslt.SetLanguage("eng")
   uslt.SetContentDescriptor("Content descriptor")
   uslt.SetLyrics("Lyrics")
   tag.AddUnsynchronisedLyricsFrame(uslt)
+  ...
+```
+
+**You should choose a language code from [ISO 639-2 code list](https://www.loc.gov/standards/iso639-2/php/code_list.php)**
+
+___
+
+### Setting comment:
+```go
+  ...
+  comment := id3v2.NewCommentFrame()
+  comment.SetLanguage("eng")
+  comment.SetDescription("Short description")
+  comment.SetText("The actual text")
+  tag.AddCommentFrame(comment)
   ...
 ```
 
