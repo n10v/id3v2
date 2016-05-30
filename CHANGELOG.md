@@ -1,5 +1,9 @@
 # ID3v2 Changelog
 
+## 0.4
+* Add USLT and COMM frames (by request from https://github.com/bogem/id3v2/issues/3)
+* Some memory improvements
+
 ## 0.3
 * Noticeably decrease allocating memory space
 * Some changes in setting pictures to picture frames
