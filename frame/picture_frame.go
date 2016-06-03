@@ -2,6 +2,7 @@ package frame
 
 import (
 	"bytes"
+	"errors"
 	"github.com/bogem/id3v2/util"
 	"io"
 	"os"
@@ -30,12 +31,17 @@ type PictureFrame struct {
 	pictureType byte
 }
 
-func (pf PictureFrame) Form() []byte {
+func (pf PictureFrame) Bytes() ([]byte, error) {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
+	defer bytesBufPool.Put(b)
+
 	b.WriteByte(util.NativeEncoding)
 	b.WriteString(pf.mimeType)
 	b.WriteByte(0)
+	if pf.pictureType < 0 || pf.pictureType > 20 {
+		return nil, errors.New("Incorrect picture type in picture frame with description " + pf.description)
+	}
 	b.WriteByte(pf.pictureType)
 	b.WriteString(pf.description)
 	b.WriteByte(0)
@@ -45,8 +51,7 @@ func (pf PictureFrame) Form() []byte {
 		v.Close()
 	}
 
-	bytesBufPool.Put(b)
-	return b.Bytes()
+	return b.Bytes(), nil
 }
 
 func (pf PictureFrame) Description() string {

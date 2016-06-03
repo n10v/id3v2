@@ -16,15 +16,15 @@ type TextFrame struct {
 	textBuffer bytes.Buffer
 }
 
-func (tf TextFrame) Form() []byte {
+func (tf TextFrame) Bytes() ([]byte, error) {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
+	defer bytesBufPool.Put(b)
 
 	b.WriteByte(util.NativeEncoding)
 	b.WriteString(tf.Text())
 
-	bytesBufPool.Put(b)
-	return b.Bytes()
+	return b.Bytes(), nil
 }
 
 func (tf *TextFrame) SetText(text string) {

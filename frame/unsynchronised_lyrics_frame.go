@@ -2,6 +2,7 @@ package frame
 
 import (
 	"bytes"
+	"errors"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -24,18 +25,21 @@ type UnsynchronisedLyricsFrame struct {
 	lyrics            bytes.Buffer
 }
 
-func (uslf UnsynchronisedLyricsFrame) Form() []byte {
+func (uslf UnsynchronisedLyricsFrame) Bytes() ([]byte, error) {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
 
 	b.WriteByte(util.NativeEncoding)
 	b.WriteString(uslf.language)
+	if uslf.language == "" {
+		return nil, errors.New("Language isn't set up in USLT frame with description " + uslf.ContentDescriptor())
+	}
 	b.WriteString(uslf.ContentDescriptor())
 	b.WriteByte(0)
 	b.WriteString(uslf.Lyrics())
 
 	bytesBufPool.Put(b)
-	return b.Bytes()
+	return b.Bytes(), nil
 }
 
 func (uslf UnsynchronisedLyricsFrame) Language() string {

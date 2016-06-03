@@ -241,7 +241,10 @@ func (t Tag) FormFrames() ([]byte, error) {
 	frames.Reset()
 
 	for id, f := range t.frames {
-		frameBody := f.Form()
+		frameBody, err := f.Bytes()
+		if err != nil {
+			return nil, err
+		}
 		frameHeader, err := formFrameHeader(id, uint32(len(frameBody)))
 		if err != nil {
 			return nil, err
@@ -260,7 +263,10 @@ func (t Tag) FormSequences() ([]byte, error) {
 
 	for id, s := range t.sequences {
 		for _, f := range s.Frames() {
-			frameBody := f.Form()
+			frameBody, err := f.Bytes()
+			if err != nil {
+				return nil, err
+			}
 			frameHeader, err := formFrameHeader(id, uint32(len(frameBody)))
 			if err != nil {
 				return nil, err

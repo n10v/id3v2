@@ -10,5 +10,5 @@ var bytesBufPool = sync.Pool{
 }
 
 type Framer interface {
-	Form() []byte
+	Bytes() ([]byte, error)
 }

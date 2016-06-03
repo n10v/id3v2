@@ -2,6 +2,7 @@ package frame
 
 import (
 	"bytes"
+	"errors"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -24,18 +25,21 @@ type CommentFrame struct {
 	text        bytes.Buffer
 }
 
-func (cf CommentFrame) Form() []byte {
+func (cf CommentFrame) Bytes() ([]byte, error) {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
+	defer bytesBufPool.Put(b)
 
 	b.WriteByte(util.NativeEncoding)
+	if cf.language == "" {
+		return nil, errors.New("Language isn't set up in comment frame with description " + cf.Description())
+	}
 	b.WriteString(cf.language)
 	b.WriteString(cf.Description())
 	b.WriteByte(0)
 	b.WriteString(cf.Text())
 
-	bytesBufPool.Put(b)
-	return b.Bytes()
+	return b.Bytes(), nil
 }
 
 func (cf CommentFrame) Language() string {
