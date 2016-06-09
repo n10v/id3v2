@@ -165,6 +165,7 @@ ___
 
 ## TODO
 
+- [ ] Documentation
 - [ ] Parse tags
 - [ ] Work with other encodings
 - [ ] Work with extended header, flags, padding ***(Does somebody really use it?)***
