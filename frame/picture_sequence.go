@@ -20,19 +20,25 @@ func NewPictureSequence() *PictureSequence {
 	}
 }
 
-func (as PictureSequence) Frames() []Framer {
-	frames := []Framer{}
-	for _, f := range as.sequence {
-		frames = append(frames, f)
+func (ps PictureSequence) Frames() []Framer {
+	var (
+		i      = 0
+		frames = make([]Framer, len(ps.sequence))
+	)
+
+	for _, v := range ps.sequence {
+		frames[i] = v
+		i++
 	}
 	return frames
 }
 
-func (as PictureSequence) Picture(pt byte) PictureFramer {
-	return as.sequence[int(pt)]
+func (ps PictureSequence) Picture(pt byte) PictureFramer {
+	return ps.sequence[int(pt)]
 }
 
-func (as *PictureSequence) AddPicture(pic PictureFramer) {
-	pt := pic.PictureType()
-	as.sequence[int(pt)] = pic
+func (ps *PictureSequence) AddFrame(f Framer) {
+	pf := f.(PictureFramer)
+	pt := pf.PictureType()
+	ps.sequence[int(pt)] = pf
 }

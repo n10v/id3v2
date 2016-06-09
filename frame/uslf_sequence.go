@@ -4,7 +4,6 @@ type USLFSequencer interface {
 	Sequencer
 
 	USLF(language string, contentDescriptor string) UnsynchronisedLyricsFramer
-	AddUSLF(UnsynchronisedLyricsFramer)
 }
 
 type USLFSequence struct {
@@ -18,9 +17,14 @@ func NewUSLFSequence() *USLFSequence {
 }
 
 func (us USLFSequence) Frames() []Framer {
-	frames := []Framer{}
-	for _, f := range us.sequence {
-		frames = append(frames, f)
+	var (
+		i      = 0
+		frames = make([]Framer, len(us.sequence))
+	)
+
+	for _, v := range us.sequence {
+		frames[i] = v
+		i++
 	}
 	return frames
 }
@@ -29,7 +33,8 @@ func (us USLFSequence) USLF(language string, contentDescriptor string) Unsynchro
 	return us.sequence[language+contentDescriptor]
 }
 
-func (us *USLFSequence) AddUSLF(uslf UnsynchronisedLyricsFramer) {
+func (us *USLFSequence) AddFrame(f Framer) {
+	uslf := f.(UnsynchronisedLyricsFramer)
 	id := uslf.Language() + uslf.ContentDescriptor()
 	us.sequence[id] = uslf
 }

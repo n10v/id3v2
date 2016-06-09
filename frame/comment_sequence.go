@@ -18,9 +18,14 @@ func NewCommentSequence() *CommentSequence {
 }
 
 func (cs CommentSequence) Frames() []Framer {
-	frames := []Framer{}
-	for _, f := range cs.sequence {
-		frames = append(frames, f)
+	var (
+		i      = 0
+		frames = make([]Framer, len(cs.sequence))
+	)
+
+	for _, v := range cs.sequence {
+		frames[i] = v
+		i++
 	}
 	return frames
 }
@@ -29,7 +34,8 @@ func (cs CommentSequence) Comment(language string, description string) CommentFr
 	return cs.sequence[language+description]
 }
 
-func (cs *CommentSequence) AddComment(cf CommentFramer) {
+func (cs *CommentSequence) AddFrame(f Framer) {
+	cf := f.(CommentFramer)
 	id := cf.Language() + cf.Description()
 	cs.sequence[id] = cf
 }
