@@ -216,6 +216,9 @@ func (t Tag) FormFrames() ([]byte, error) {
 	frames.Reset()
 
 	for id, f := range t.frames {
+		if id == "" {
+			return nil, errors.New("Uncorrect ID in frames")
+		}
 		frameBody, err := f.Bytes()
 		if err != nil {
 			return nil, err
@@ -237,6 +240,9 @@ func (t Tag) FormSequences() ([]byte, error) {
 	frames.Reset()
 
 	for id, s := range t.sequences {
+		if id == "" {
+			return nil, errors.New("Uncorrect ID in sequences")
+		}
 		for _, f := range s.Frames() {
 			frameBody, err := f.Bytes()
 			if err != nil {
