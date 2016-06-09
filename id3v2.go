@@ -45,6 +45,12 @@ func Open(name string) (*Tag, error) {
 	return ParseTag(file)
 }
 
+func NewTextFrame(text string) *frame.TextFrame {
+	tf := new(frame.TextFrame)
+	tf.SetText(text)
+	return tf
+}
+
 func NewAttachedPicture() *frame.PictureFrame {
 	return new(frame.PictureFrame)
 }

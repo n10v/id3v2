@@ -19,83 +19,58 @@ type Tag struct {
 	OriginalSize uint32
 }
 
-func (t *Tag) AddAttachedPicture(pf frame.PictureFramer) {
-	var f frame.PictureSequencer
-	id := t.commonIDs["Attached Picture"]
-
-	existingSequence := t.sequences[id]
-	if existingSequence == nil {
-		f = frame.NewPictureSequence()
-	} else {
-		f = existingSequence.(frame.PictureSequencer)
-	}
-
-	f.AddPicture(pf)
-	t.sequences[id] = f
-}
-
-func (t *Tag) AddTextFrame(id string, text string) {
-	var f frame.TextFramer
-
-	existingFrame := t.frames[id]
-	if existingFrame == nil {
-		f = new(frame.TextFrame)
-	} else {
-		f = existingFrame.(frame.TextFramer)
-	}
-
-	f.SetText(text)
+func (t *Tag) AddFrame(id string, f frame.Framer) {
 	t.frames[id] = f
 }
 
-func (t *Tag) AddUnsynchronisedLyricsFrame(uslf frame.UnsynchronisedLyricsFramer) {
-	var f frame.USLFSequencer
-	id := t.commonIDs["Unsynchronised Lyrics/Text"]
-
-	existingSequence := t.sequences[id]
-	if existingSequence == nil {
-		f = frame.NewUSLFSequence()
-	} else {
-		f = existingSequence.(frame.USLFSequencer)
+func (t *Tag) AddAttachedPicture(pf frame.PictureFramer) {
+	id := t.commonIDs["Attached picture"]
+	if t.sequences[id] == nil {
+		t.sequences[id] = frame.NewPictureSequence()
 	}
+	t.addFrameToSequence(pf, id)
+}
 
-	f.AddUSLF(uslf)
-	t.sequences[id] = f
+func (t *Tag) AddUnsynchronisedLyricsFrame(uslf frame.UnsynchronisedLyricsFramer) {
+	id := t.commonIDs["USLT"]
+	if t.sequences[id] == nil {
+		t.sequences[id] = frame.NewUSLFSequence()
+	}
+	t.addFrameToSequence(uslf, id)
 }
 
 func (t *Tag) AddCommentFrame(cf frame.CommentFramer) {
-	var f frame.CommentSequencer
 	id := t.commonIDs["Comment"]
-
-	existingSequence := t.sequences[id]
-	if existingSequence == nil {
-		f = frame.NewCommentSequence()
-	} else {
-		f = existingSequence.(frame.CommentSequencer)
+	if t.sequences[id] == nil {
+		t.sequences[id] = frame.NewCommentSequence()
 	}
+	t.addFrameToSequence(cf, id)
+}
 
-	f.AddComment(cf)
-	t.sequences[id] = f
+func (t *Tag) addFrameToSequence(f frame.Framer, id string) {
+	s := t.sequences[id]
+	s.AddFrame(f)
+	t.sequences[id] = s
 }
 
 func (t *Tag) SetTitle(title string) {
-	t.AddTextFrame(t.commonIDs["Title"], title)
+	t.AddFrame(t.commonIDs["Title"], NewTextFrame(title))
 }
 
 func (t *Tag) SetArtist(artist string) {
-	t.AddTextFrame(t.commonIDs["Artist"], artist)
+	t.AddFrame(t.commonIDs["Artist"], NewTextFrame(artist))
 }
 
 func (t *Tag) SetAlbum(album string) {
-	t.AddTextFrame(t.commonIDs["Album"], album)
+	t.AddFrame(t.commonIDs["Album"], NewTextFrame(album))
 }
 
 func (t *Tag) SetYear(year string) {
-	t.AddTextFrame(t.commonIDs["Year"], year)
+	t.AddFrame(t.commonIDs["Year"], NewTextFrame(year))
 }
 
 func (t *Tag) SetGenre(genre string) {
-	t.AddTextFrame(t.commonIDs["Genre"], genre)
+	t.AddFrame(t.commonIDs["Genre"], NewTextFrame(genre))
 }
 
 func NewTag(file *os.File) *Tag {
