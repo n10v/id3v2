@@ -11,7 +11,7 @@ type CommentSequence struct {
 	sequence map[string]CommentFramer
 }
 
-func NewCommentSequence() *CommentSequence {
+func NewCommentSequence() Sequencer {
 	return &CommentSequence{
 		sequence: make(map[string]CommentFramer),
 	}

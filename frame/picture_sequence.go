@@ -14,7 +14,7 @@ type PictureSequence struct {
 	sequence map[int]PictureFramer
 }
 
-func NewPictureSequence() *PictureSequence {
+func NewPictureSequence() Sequencer {
 	return &PictureSequence{
 		sequence: make(map[int]PictureFramer),
 	}

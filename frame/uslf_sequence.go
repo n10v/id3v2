@@ -10,7 +10,7 @@ type USLFSequence struct {
 	sequence map[string]UnsynchronisedLyricsFramer
 }
 
-func NewUSLFSequence() *USLFSequence {
+func NewUSLFSequence() Sequencer {
 	return &USLFSequence{
 		sequence: make(map[string]UnsynchronisedLyricsFramer),
 	}
