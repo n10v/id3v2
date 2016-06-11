@@ -137,7 +137,6 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 
 // Check integrity at the end of mp3's music part
 func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
-	expected := []byte{3, 162, 192, 0, 3, 224, 203}
 	mp3, err := os.Open(mp3Name)
 	if err != nil {
 		t.Error("Error while opening mp3 file: ", err)
@@ -145,6 +144,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 	defer mp3.Close()
 
 	rd := bufio.NewReader(mp3)
+	expected := []byte{3, 162, 192, 0, 3, 224, 203}
 	toDiscard := tagSize + musicSize - len(expected)
 	n, err := rd.Discard(toDiscard)
 	if n != toDiscard {
