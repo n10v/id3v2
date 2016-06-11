@@ -12,7 +12,7 @@ const (
 	mp3Name        = "test.mp3"
 	frontCoverName = "front_cover.jpg"
 	backCoverName  = "back_cover.png"
-	framesSize     = 62892
+	framesSize     = 62988
 	tagSize        = TagHeaderSize + framesSize
 	musicSize      = 273310
 )
@@ -48,10 +48,16 @@ func TestSetTags(t *testing.T) {
 	}
 	tag.AddAttachedPicture(pic)
 
-	// Setting USLT
+	// Setting USLTs
 	uslt := NewUnsynchronisedLyricsFrame()
 	uslt.SetLanguage("eng")
 	uslt.SetContentDescriptor("Content descriptor")
+	uslt.SetLyrics("bogem/id3v2")
+	tag.AddUnsynchronisedLyricsFrame(uslt)
+
+	uslt = NewUnsynchronisedLyricsFrame()
+	uslt.SetLanguage("ger")
+	uslt.SetContentDescriptor("Inhaltsdeskriptor")
 	uslt.SetLyrics("bogem/id3v2")
 	tag.AddUnsynchronisedLyricsFrame(uslt)
 
@@ -60,6 +66,12 @@ func TestSetTags(t *testing.T) {
 	cf.SetLanguage("eng")
 	cf.SetDescription("Short description")
 	cf.SetText("The actual text")
+	tag.AddCommentFrame(cf)
+
+	cf = NewCommentFrame()
+	cf.SetLanguage("ger")
+	cf.SetDescription("Kurze Beschreibung")
+	cf.SetText("Der eigentliche Text")
 	tag.AddCommentFrame(cf)
 
 	if err = tag.Flush(); err != nil {
@@ -93,7 +105,6 @@ func TestCorrectnessOfSettingTag(t *testing.T) {
 
 // Check integrity at the beginning of mp3's music part
 func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
-	expected := []byte{0, 0, 0, 20, 102, 116, 121}
 	mp3, err := os.Open(mp3Name)
 	if err != nil {
 		t.Error("Error while opening mp3 file: ", err)
@@ -109,6 +120,7 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 		t.Error("Error while reading mp3 file: ", err)
 	}
 
+	expected := []byte{0, 0, 0, 20, 102, 116, 121}
 	got := make([]byte, len(expected))
 	n, err = rd.Read(got)
 	if n != len(expected) {
