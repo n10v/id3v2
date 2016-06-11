@@ -20,37 +20,41 @@ type Tag struct {
 }
 
 func (t *Tag) AddFrame(id string, f frame.Framer) {
+	if t.frames == nil {
+		t.frames = make(map[string]frame.Framer)
+	}
 	t.frames[id] = f
 }
 
 func (t *Tag) AddAttachedPicture(pf frame.PictureFramer) {
 	id := t.commonIDs["Attached picture"]
-	if t.sequences[id] == nil {
-		t.sequences[id] = frame.NewPictureSequence()
-	}
+	t.checkExistenceOfSequence(id, frame.NewPictureSequence)
 	t.addFrameToSequence(pf, id)
 }
 
 func (t *Tag) AddUnsynchronisedLyricsFrame(uslf frame.UnsynchronisedLyricsFramer) {
 	id := t.commonIDs["USLT"]
-	if t.sequences[id] == nil {
-		t.sequences[id] = frame.NewUSLFSequence()
-	}
+	t.checkExistenceOfSequence(id, frame.NewUSLFSequence)
 	t.addFrameToSequence(uslf, id)
 }
 
 func (t *Tag) AddCommentFrame(cf frame.CommentFramer) {
 	id := t.commonIDs["Comment"]
-	if t.sequences[id] == nil {
-		t.sequences[id] = frame.NewCommentSequence()
-	}
+	t.checkExistenceOfSequence(id, frame.NewCommentSequence)
 	t.addFrameToSequence(cf, id)
 }
 
+func (t *Tag) checkExistenceOfSequence(id string, newSequence func() frame.Sequencer) {
+	if t.sequences == nil {
+		t.sequences = make(map[string]frame.Sequencer)
+	}
+	if t.sequences[id] == nil {
+		t.sequences[id] = newSequence()
+	}
+}
+
 func (t *Tag) addFrameToSequence(f frame.Framer, id string) {
-	s := t.sequences[id]
-	s.AddFrame(f)
-	t.sequences[id] = s
+	t.sequences[id].AddFrame(f)
 }
 
 func (t *Tag) SetTitle(title string) {
@@ -73,14 +77,12 @@ func (t *Tag) SetGenre(genre string) {
 	t.AddFrame(t.commonIDs["Genre"], NewTextFrame(genre))
 }
 
-func NewTag(file *os.File) *Tag {
+func NewTag(file *os.File, size uint32) *Tag {
 	return &Tag{
-		frames:    make(map[string]frame.Framer),
-		sequences: make(map[string]frame.Sequencer),
 		commonIDs: frame.V24CommonIDs,
 
 		File:         file,
-		OriginalSize: 0,
+		OriginalSize: size,
 	}
 }
 
@@ -91,26 +93,17 @@ func ParseTag(file *os.File) (*Tag, error) {
 		return nil, err
 	}
 	if header == nil {
-		return NewTag(file), nil
+		return NewTag(file, 0), nil
 	}
 	if header.Version < 3 {
 		err = errors.New("Unsupported version of ID3 tag")
 		return nil, err
 	}
 
-	tag := &Tag{
-		frames:    make(map[string]frame.Framer),
-		sequences: make(map[string]frame.Sequencer),
-		commonIDs: frame.V24CommonIDs,
-
-		File:         file,
-		OriginalSize: TagHeaderSize + header.FramesSize,
-	}
-
-	return tag, nil
+	return NewTag(file, TagHeaderSize+header.FramesSize), nil
 }
 
-func (t *Tag) Flush() error {
+func (t Tag) Flush() error {
 	// Creating a temp file for mp3 file, which will contain new tag
 	newFile, err := ioutil.TempFile("", "")
 	if err != nil {
