@@ -151,7 +151,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 		t.Errorf("Expected length of discarded bytes %v, got %v", toDiscard, n)
 	}
 	if err != nil {
-		t.Error("Error while reading mp3 file: ", err)
+		t.Error("Error while discarding: ", err)
 	}
 
 	got := make([]byte, len(expected))
