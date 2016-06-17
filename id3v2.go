@@ -3,6 +3,7 @@ package id3v2
 import (
 	"bytes"
 	"github.com/bogem/id3v2/frame"
+	"github.com/bogem/id3v2/util"
 	"os"
 	"sync"
 )
@@ -32,6 +33,26 @@ const (
 	PTPublisherStudioLogotype = 20
 )
 
+var (
+	// Encodings
+	ENISO = util.Encoding{
+		Key:              0,
+		TerminationBytes: []byte{0},
+	}
+	ENUTF16 = util.Encoding{
+		Key:              1,
+		TerminationBytes: []byte{0, 0},
+	}
+	ENUTF16BE = util.Encoding{
+		Key:              2,
+		TerminationBytes: []byte{0, 0},
+	}
+	ENUTF8 = util.Encoding{
+		Key:              3,
+		TerminationBytes: []byte{0},
+	}
+)
+
 var bytesBufPool = sync.Pool{
 	New: func() interface{} { return new(bytes.Buffer) },
 }
@@ -45,20 +66,27 @@ func Open(name string) (*Tag, error) {
 	return ParseTag(file)
 }
 
+func NewAttachedPicture() *frame.PictureFrame {
+	pf := new(frame.PictureFrame)
+	pf.SetEncoding(ENUTF8)
+	return pf
+}
+
+func NewCommentFrame() *frame.CommentFrame {
+	cf := new(frame.CommentFrame)
+	cf.SetEncoding(ENUTF8)
+	return cf
+}
+
 func NewTextFrame(text string) *frame.TextFrame {
 	tf := new(frame.TextFrame)
+	tf.SetEncoding(ENUTF8)
 	tf.SetText(text)
 	return tf
 }
 
-func NewAttachedPicture() *frame.PictureFrame {
-	return new(frame.PictureFrame)
-}
-
 func NewUnsynchronisedLyricsFrame() *frame.UnsynchronisedLyricsFrame {
-	return new(frame.UnsynchronisedLyricsFrame)
-}
-
-func NewCommentFrame() *frame.CommentFrame {
-	return new(frame.CommentFrame)
+	uslf := new(frame.UnsynchronisedLyricsFrame)
+	uslf.SetEncoding(ENUTF8)
+	return uslf
 }

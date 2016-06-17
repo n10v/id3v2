@@ -11,6 +11,9 @@ import (
 type PictureFramer interface {
 	Framer
 
+	Encoding() util.Encoding
+	SetEncoding(util.Encoding)
+
 	Description() string
 	SetDescription(string)
 
@@ -25,6 +28,7 @@ type PictureFramer interface {
 }
 
 type PictureFrame struct {
+	encoding    util.Encoding
 	description string
 	mimeType    string
 	picture     io.Reader
@@ -36,7 +40,7 @@ func (pf PictureFrame) Bytes() ([]byte, error) {
 	b.Reset()
 	defer bytesBufPool.Put(b)
 
-	b.WriteByte(util.NativeEncoding)
+	b.WriteByte(pf.encoding.Key)
 	b.WriteString(pf.mimeType)
 	b.WriteByte(0)
 	if pf.pictureType < 0 || pf.pictureType > 20 {
@@ -44,7 +48,7 @@ func (pf PictureFrame) Bytes() ([]byte, error) {
 	}
 	b.WriteByte(pf.pictureType)
 	b.WriteString(pf.description)
-	b.WriteByte(0)
+	b.Write(pf.encoding.TerminationBytes)
 
 	b.ReadFrom(pf.picture)
 	if v, ok := pf.picture.(*os.File); ok {
@@ -52,6 +56,14 @@ func (pf PictureFrame) Bytes() ([]byte, error) {
 	}
 
 	return b.Bytes(), nil
+}
+
+func (pf PictureFrame) Encoding() util.Encoding {
+	return pf.encoding
+}
+
+func (pf *PictureFrame) SetEncoding(e util.Encoding) {
+	pf.encoding = e
 }
 
 func (pf PictureFrame) Description() string {

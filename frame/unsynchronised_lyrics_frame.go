@@ -9,6 +9,9 @@ import (
 type UnsynchronisedLyricsFramer interface {
 	Framer
 
+	Encoding() util.Encoding
+	SetEncoding(util.Encoding)
+
 	Language() string
 	SetLanguage(string)
 
@@ -20,6 +23,7 @@ type UnsynchronisedLyricsFramer interface {
 }
 
 type UnsynchronisedLyricsFrame struct {
+	encoding          util.Encoding
 	language          string
 	contentDescriptor bytes.Buffer
 	lyrics            bytes.Buffer
@@ -29,17 +33,25 @@ func (uslf UnsynchronisedLyricsFrame) Bytes() ([]byte, error) {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
 
-	b.WriteByte(util.NativeEncoding)
-	b.WriteString(uslf.language)
+	b.WriteByte(uslf.encoding.Key)
 	if uslf.language == "" {
 		return nil, errors.New("Language isn't set up in USLT frame with description " + uslf.ContentDescriptor())
 	}
+	b.WriteString(uslf.language)
 	b.WriteString(uslf.ContentDescriptor())
-	b.WriteByte(0)
+	b.Write(uslf.encoding.TerminationBytes)
 	b.WriteString(uslf.Lyrics())
 
 	bytesBufPool.Put(b)
 	return b.Bytes(), nil
+}
+
+func (uslf UnsynchronisedLyricsFrame) Encoding() util.Encoding {
+	return uslf.encoding
+}
+
+func (uslf *UnsynchronisedLyricsFrame) SetEncoding(e util.Encoding) {
+	uslf.encoding = e
 }
 
 func (uslf UnsynchronisedLyricsFrame) Language() string {

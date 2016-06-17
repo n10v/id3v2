@@ -7,8 +7,6 @@ import (
 const (
 	BytesPerInt = 4
 	SizeBase    = 7
-
-	NativeEncoding = 3 // UTF-8
 )
 
 var (

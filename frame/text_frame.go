@@ -8,11 +8,15 @@ import (
 type TextFramer interface {
 	Framer
 
+	Encoding() util.Encoding
+	SetEncoding(util.Encoding)
+
 	Text() string
 	SetText(string)
 }
 
 type TextFrame struct {
+	encoding   util.Encoding
 	textBuffer bytes.Buffer
 }
 
@@ -21,17 +25,25 @@ func (tf TextFrame) Bytes() ([]byte, error) {
 	b.Reset()
 	defer bytesBufPool.Put(b)
 
-	b.WriteByte(util.NativeEncoding)
+	b.WriteByte(tf.encoding.Key)
 	b.WriteString(tf.Text())
 
 	return b.Bytes(), nil
 }
 
-func (tf *TextFrame) SetText(text string) {
-	tf.textBuffer.Reset()
-	tf.textBuffer.WriteString(text)
+func (tf TextFrame) Encoding() util.Encoding {
+	return tf.encoding
+}
+
+func (tf *TextFrame) SetEncoding(e util.Encoding) {
+	tf.encoding = e
 }
 
 func (tf TextFrame) Text() string {
 	return tf.textBuffer.String()
+}
+
+func (tf *TextFrame) SetText(text string) {
+	tf.textBuffer.Reset()
+	tf.textBuffer.WriteString(text)
 }
