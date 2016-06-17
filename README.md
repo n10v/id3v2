@@ -6,7 +6,7 @@ I think, **ID3** is a very overwhelmed standard: it does **more than it really s
 ## Information
 **Stable and fast ID3v2 Library written in Go**
 
-This library can only set and write tags, but can't read them. So if you only want to set tags, it fits you. And if there is a tag of version 3 or 4, this library will just delete it. If version of the tag is small than 3, this library will return an error.
+This library can only set and write tags, but can't read them. So if you only want to set tags, it fits you. And if there is a tag of version 3 or 4, this library will just delete this tag, because it can't yet parse tags, because . If version of the tag is small than 3, this library will return an error.
 
 What it **can** do:
 * Set artist, album, year, genre, unsynchronised lyrics/text (USLT), comments and **attached pictures** (e.g. album covers) and write all to file
