@@ -25,7 +25,7 @@ func TestParseHeader(t *testing.T) {
 }
 
 func TestFormTagHeader(t *testing.T) {
-	formed := FormTagHeader()
+	formed := FormTagHeader([]byte{0, 0, 0, 0})
 	if err := testutil.AreByteSlicesEqual(formed, thb); err != nil {
 		t.Error(err)
 	}

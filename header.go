@@ -52,7 +52,7 @@ func isID3Tag(data []byte) bool {
 	return string(data[0:3]) == ID3Identifier
 }
 
-func FormTagHeader() []byte {
+func FormTagHeader(framesSize []byte) []byte {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
 
@@ -68,9 +68,8 @@ func FormTagHeader() []byte {
 	// Flags
 	b.WriteByte(0)
 
-	// Set blank size
-	// Function setSize in tag.go writes actual size of tag
-	b.Write([]byte{0, 0, 0, 0})
+	// Size of frames
+	b.Write(framesSize)
 
 	bytesBufPool.Put(b)
 	return b.Bytes()
