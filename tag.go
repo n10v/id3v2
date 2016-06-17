@@ -111,19 +111,25 @@ func (t Tag) Flush() error {
 	}
 	newFileBuf := bufio.NewWriter(newFile)
 
-	// Writing to new file new tag header
-	if _, err := newFileBuf.Write(FormTagHeader()); err != nil {
-		return err
-	}
-
-	// Writing to new file new frames
-	// And getting size of them
+	// Forming new frames
 	frames, err := t.FormAllFrames()
 	if err != nil {
 		return err
 	}
-	framesSize, err := newFileBuf.Write(frames)
+
+	// Forming size of new frames
+	framesSize, err := util.FormSize(uint32(len(frames)))
 	if err != nil {
+		return err
+	}
+
+	// Writing to new file new tag header
+	if _, err := newFileBuf.Write(FormTagHeader(framesSize)); err != nil {
+		return err
+	}
+
+	// Writing to new file new frames
+	if _, err := newFileBuf.Write(frames); err != nil {
 		return err
 	}
 
@@ -149,11 +155,6 @@ func (t Tag) Flush() error {
 		return err
 	}
 
-	// Setting size of frames to new file
-	if err = setSize(newFile, uint32(framesSize)); err != nil {
-		return err
-	}
-
 	// Replacing original file with new file
 	if err = os.Rename(newFile.Name(), f.Name()); err != nil {
 		return err
@@ -167,38 +168,21 @@ func (t Tag) Flush() error {
 	return nil
 }
 
-func setSize(f *os.File, size uint32) (err error) {
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
-		return err
-	}
-
-	sizeBytes, err := util.FormSize(size)
-	if err != nil {
-		return
-	}
-
-	if _, err = f.WriteAt(sizeBytes, 6); err != nil {
-		return
-	}
-
-	return
-}
-
 func (t Tag) FormAllFrames() ([]byte, error) {
 	frames := bytesBufPool.Get().(*bytes.Buffer)
 	frames.Reset()
 
-	if f, err := t.FormFrames(); err != nil {
+	f, err := t.FormFrames()
+	if err != nil {
 		return nil, err
-	} else {
-		frames.Write(f)
 	}
+	frames.Write(f)
 
-	if s, err := t.FormSequences(); err != nil {
+	s, err := t.FormSequences()
+	if err != nil {
 		return nil, err
-	} else {
-		frames.Write(s)
 	}
+	frames.Write(s)
 
 	bytesBufPool.Put(frames)
 	return frames.Bytes(), nil
@@ -259,11 +243,11 @@ func formFrameHeader(id string, frameSize uint32) ([]byte, error) {
 	b.Reset()
 
 	b.WriteString(id)
-	if size, err := util.FormSize(frameSize); err != nil {
+	size, err := util.FormSize(frameSize)
+	if err != nil {
 		return nil, err
-	} else {
-		b.Write(size)
 	}
+	b.Write(size)
 	b.WriteByte(0)
 	b.WriteByte(0)
 

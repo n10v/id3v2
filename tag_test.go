@@ -61,7 +61,7 @@ func TestSetTags(t *testing.T) {
 	uslt.SetLyrics("bogem/id3v2")
 	tag.AddUnsynchronisedLyricsFrame(uslt)
 
-	// Setting comment
+	// Setting comments
 	cf := NewCommentFrame()
 	cf.SetLanguage("eng")
 	cf.SetDescription("Short description")
