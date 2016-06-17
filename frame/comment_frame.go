@@ -9,6 +9,9 @@ import (
 type CommentFramer interface {
 	Framer
 
+	Encoding() util.Encoding
+	SetEncoding(util.Encoding)
+
 	Language() string
 	SetLanguage(string)
 
@@ -20,6 +23,7 @@ type CommentFramer interface {
 }
 
 type CommentFrame struct {
+	encoding    util.Encoding
 	language    string
 	description bytes.Buffer
 	text        bytes.Buffer
@@ -30,16 +34,24 @@ func (cf CommentFrame) Bytes() ([]byte, error) {
 	b.Reset()
 	defer bytesBufPool.Put(b)
 
-	b.WriteByte(util.NativeEncoding)
+	b.WriteByte(cf.encoding.Key)
 	if cf.language == "" {
 		return nil, errors.New("Language isn't set up in comment frame with description " + cf.Description())
 	}
 	b.WriteString(cf.language)
 	b.WriteString(cf.Description())
-	b.WriteByte(0)
+	b.Write(cf.encoding.TerminationBytes)
 	b.WriteString(cf.Text())
 
 	return b.Bytes(), nil
+}
+
+func (cf CommentFrame) Encoding() util.Encoding {
+	return cf.encoding
+}
+
+func (cf *CommentFrame) SetEncoding(e util.Encoding) {
+	cf.encoding = e
 }
 
 func (cf CommentFrame) Language() string {
