@@ -11,11 +11,11 @@ This library can only set and write tags, but can't read them. So if you only wa
 What it **can** do:
 * Set artist, album, year, genre, unsynchronised lyrics/text (USLT), comments and **attached pictures** (e.g. album covers) and write all to file
 * Set several USLT, comments and attached pictures
+* Work with all allowed encodings
 
 What it **can't** do:
 * Parse tags
 * Work with extended header, flags, padding
-* Work with encodings, except UTF-8
 
 **If you want some functionality, that library can't do, just write an issue. I will implement it as fast as I can**
 
@@ -38,8 +38,7 @@ BenchmarkSetManyTags-4  	     100	  15251942 ns/op	   15081 B/op	      50 allocs
 ## Installation
   	$ go get -u github.com/bogem/id3v2
 
-## Usage
-### Example:
+## Example of Usage:
 ```go
 package main
 
@@ -49,126 +48,40 @@ import (
 )
 
 func main() {
+  // Open file and find tag in it
   tag, err := id3v2.Open("file.mp3")
   if err != nil {
    log.Fatal("Error while opening mp3 file: ", err)
   }
 
+  // Set tags
   tag.SetArtist("Artist")
   tag.SetTitle("Title")
-  tag.SetYear("2016")
-  ...
 
-
-  if err = tag.Flush(); err != nil {
-    log.Fatal("Error while closing a tag: ", err)
-  }
-}
-
-```
-
-### Available functions for setting text frames:
-```go
-tag.SetTitle(title string)
-tag.SetArtist(artist string)
-tag.SetAlbum(album string)
-tag.SetYear(year string)
-tag.SetGenre(genre string)
-```
-
-___
-
-### Setting a picture:
-```go
-package main
-
-import (
-  "github.com/bogem/id3v2"
-  "log"
-)
-
-func main() {
-  tag, err := id3v2.Open("file.mp3")
-  if err != nil {
-    log.Fatal("Error while opening mp3 file: ", err)
-  }
-
-  pic := id3v2.NewAttachedPicture()
-  pic.SetMimeType("image/jpeg")
-  pic.SetDescription("Cover")
-  pic.SetPictureType(id3v2.PTFrontCover)
-  if err = pic.SetPictureFromFile("artwork.jpg"); err != nil {
-    log.Fatal("Error while setting a picture from file: ", err)
-  }
-  tag.AddAttachedPicture(pic)
-
-  if err = tag.Flush(); err != nil {
-    log.Fatal("Error while closing a tag: ", err)
-  }
-}
-```
-
-**Available picture types:**
-* `PTOther`
-* `PTFileIcon`
-* `PTOtherFileIcon`
-* `PTFrontCover`
-* `PTBackCover`
-* `PTLeafletPage`
-* `PTMedia`
-* `PTLeadArtistSoloist`
-* `PTArtistPerformer`
-* `PTConductor`
-* `PTBandOrchestra`
-* `PTComposer`
-* `PTLyricistTextWriter`
-* `PTRecordingLocation`
-* `PTDuringRecording`
-* `PTDuringPerformance`
-* `PTMovieScreenCapture`
-* `PTBrightColouredFish`
-* `PTIllustration`
-* `PTBandArtistLogotype`
-* `PTPublisherStudioLogotype`
-
-___
-
-### Setting an unsynchronised lyrics/text:
-```go
-  ...
-  uslt := id3v2.NewUnsynchronisedLyricsFrame()
-  uslt.SetLanguage("eng")
-  uslt.SetContentDescriptor("Content descriptor")
-  uslt.SetLyrics("Lyrics")
-  tag.AddUnsynchronisedLyricsFrame(uslt)
-  ...
-```
-
-**You should choose a language code from [ISO 639-2 code list](https://www.loc.gov/standards/iso639-2/php/code_list.php)**
-
-___
-
-### Setting a comment:
-```go
-  ...
   comment := id3v2.NewCommentFrame()
   comment.SetLanguage("eng")
   comment.SetDescription("Short description")
   comment.SetText("The actual text")
   tag.AddCommentFrame(comment)
-  ...
+
+  // Write it to file
+  if err = tag.Flush(); err != nil {
+    log.Fatal("Error while flushing a tag: ", err)
+  }
+}
+
 ```
 
-**You should choose a language code from [ISO 639-2 code list](https://www.loc.gov/standards/iso639-2/php/code_list.php)**
+## Documentation
 
-___
+You can find it here: https://godoc.org/github.com/bogem/id3v2
 
 ## TODO
 
-- [ ] Documentation
 - [ ] Parse tags
-- [ ] Work with other encodings
 - [ ] Work with extended header, flags, padding ***(Does somebody really use it?)***
+- [x] Documentation
+- [x] Work with other encodings
 
 ## License
 MIT
