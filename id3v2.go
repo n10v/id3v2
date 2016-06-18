@@ -28,12 +28,16 @@
 //		// Set tags
 // 		tag.SetArtist("Artist")
 // 		tag.SetTitle("Title")
-// 		tag.SetYear("2016")
-// 		...
 //
-//		// Write it in file
+//		comment := id3v2.NewCommentFrame()
+//		comment.SetLanguage("eng")
+//		comment.SetDescription("Short description")
+//		comment.SetText("The actual text")
+//		tag.AddCommentFrame(comment)
+//
+//		// Write it to file
 // 		if err = tag.Flush(); err != nil {
-// 			log.Fatal("Error while closing a tag: ", err)
+// 			log.Fatal("Error while flushing a tag: ", err)
 // 		}
 // 	}
 package id3v2
