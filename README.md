@@ -4,7 +4,7 @@
 I think, **ID3** is a very overwhelmed standard: it does **more than it really should do**. There are a lot of aspects, which developer should take into consideration. And that's why it's pretty complicated to write a **good library**. So if you have some thoughts about writing a **new simply and elegant standard** for providing information for digital music tracks, just write me. I think, it's a good time to write an appropriate standard for it 😉
 
 ## Information
-**Stable and fast ID3v2 Library written in Go**
+**Fast and stable ID3 writing library for Go**
 
 This library can only set and write tags, but can't read them. So if you only want to set tags, it fits you. And if there is a tag of version 3 or 4, this library will just delete this tag, because it can't parse tags yet. If version of the tag is small than 3, this library will return an error.
 
