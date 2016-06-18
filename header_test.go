@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	th = TagHeader{
+	th = tagHeader{
 		FramesSize: 0,
 		Version:    4,
 	}
@@ -15,7 +15,7 @@ var (
 )
 
 func TestParseHeader(t *testing.T) {
-	parsed, err := ParseHeader(bytes.NewReader(thb))
+	parsed, err := parseHeader(bytes.NewReader(thb))
 	if err != nil {
 		t.Error(err)
 	}
@@ -25,7 +25,7 @@ func TestParseHeader(t *testing.T) {
 }
 
 func TestFormTagHeader(t *testing.T) {
-	formed := FormTagHeader([]byte{0, 0, 0, 0})
+	formed := formTagHeader([]byte{0, 0, 0, 0})
 	if err := testutil.AreByteSlicesEqual(formed, thb); err != nil {
 		t.Error(err)
 	}

@@ -11,12 +11,11 @@ import (
 )
 
 type Tag struct {
-	frames    map[string]frame.Framer
-	sequences map[string]frame.Sequencer
-	commonIDs map[string]string
-
-	File         *os.File
-	OriginalSize uint32
+	frames       map[string]frame.Framer
+	sequences    map[string]frame.Sequencer
+	commonIDs    map[string]string
+	file         *os.File
+	originalSize uint32
 }
 
 func (t *Tag) AddFrame(id string, f frame.Framer) {
@@ -77,32 +76,33 @@ func (t *Tag) SetGenre(genre string) {
 	t.AddFrame(t.commonIDs["Genre"], NewTextFrame(genre))
 }
 
-func NewTag(file *os.File, size uint32) *Tag {
+func newTag(file *os.File, size uint32) *Tag {
 	return &Tag{
 		commonIDs: frame.V24CommonIDs,
 
-		File:         file,
-		OriginalSize: size,
+		file:         file,
+		originalSize: size,
 	}
 }
 
-func ParseTag(file *os.File) (*Tag, error) {
-	header, err := ParseHeader(file)
+func parseTag(file *os.File) (*Tag, error) {
+	header, err := parseHeader(file)
 	if err != nil {
 		err = errors.New("Trying to parse tag header: " + err.Error())
 		return nil, err
 	}
 	if header == nil {
-		return NewTag(file, 0), nil
+		return newTag(file, 0), nil
 	}
 	if header.Version < 3 {
 		err = errors.New("Unsupported version of ID3 tag")
 		return nil, err
 	}
 
-	return NewTag(file, TagHeaderSize+header.FramesSize), nil
+	return newTag(file, tagHeaderSize+header.FramesSize), nil
 }
 
+// Flush writes tag to the file.
 func (t Tag) Flush() error {
 	// Creating a temp file for mp3 file, which will contain new tag
 	newFile, err := ioutil.TempFile("", "")
@@ -112,7 +112,7 @@ func (t Tag) Flush() error {
 	newFileBuf := bufio.NewWriter(newFile)
 
 	// Forming new frames
-	frames, err := t.FormAllFrames()
+	frames, err := t.formAllFrames()
 	if err != nil {
 		return err
 	}
@@ -124,7 +124,7 @@ func (t Tag) Flush() error {
 	}
 
 	// Writing to new file new tag header
-	if _, err := newFileBuf.Write(FormTagHeader(framesSize)); err != nil {
+	if _, err := newFileBuf.Write(formTagHeader(framesSize)); err != nil {
 		return err
 	}
 
@@ -135,13 +135,13 @@ func (t Tag) Flush() error {
 
 	// Getting a music part of mp3
 	// (Discarding an original tag of mp3)
-	f := t.File
+	f := t.file
 	defer f.Close()
 	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
 		return err
 	}
 	originalFileBuf := bufio.NewReader(f)
-	if _, err := originalFileBuf.Discard(int(t.OriginalSize)); err != nil {
+	if _, err := originalFileBuf.Discard(int(t.originalSize)); err != nil {
 		return err
 	}
 
@@ -168,17 +168,17 @@ func (t Tag) Flush() error {
 	return nil
 }
 
-func (t Tag) FormAllFrames() ([]byte, error) {
+func (t Tag) formAllFrames() ([]byte, error) {
 	frames := bytesBufPool.Get().(*bytes.Buffer)
 	frames.Reset()
 
-	f, err := t.FormFrames()
+	f, err := t.formFrames()
 	if err != nil {
 		return nil, err
 	}
 	frames.Write(f)
 
-	s, err := t.FormSequences()
+	s, err := t.formSequences()
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (t Tag) FormAllFrames() ([]byte, error) {
 	return frames.Bytes(), nil
 }
 
-func (t Tag) FormFrames() ([]byte, error) {
+func (t Tag) formFrames() ([]byte, error) {
 	frames := bytesBufPool.Get().(*bytes.Buffer)
 	frames.Reset()
 
@@ -212,7 +212,7 @@ func (t Tag) FormFrames() ([]byte, error) {
 	return frames.Bytes(), nil
 }
 
-func (t Tag) FormSequences() ([]byte, error) {
+func (t Tag) formSequences() ([]byte, error) {
 	frames := bytesBufPool.Get().(*bytes.Buffer)
 	frames.Reset()
 

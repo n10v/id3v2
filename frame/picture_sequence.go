@@ -1,15 +1,11 @@
 package frame
 
-type PictureSequencer interface {
-	Sequencer
-
-	Picture(pt byte) PictureFramer
-	AddPicture(PictureFramer)
-}
-
-// PictureSequence stores several pictures and implements interface Framer.
+// PictureSequence stores several picture frames.
 // Key for PictureSequence is a picture type code,
-// so there is only one picture with the same picture type
+// so there is only one picture with the same picture type.
+//
+// It's only needed for internal operations. Users of library id3v2 should not
+// use any sequence in no case.
 type PictureSequence struct {
 	sequence map[int]PictureFramer
 }

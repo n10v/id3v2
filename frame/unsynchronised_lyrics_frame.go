@@ -6,6 +6,7 @@ import (
 	"github.com/bogem/id3v2/util"
 )
 
+// UnsynchronisedLyricsFramer is used to work with USLT frames.
 type UnsynchronisedLyricsFramer interface {
 	Framer
 
@@ -22,6 +23,7 @@ type UnsynchronisedLyricsFramer interface {
 	SetLyrics(string)
 }
 
+// Just implementation of UnsynchronisedLyricsFramer interface.
 type UnsynchronisedLyricsFrame struct {
 	encoding          util.Encoding
 	language          string

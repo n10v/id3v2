@@ -8,19 +8,19 @@ import (
 )
 
 const (
-	ID3Identifier = "ID3"
-	TagHeaderSize = 10
+	id3Identifier = "ID3"
+	tagHeaderSize = 10
 )
 
-type TagHeader struct {
+type tagHeader struct {
 	FramesSize uint32
 	Version    byte
 }
 
-func ParseHeader(rd io.Reader) (*TagHeader, error) {
-	data := make([]byte, TagHeaderSize)
+func parseHeader(rd io.Reader) (*tagHeader, error) {
+	data := make([]byte, tagHeaderSize)
 	n, err := rd.Read(data)
-	if n < TagHeaderSize {
+	if n < tagHeaderSize {
 		err = errors.New("Size of tag header is less than expected")
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func ParseHeader(rd io.Reader) (*TagHeader, error) {
 		return nil, err
 	}
 
-	header := &TagHeader{
+	header := &tagHeader{
 		Version:    data[3],
 		FramesSize: size,
 	}
@@ -46,18 +46,18 @@ func ParseHeader(rd io.Reader) (*TagHeader, error) {
 }
 
 func isID3Tag(data []byte) bool {
-	if len(data) != len(ID3Identifier) {
+	if len(data) != len(id3Identifier) {
 		return false
 	}
-	return string(data[0:3]) == ID3Identifier
+	return string(data[0:3]) == id3Identifier
 }
 
-func FormTagHeader(framesSize []byte) []byte {
+func formTagHeader(framesSize []byte) []byte {
 	b := bytesBufPool.Get().(*bytes.Buffer)
 	b.Reset()
 
 	// Identifier
-	b.WriteString(ID3Identifier)
+	b.WriteString(id3Identifier)
 
 	// Version
 	b.WriteByte(4)

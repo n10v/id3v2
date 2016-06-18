@@ -1,12 +1,12 @@
 package frame
 
-type CommentSequencer interface {
-	Sequencer
-
-	Comment(language string, description string) CommentFramer
-	AddComment(CommentFramer)
-}
-
+// CommentSequence stores several comment frames.
+// Key for CommentSequence is language and description,
+// so there is only one comment frame with the same language and
+// description.
+//
+// It's only needed for internal operations. Users of library id3v2 should not
+// use any sequence in no case.
 type CommentSequence struct {
 	sequence map[string]CommentFramer
 }

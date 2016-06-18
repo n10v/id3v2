@@ -8,6 +8,7 @@ import (
 	"os"
 )
 
+// PictureFramer is used to work with APIC frames.
 type PictureFramer interface {
 	Framer
 
@@ -27,6 +28,7 @@ type PictureFramer interface {
 	SetPictureType(byte)
 }
 
+// Just implementation of PictureFramer interface.
 type PictureFrame struct {
 	encoding    util.Encoding
 	description string

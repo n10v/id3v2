@@ -13,7 +13,7 @@ const (
 	frontCoverName = "testdata/front_cover.jpg"
 	backCoverName  = "testdata/back_cover.png"
 	framesSize     = 62988
-	tagSize        = TagHeaderSize + framesSize
+	tagSize        = tagHeaderSize + framesSize
 	musicSize      = 273310
 )
 
@@ -86,10 +86,10 @@ func TestCorrectnessOfSettingTag(t *testing.T) {
 	}
 	defer mp3.Close()
 
-	tagHeader := make([]byte, TagHeaderSize)
+	tagHeader := make([]byte, tagHeaderSize)
 	n, err := mp3.Read(tagHeader)
-	if n != TagHeaderSize {
-		t.Errorf("Expected length of header %v, got %v", TagHeaderSize, n)
+	if n != tagHeaderSize {
+		t.Errorf("Expected length of header %v, got %v", tagHeaderSize, n)
 	}
 	if err != nil {
 		t.Error("Error while reading a tag header: ", err)

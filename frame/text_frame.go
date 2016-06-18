@@ -5,6 +5,8 @@ import (
 	"github.com/bogem/id3v2/util"
 )
 
+// TextFramer is used to work with all text frames
+// (all T*** frames like TIT2, TALB and so on).
 type TextFramer interface {
 	Framer
 

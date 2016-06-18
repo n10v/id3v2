@@ -6,6 +6,7 @@ import (
 	"github.com/bogem/id3v2/util"
 )
 
+// CommentFramer is used to work with COMM frames.
 type CommentFramer interface {
 	Framer
 
@@ -22,6 +23,7 @@ type CommentFramer interface {
 	SetText(string)
 }
 
+// Just implementation of CommentFramer interface.
 type CommentFrame struct {
 	encoding    util.Encoding
 	language    string

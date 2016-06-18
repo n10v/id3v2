@@ -1,11 +1,12 @@
 package frame
 
-type USLFSequencer interface {
-	Sequencer
-
-	USLF(language string, contentDescriptor string) UnsynchronisedLyricsFramer
-}
-
+// USLFSequence stores several USLT frames.
+// Key for USLFSequence is language and content descriptor,
+// so there is only one USLT frame with the same language and
+// content descriptor.
+//
+// It's only needed for internal operations. Users of library id3v2 should not
+// use any sequence in no case.
 type USLFSequence struct {
 	sequence map[string]UnsynchronisedLyricsFramer
 }
