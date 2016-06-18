@@ -4,7 +4,7 @@ import "testing"
 
 func BenchmarkSetCommonCase(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		t, err := Open("test.mp3")
+		t, err := Open(mp3Name)
 		if t == nil || err != nil {
 			b.Error("Error while opening mp3 file: ", err)
 		}
@@ -16,7 +16,7 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		pic := NewAttachedPicture()
 		pic.SetMimeType("image/jpeg")
 		pic.SetPictureType(PTFrontCover)
-		if err = pic.SetPictureFromFile("front_cover.jpg"); err != nil {
+		if err = pic.SetPictureFromFile(frontCoverName); err != nil {
 			b.Error("Error while setting a picture from file")
 		}
 		t.AddAttachedPicture(pic)
@@ -29,7 +29,7 @@ func BenchmarkSetCommonCase(b *testing.B) {
 
 func BenchmarkSetManyTags(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		t, err := Open("test.mp3")
+		t, err := Open(mp3Name)
 		if t == nil || err != nil {
 			b.Error("Error while opening mp3 file: ", err)
 		}
@@ -44,7 +44,7 @@ func BenchmarkSetManyTags(b *testing.B) {
 		pic.SetMimeType("image/jpeg")
 		pic.SetDescription("Cover")
 		pic.SetPictureType(PTFrontCover)
-		if err = pic.SetPictureFromFile("front_cover.jpg"); err != nil {
+		if err = pic.SetPictureFromFile(frontCoverName); err != nil {
 			b.Error("Error while setting a picture from file")
 		}
 		t.AddAttachedPicture(pic)

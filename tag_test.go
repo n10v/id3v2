@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	mp3Name        = "test.mp3"
-	frontCoverName = "front_cover.jpg"
-	backCoverName  = "back_cover.png"
+	mp3Name        = "testdata/test.mp3"
+	frontCoverName = "testdata/front_cover.jpg"
+	backCoverName  = "testdata/back_cover.png"
 	framesSize     = 62988
 	tagSize        = TagHeaderSize + framesSize
 	musicSize      = 273310
