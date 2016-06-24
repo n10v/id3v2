@@ -7,9 +7,10 @@ package frame
 import (
 	"bytes"
 	"errors"
-	"github.com/bogem/id3v2/util"
 	"io"
 	"os"
+
+	"github.com/bogem/id3v2/util"
 )
 
 // PictureFramer is used to work with APIC frames.

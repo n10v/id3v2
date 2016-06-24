@@ -6,6 +6,7 @@ package frame
 
 import (
 	"bytes"
+
 	"github.com/bogem/id3v2/util"
 )
 

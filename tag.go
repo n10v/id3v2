@@ -8,10 +8,11 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"github.com/bogem/id3v2/frame"
-	"github.com/bogem/id3v2/util"
 	"io/ioutil"
 	"os"
+
+	"github.com/bogem/id3v2/frame"
+	"github.com/bogem/id3v2/util"
 )
 
 type Tag struct {

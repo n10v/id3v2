@@ -44,10 +44,11 @@ package id3v2
 
 import (
 	"bytes"
-	"github.com/bogem/id3v2/frame"
-	"github.com/bogem/id3v2/util"
 	"os"
 	"sync"
+
+	"github.com/bogem/id3v2/frame"
+	"github.com/bogem/id3v2/util"
 )
 
 // Possible picture types for picture frame.

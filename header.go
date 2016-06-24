@@ -7,8 +7,9 @@ package id3v2
 import (
 	"bytes"
 	"errors"
-	"github.com/bogem/id3v2/util"
 	"io"
+
+	"github.com/bogem/id3v2/util"
 )
 
 const (

@@ -6,8 +6,9 @@ package id3v2
 
 import (
 	"bytes"
-	"github.com/bogem/id3v2/testutil"
 	"testing"
+
+	"github.com/bogem/id3v2/testutil"
 )
 
 var (

@@ -6,10 +6,11 @@ package id3v2
 
 import (
 	"bufio"
-	"github.com/bogem/id3v2/testutil"
-	"github.com/bogem/id3v2/util"
 	"os"
 	"testing"
+
+	"github.com/bogem/id3v2/testutil"
+	"github.com/bogem/id3v2/util"
 )
 
 const (
