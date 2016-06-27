@@ -57,7 +57,9 @@ func (pf PictureFrame) Bytes() ([]byte, error) {
 	b.WriteString(pf.description)
 	b.Write(pf.encoding.TerminationBytes)
 
-	b.ReadFrom(pf.picture)
+	if _, err := b.ReadFrom(pf.picture); err != nil {
+		return nil, err
+	}
 	if v, ok := pf.picture.(*os.File); ok {
 		v.Close()
 	}
