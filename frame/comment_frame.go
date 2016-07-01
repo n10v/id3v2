@@ -5,9 +5,9 @@
 package frame
 
 import (
-	"bytes"
 	"errors"
 
+	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -32,23 +32,22 @@ type CommentFramer interface {
 type CommentFrame struct {
 	encoding    util.Encoding
 	language    string
-	description bytes.Buffer
-	text        bytes.Buffer
+	description string
+	text        string
 }
 
 func (cf CommentFrame) Bytes() ([]byte, error) {
-	b := bytesBufPool.Get().(*bytes.Buffer)
-	b.Reset()
-	defer bytesBufPool.Put(b)
+	b := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(b)
 
 	b.WriteByte(cf.encoding.Key)
 	if cf.language == "" {
 		return nil, errors.New("Language isn't set up in comment frame with description " + cf.Description())
 	}
 	b.WriteString(cf.language)
-	b.WriteString(cf.Description())
+	b.WriteString(cf.description)
 	b.Write(cf.encoding.TerminationBytes)
-	b.WriteString(cf.Text())
+	b.WriteString(cf.text)
 
 	return b.Bytes(), nil
 }
@@ -70,19 +69,17 @@ func (cf *CommentFrame) SetLanguage(lang string) {
 }
 
 func (cf CommentFrame) Description() string {
-	return cf.description.String()
+	return cf.description
 }
 
 func (cf *CommentFrame) SetDescription(d string) {
-	cf.description.Reset()
-	cf.description.WriteString(d)
+	cf.description = d
 }
 
 func (cf CommentFrame) Text() string {
-	return cf.text.String()
+	return cf.text
 }
 
 func (cf *CommentFrame) SetText(text string) {
-	cf.text.Reset()
-	cf.text.WriteString(text)
+	cf.text = text
 }

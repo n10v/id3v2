@@ -43,9 +43,7 @@
 package id3v2
 
 import (
-	"bytes"
 	"os"
-	"sync"
 
 	"github.com/bogem/id3v2/frame"
 	"github.com/bogem/id3v2/util"
@@ -102,10 +100,6 @@ var (
 		TerminationBytes: []byte{0},
 	}
 )
-
-var bytesBufPool = sync.Pool{
-	New: func() interface{} { return new(bytes.Buffer) },
-}
 
 // Open opens file with string name and find tag in it.
 func Open(name string) (*Tag, error) {

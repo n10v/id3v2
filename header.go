@@ -5,10 +5,10 @@
 package id3v2
 
 import (
-	"bytes"
 	"errors"
 	"io"
 
+	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -58,8 +58,8 @@ func isID3Tag(data []byte) bool {
 }
 
 func formTagHeader(framesSize []byte) []byte {
-	b := bytesBufPool.Get().(*bytes.Buffer)
-	b.Reset()
+	b := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(b)
 
 	// Identifier
 	b.WriteString(id3Identifier)
@@ -76,6 +76,5 @@ func formTagHeader(framesSize []byte) []byte {
 	// Size of frames
 	b.Write(framesSize)
 
-	bytesBufPool.Put(b)
 	return b.Bytes()
 }

@@ -5,8 +5,7 @@
 package frame
 
 import (
-	"bytes"
-
+	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -23,17 +22,16 @@ type TextFramer interface {
 }
 
 type TextFrame struct {
-	encoding   util.Encoding
-	textBuffer bytes.Buffer
+	encoding util.Encoding
+	text     string
 }
 
 func (tf TextFrame) Bytes() ([]byte, error) {
-	b := bytesBufPool.Get().(*bytes.Buffer)
-	b.Reset()
-	defer bytesBufPool.Put(b)
+	b := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(b)
 
 	b.WriteByte(tf.encoding.Key)
-	b.WriteString(tf.Text())
+	b.WriteString(tf.text)
 
 	return b.Bytes(), nil
 }
@@ -47,10 +45,9 @@ func (tf *TextFrame) SetEncoding(e util.Encoding) {
 }
 
 func (tf TextFrame) Text() string {
-	return tf.textBuffer.String()
+	return tf.text
 }
 
 func (tf *TextFrame) SetText(text string) {
-	tf.textBuffer.Reset()
-	tf.textBuffer.WriteString(text)
+	tf.text = text
 }

@@ -5,11 +5,11 @@
 package frame
 
 import (
-	"bytes"
 	"errors"
 	"io"
 	"os"
 
+	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -43,9 +43,8 @@ type PictureFrame struct {
 }
 
 func (pf PictureFrame) Bytes() ([]byte, error) {
-	b := bytesBufPool.Get().(*bytes.Buffer)
-	b.Reset()
-	defer bytesBufPool.Put(b)
+	b := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(b)
 
 	b.WriteByte(pf.encoding.Key)
 	b.WriteString(pf.mimeType)

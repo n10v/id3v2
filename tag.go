@@ -6,11 +6,11 @@ package id3v2
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"io/ioutil"
 	"os"
 
+	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/frame"
 	"github.com/bogem/id3v2/util"
 )
@@ -174,8 +174,8 @@ func (t Tag) Flush() error {
 }
 
 func (t Tag) formAllFrames() ([]byte, error) {
-	frames := bytesBufPool.Get().(*bytes.Buffer)
-	frames.Reset()
+	frames := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(frames)
 
 	f, err := t.formFrames()
 	if err != nil {
@@ -189,13 +189,12 @@ func (t Tag) formAllFrames() ([]byte, error) {
 	}
 	frames.Write(s)
 
-	bytesBufPool.Put(frames)
 	return frames.Bytes(), nil
 }
 
 func (t Tag) formFrames() ([]byte, error) {
-	frames := bytesBufPool.Get().(*bytes.Buffer)
-	frames.Reset()
+	frames := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(frames)
 
 	for id, f := range t.frames {
 		if id == "" {
@@ -213,13 +212,12 @@ func (t Tag) formFrames() ([]byte, error) {
 		frames.Write(frameBody)
 	}
 
-	bytesBufPool.Put(frames)
 	return frames.Bytes(), nil
 }
 
 func (t Tag) formSequences() ([]byte, error) {
-	frames := bytesBufPool.Get().(*bytes.Buffer)
-	frames.Reset()
+	frames := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(frames)
 
 	for id, s := range t.sequences {
 		if id == "" {
@@ -239,13 +237,12 @@ func (t Tag) formSequences() ([]byte, error) {
 		}
 	}
 
-	bytesBufPool.Put(frames)
 	return frames.Bytes(), nil
 }
 
 func formFrameHeader(id string, frameSize uint32) ([]byte, error) {
-	b := bytesBufPool.Get().(*bytes.Buffer)
-	b.Reset()
+	b := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(b)
 
 	b.WriteString(id)
 	size, err := util.FormSize(frameSize)
@@ -256,6 +253,5 @@ func formFrameHeader(id string, frameSize uint32) ([]byte, error) {
 	b.WriteByte(0)
 	b.WriteByte(0)
 
-	bytesBufPool.Put(b)
 	return b.Bytes(), nil
 }

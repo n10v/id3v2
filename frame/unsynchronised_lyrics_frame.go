@@ -5,9 +5,9 @@
 package frame
 
 import (
-	"bytes"
 	"errors"
 
+	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -32,24 +32,23 @@ type UnsynchronisedLyricsFramer interface {
 type UnsynchronisedLyricsFrame struct {
 	encoding          util.Encoding
 	language          string
-	contentDescriptor bytes.Buffer
-	lyrics            bytes.Buffer
+	contentDescriptor string
+	lyrics            string
 }
 
 func (uslf UnsynchronisedLyricsFrame) Bytes() ([]byte, error) {
-	b := bytesBufPool.Get().(*bytes.Buffer)
-	b.Reset()
+	b := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(b)
 
 	b.WriteByte(uslf.encoding.Key)
 	if uslf.language == "" {
 		return nil, errors.New("Language isn't set up in USLT frame with description " + uslf.ContentDescriptor())
 	}
 	b.WriteString(uslf.language)
-	b.WriteString(uslf.ContentDescriptor())
+	b.WriteString(uslf.contentDescriptor)
 	b.Write(uslf.encoding.TerminationBytes)
-	b.WriteString(uslf.Lyrics())
+	b.WriteString(uslf.lyrics)
 
-	bytesBufPool.Put(b)
 	return b.Bytes(), nil
 }
 
@@ -70,19 +69,17 @@ func (uslf *UnsynchronisedLyricsFrame) SetLanguage(lang string) {
 }
 
 func (uslf UnsynchronisedLyricsFrame) ContentDescriptor() string {
-	return uslf.contentDescriptor.String()
+	return uslf.contentDescriptor
 }
 
 func (uslf *UnsynchronisedLyricsFrame) SetContentDescriptor(cd string) {
-	uslf.contentDescriptor.Reset()
-	uslf.contentDescriptor.WriteString(cd)
+	uslf.contentDescriptor = cd
 }
 
 func (uslf UnsynchronisedLyricsFrame) Lyrics() string {
-	return uslf.lyrics.String()
+	return uslf.lyrics
 }
 
 func (uslf *UnsynchronisedLyricsFrame) SetLyrics(lyrics string) {
-	uslf.lyrics.Reset()
-	uslf.lyrics.WriteString(lyrics)
+	uslf.lyrics = lyrics
 }
