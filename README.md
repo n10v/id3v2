@@ -79,7 +79,7 @@ You can find it here: https://godoc.org/github.com/bogem/id3v2
 ## TODO
 
 - [ ] Parse tags
-- [ ] Work with extended header, flags, padding ***(Does somebody really use it?)***
+- [ ] Work with extended header, flags, padding ***(Does anyone really use it?)***
 - [x] Documentation
 - [x] Work with other encodings
 
