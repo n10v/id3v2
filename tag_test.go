@@ -100,8 +100,7 @@ func TestCorrectnessOfSettingTag(t *testing.T) {
 		t.Error("Error while reading a tag header: ", err)
 	}
 
-	sizeBytes := tagHeader[6:10]
-	size, _ := util.ParseSize(sizeBytes)
+	size := util.ParseSize(tagHeader[6:10])
 
 	if framesSize != size {
 		t.Errorf("Expected size of frames: %v, got: %v", framesSize, size)

@@ -37,10 +37,7 @@ func parseHeader(rd io.Reader) (*tagHeader, error) {
 		return nil, nil
 	}
 
-	size, err := util.ParseSize(data[6:])
-	if err != nil {
-		return nil, err
-	}
+	size := util.ParseSize(data[6:])
 
 	header := &tagHeader{
 		Version:    data[3],

@@ -116,10 +116,7 @@ func (t Tag) Flush() error {
 	}
 
 	// Forming size of new frames
-	framesSize, err := util.FormSize(uint32(len(frames)))
-	if err != nil {
-		return err
-	}
+	framesSize := util.FormSize(uint32(len(frames)))
 
 	// Creating a temp file for mp3 file, which will contain new tag
 	newFile, err := ioutil.TempFile("", "")
@@ -234,11 +231,7 @@ func formFrameHeader(id string, frameSize uint32) ([]byte, error) {
 	defer bytesbufferpool.Put(b)
 
 	b.WriteString(id)
-	size, err := util.FormSize(frameSize)
-	if err != nil {
-		return nil, err
-	}
-	b.Write(size)
+	b.Write(util.FormSize(frameSize))
 	b.WriteByte(0)
 	b.WriteByte(0)
 
