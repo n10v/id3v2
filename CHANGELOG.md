@@ -1,5 +1,9 @@
 # ID3v2 Changelog
 
+## 0.5.1
+* Noticeable improvement in performance
+* Added panics in `util` package
+
 ## 0.5
 * Add support of encodings
 * Add documentation (https://godoc.org/github.com/bogem/id3v2)
