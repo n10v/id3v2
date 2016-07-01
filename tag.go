@@ -5,8 +5,8 @@
 package id3v2
 
 import (
-	"bufio"
 	"errors"
+	"io"
 	"io/ioutil"
 	"os"
 
@@ -109,13 +109,6 @@ func parseTag(file *os.File) (*Tag, error) {
 
 // Flush writes tag to the file.
 func (t Tag) Flush() error {
-	// Creating a temp file for mp3 file, which will contain new tag
-	newFile, err := ioutil.TempFile("", "")
-	if err != nil {
-		return err
-	}
-	newFileBuf := bufio.NewWriter(newFile)
-
 	// Forming new frames
 	frames, err := t.formAllFrames()
 	if err != nil {
@@ -128,40 +121,36 @@ func (t Tag) Flush() error {
 		return err
 	}
 
+	// Creating a temp file for mp3 file, which will contain new tag
+	newFile, err := ioutil.TempFile("", "")
+	if err != nil {
+		return err
+	}
+
 	// Writing to new file new tag header
-	if _, err := newFileBuf.Write(formTagHeader(framesSize)); err != nil {
+	if _, err := newFile.Write(formTagHeader(framesSize)); err != nil {
 		return err
 	}
 
 	// Writing to new file new frames
-	if _, err := newFileBuf.Write(frames); err != nil {
+	if _, err := newFile.Write(frames); err != nil {
 		return err
 	}
 
-	// Getting a music part of mp3
-	// (Discarding an original tag of mp3)
-	f := t.file
-	defer f.Close()
-	if _, err := f.Seek(0, os.SEEK_SET); err != nil {
-		return err
-	}
-	originalFileBuf := bufio.NewReader(f)
-	if _, err := originalFileBuf.Discard(int(t.originalSize)); err != nil {
+	// Seeking to a music part of mp3
+	originalFile := t.file
+	defer originalFile.Close()
+	if _, err := originalFile.Seek(int64(t.originalSize), os.SEEK_SET); err != nil {
 		return err
 	}
 
 	// Writing to new file the music part
-	if _, err = newFileBuf.ReadFrom(originalFileBuf); err != nil {
-		return err
-	}
-
-	// Flushing the buffered data to new file
-	if err = newFileBuf.Flush(); err != nil {
+	if _, err = io.Copy(newFile, originalFile); err != nil {
 		return err
 	}
 
 	// Replacing original file with new file
-	if err = os.Rename(newFile.Name(), f.Name()); err != nil {
+	if err = os.Rename(newFile.Name(), originalFile.Name()); err != nil {
 		return err
 	}
 
