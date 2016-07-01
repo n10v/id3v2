@@ -13,6 +13,26 @@ var (
 	byteSize = make([]byte, bytesPerInt) // Made for reusing in FormSize
 )
 
+// FormSize transforms uint32 integer to byte slice with
+// ID3v2 size (4 * 0b0xxxxxxx).
+//
+// If size more than allowed (256MB), then panic occurs.
+func FormSize(n uint32) []byte {
+	allowedSize := uint32(268435455) // 4 * 0b01111111
+	if n > allowedSize {
+		panic("Size is more than allowed in id3 tag")
+	}
+
+	mask := uint32(1<<sizeBase - 1)
+
+	for i, _ := range byteSize {
+		byteSize[len(byteSize)-i-1] = byte(n & mask)
+		n >>= sizeBase
+	}
+
+	return byteSize
+}
+
 // ParseSize parses byte slice with ID3v2 size (4 * 0b0xxxxxxx) and returns
 // uint32 integer.
 //
@@ -34,24 +54,4 @@ func ParseSize(data []byte) uint32 {
 	}
 
 	return size
-}
-
-// FormSize transforms uint32 integer to byte slice with
-// ID3v2 size (4 * 0b0xxxxxxx).
-//
-// If size more than allowed (256MB), then panic occurs.
-func FormSize(n uint32) []byte {
-	allowedSize := uint32(268435455) // 4 * 0b01111111
-	if n > allowedSize {
-		panic("Size is more than allowed in id3 tag")
-	}
-
-	mask := uint32(1<<sizeBase - 1)
-
-	for i, _ := range byteSize {
-		byteSize[len(byteSize)-i-1] = byte(n & mask)
-		n >>= sizeBase
-	}
-
-	return byteSize
 }
