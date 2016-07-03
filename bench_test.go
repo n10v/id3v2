@@ -4,28 +4,35 @@
 
 package id3v2
 
+import "os"
 import "testing"
 
 func BenchmarkSetCommonCase(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		t, err := Open(mp3Name)
-		if t == nil || err != nil {
+		tag, err := Open(mp3Name)
+		if tag == nil || err != nil {
 			b.Error("Error while opening mp3 file: ", err)
 		}
-		t.SetTitle("Title")
-		t.SetArtist("Artist")
-		t.SetYear("2016")
+		tag.SetTitle("Title")
+		tag.SetArtist("Artist")
+		tag.SetYear("2016")
 
 		// Setting front cover
-		pic := NewAttachedPicture()
-		pic.SetMimeType("image/jpeg")
-		pic.SetPictureType(PTFrontCover)
-		if err = pic.SetPictureFromFile(frontCoverName); err != nil {
-			b.Error("Error while setting a picture from file")
+		frontCover, err := os.Open(frontCoverName)
+		if err != nil {
+			b.Error("Error while opening front cover file")
 		}
-		t.AddAttachedPicture(pic)
+		defer frontCover.Close()
+		pic := PictureFrame{
+			Encoding:    ENUTF8,
+			MimeType:    "image/jpeg",
+			Description: "Front cover",
+			Picture:     frontCover,
+			PictureType: PTFrontCover,
+		}
+		tag.AddAttachedPicture(pic)
 
-		if err = t.Flush(); err != nil {
+		if err = tag.Flush(); err != nil {
 			b.Error("Error while closing a tag: ", err)
 		}
 	}
@@ -33,41 +40,51 @@ func BenchmarkSetCommonCase(b *testing.B) {
 
 func BenchmarkSetManyTags(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		t, err := Open(mp3Name)
-		if t == nil || err != nil {
+		tag, err := Open(mp3Name)
+		if tag == nil || err != nil {
 			b.Error("Error while opening mp3 file: ", err)
 		}
-		t.SetTitle("Title")
-		t.SetArtist("Artist")
-		t.SetAlbum("Album")
-		t.SetYear("2016")
-		t.SetGenre("Genre")
+		tag.SetTitle("Title")
+		tag.SetArtist("Artist")
+		tag.SetAlbum("Album")
+		tag.SetYear("2016")
+		tag.SetGenre("Genre")
 
 		// Setting front cover
-		pic := NewAttachedPicture()
-		pic.SetMimeType("image/jpeg")
-		pic.SetDescription("Cover")
-		pic.SetPictureType(PTFrontCover)
-		if err = pic.SetPictureFromFile(frontCoverName); err != nil {
-			b.Error("Error while setting a picture from file")
+		frontCover, err := os.Open(frontCoverName)
+		if err != nil {
+			b.Error("Error while opening front cover file")
 		}
-		t.AddAttachedPicture(pic)
+		defer frontCover.Close()
+
+		pic := PictureFrame{
+			Encoding:    ENUTF8,
+			MimeType:    "image/jpeg",
+			Description: "Front cover",
+			Picture:     frontCover,
+			PictureType: PTFrontCover,
+		}
+		tag.AddAttachedPicture(pic)
 
 		// Setting USLT
-		uslt := NewUnsynchronisedLyricsFrame()
-		uslt.SetLanguage("eng")
-		uslt.SetContentDescriptor("Content descriptor")
-		uslt.SetLyrics("bogem/id3v2")
-		t.AddUnsynchronisedLyricsFrame(uslt)
+		uslt := UnsynchronisedLyricsFrame{
+			Encoding:          ENUTF8,
+			Language:          "eng",
+			ContentDescriptor: "Content descriptor",
+			Lyrics:            "bogem/id3v2",
+		}
+		tag.AddUnsynchronisedLyricsFrame(uslt)
 
 		// Setting comment
-		cf := NewCommentFrame()
-		cf.SetLanguage("eng")
-		cf.SetDescription("Short description")
-		cf.SetText("The actual text")
-		t.AddCommentFrame(cf)
+		comm := CommentFrame{
+			Encoding:    ENUTF8,
+			Language:    "eng",
+			Description: "Short description",
+			Text:        "The actual text",
+		}
+		tag.AddCommentFrame(comm)
 
-		if err = t.Flush(); err != nil {
+		if err = tag.Flush(); err != nil {
 			b.Error("Error while closing a tag: ", err)
 		}
 	}

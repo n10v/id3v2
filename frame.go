@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package frame
+package id3v2
 
 // Framer provides a generic interface for frames.
 type Framer interface {

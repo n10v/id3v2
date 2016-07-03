@@ -11,79 +11,78 @@ import (
 	"os"
 
 	"github.com/bogem/id3v2/bytesbufferpool"
-	"github.com/bogem/id3v2/frame"
 	"github.com/bogem/id3v2/util"
 )
 
 type Tag struct {
-	frames       map[string]frame.Framer
-	sequences    map[string]frame.Sequencer
+	frames       map[string]Framer
+	sequences    map[string]Sequencer
 	commonIDs    map[string]string
 	file         *os.File
 	originalSize uint32
 }
 
-func (t *Tag) AddFrame(id string, f frame.Framer) {
+func (t *Tag) AddFrame(id string, f Framer) {
 	if t.frames == nil {
-		t.frames = make(map[string]frame.Framer)
+		t.frames = make(map[string]Framer)
 	}
 	t.frames[id] = f
 }
 
-func (t *Tag) AddAttachedPicture(pf frame.PictureFramer) {
+func (t *Tag) AddAttachedPicture(pf PictureFrame) {
 	id := t.commonIDs["Attached picture"]
-	t.checkExistenceOfSequence(id, frame.NewPictureSequence)
+	t.checkExistenceOfSequence(id, NewPictureSequence)
 	t.addFrameToSequence(pf, id)
 }
 
-func (t *Tag) AddUnsynchronisedLyricsFrame(uslf frame.UnsynchronisedLyricsFramer) {
+func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 	id := t.commonIDs["USLT"]
-	t.checkExistenceOfSequence(id, frame.NewUSLFSequence)
+	t.checkExistenceOfSequence(id, NewUSLFSequence)
 	t.addFrameToSequence(uslf, id)
 }
 
-func (t *Tag) AddCommentFrame(cf frame.CommentFramer) {
+func (t *Tag) AddCommentFrame(cf CommentFrame) {
 	id := t.commonIDs["Comment"]
-	t.checkExistenceOfSequence(id, frame.NewCommentSequence)
+	t.checkExistenceOfSequence(id, NewCommentSequence)
 	t.addFrameToSequence(cf, id)
 }
 
-func (t *Tag) checkExistenceOfSequence(id string, newSequence func() frame.Sequencer) {
+func (t *Tag) checkExistenceOfSequence(id string, newSequence func() Sequencer) {
 	if t.sequences == nil {
-		t.sequences = make(map[string]frame.Sequencer)
+		t.sequences = make(map[string]Sequencer)
 	}
 	if t.sequences[id] == nil {
 		t.sequences[id] = newSequence()
 	}
 }
 
-func (t *Tag) addFrameToSequence(f frame.Framer, id string) {
+func (t *Tag) addFrameToSequence(f Framer, id string) {
 	t.sequences[id].AddFrame(f)
 }
 
 func (t *Tag) SetTitle(title string) {
-	t.AddFrame(t.commonIDs["Title"], NewTextFrame(title))
+	t.AddFrame(t.commonIDs["Title"], TextFrame{Encoding: ENUTF8, Text: title})
 }
 
 func (t *Tag) SetArtist(artist string) {
-	t.AddFrame(t.commonIDs["Artist"], NewTextFrame(artist))
+	t.AddFrame(t.commonIDs["Artist"], TextFrame{Encoding: ENUTF8, Text: artist})
 }
 
 func (t *Tag) SetAlbum(album string) {
-	t.AddFrame(t.commonIDs["Album"], NewTextFrame(album))
+	t.AddFrame(t.commonIDs["Album"], TextFrame{Encoding: ENUTF8, Text: album})
 }
 
 func (t *Tag) SetYear(year string) {
-	t.AddFrame(t.commonIDs["Year"], NewTextFrame(year))
+	t.AddFrame(t.commonIDs["Year"], TextFrame{Encoding: ENUTF8, Text: year})
 }
 
 func (t *Tag) SetGenre(genre string) {
-	t.AddFrame(t.commonIDs["Genre"], NewTextFrame(genre))
+	t.AddFrame(t.commonIDs["Genre"], TextFrame{Encoding: ENUTF8, Text: genre})
 }
 
 func newTag(file *os.File, size uint32) *Tag {
 	return &Tag{
-		commonIDs: frame.V24CommonIDs,
+		commonIDs: V24CommonIDs,
 
 		file:         file,
 		originalSize: size,
@@ -190,10 +189,7 @@ func (t Tag) formFrames() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		frameHeader, err := formFrameHeader(id, uint32(len(frameBody)))
-		if err != nil {
-			return nil, err
-		}
+		frameHeader := formFrameHeader(id, uint32(len(frameBody)))
 		frames.Write(frameHeader)
 		frames.Write(frameBody)
 	}
@@ -214,10 +210,7 @@ func (t Tag) formSequences() ([]byte, error) {
 			if err != nil {
 				return nil, err
 			}
-			frameHeader, err := formFrameHeader(id, uint32(len(frameBody)))
-			if err != nil {
-				return nil, err
-			}
+			frameHeader := formFrameHeader(id, uint32(len(frameBody)))
 			frames.Write(frameHeader)
 			frames.Write(frameBody)
 		}
@@ -226,7 +219,7 @@ func (t Tag) formSequences() ([]byte, error) {
 	return frames.Bytes(), nil
 }
 
-func formFrameHeader(id string, frameSize uint32) ([]byte, error) {
+func formFrameHeader(id string, frameSize uint32) []byte {
 	b := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(b)
 
@@ -235,5 +228,5 @@ func formFrameHeader(id string, frameSize uint32) ([]byte, error) {
 	b.WriteByte(0)
 	b.WriteByte(0)
 
-	return b.Bytes(), nil
+	return b.Bytes()
 }

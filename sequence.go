@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package frame
+package id3v2
 
 // Sequencer is used to manipulate with frames, which can be in tag
 // more than one (e.g. APIC, COMM, USLT, SYLT and etc.)

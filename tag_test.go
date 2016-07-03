@@ -34,50 +34,70 @@ func TestSetTags(t *testing.T) {
 	tag.SetGenre("Genre")
 
 	// Setting front cover
-	pic := NewAttachedPicture()
-	pic.SetMimeType("image/jpeg")
-	pic.SetDescription("Front cover")
-	pic.SetPictureType(PTFrontCover)
-	if err = pic.SetPictureFromFile(frontCoverName); err != nil {
-		t.Error("Error while setting a front cover from file")
+	frontCover, err := os.Open(frontCoverName)
+	if err != nil {
+		t.Error("Error while opening front cover file")
+	}
+	defer frontCover.Close()
+
+	pic := PictureFrame{
+		Encoding:    ENUTF8,
+		MimeType:    "image/jpeg",
+		Description: "Front cover",
+		Picture:     frontCover,
+		PictureType: PTFrontCover,
 	}
 	tag.AddAttachedPicture(pic)
 
 	// Setting back cover
-	pic = NewAttachedPicture()
-	pic.SetMimeType("image/png")
-	pic.SetDescription("Back cover")
-	pic.SetPictureType(PTBackCover)
-	if err = pic.SetPictureFromFile(backCoverName); err != nil {
-		t.Error("Error while setting a back cover from file")
+	backCover, err := os.Open(backCoverName)
+	if err != nil {
+		t.Error("Error while opening back cover file")
+	}
+	defer backCover.Close()
+
+	pic = PictureFrame{
+		Encoding:    ENUTF8,
+		MimeType:    "image/png",
+		Description: "Back cover",
+		Picture:     backCover,
+		PictureType: PTBackCover,
 	}
 	tag.AddAttachedPicture(pic)
 
 	// Setting USLTs
-	uslt := NewUnsynchronisedLyricsFrame()
-	uslt.SetLanguage("eng")
-	uslt.SetContentDescriptor("Content descriptor")
-	uslt.SetLyrics("bogem/id3v2")
+	uslt := UnsynchronisedLyricsFrame{
+		Encoding:          ENUTF8,
+		Language:          "eng",
+		ContentDescriptor: "Content descriptor",
+		Lyrics:            "bogem/id3v2",
+	}
 	tag.AddUnsynchronisedLyricsFrame(uslt)
 
-	uslt = NewUnsynchronisedLyricsFrame()
-	uslt.SetLanguage("ger")
-	uslt.SetContentDescriptor("Inhaltsdeskriptor")
-	uslt.SetLyrics("bogem/id3v2")
+	uslt = UnsynchronisedLyricsFrame{
+		Encoding:          ENUTF8,
+		Language:          "ger",
+		ContentDescriptor: "Inhaltsdeskriptor",
+		Lyrics:            "Einigkeit und Recht und Freiheit",
+	}
 	tag.AddUnsynchronisedLyricsFrame(uslt)
 
 	// Setting comments
-	cf := NewCommentFrame()
-	cf.SetLanguage("eng")
-	cf.SetDescription("Short description")
-	cf.SetText("The actual text")
-	tag.AddCommentFrame(cf)
+	comm := CommentFrame{
+		Encoding:    ENUTF8,
+		Language:    "eng",
+		Description: "Short description",
+		Text:        "The actual text",
+	}
+	tag.AddCommentFrame(comm)
 
-	cf = NewCommentFrame()
-	cf.SetLanguage("ger")
-	cf.SetDescription("Kurze Beschreibung")
-	cf.SetText("Der eigentliche Text")
-	tag.AddCommentFrame(cf)
+	comm = CommentFrame{
+		Encoding:    ENUTF8,
+		Language:    "ger",
+		Description: "Kurze Beschreibung",
+		Text:        "Der eigentliche Text",
+	}
+	tag.AddCommentFrame(comm)
 
 	if err = tag.Flush(); err != nil {
 		t.Error("Error while closing a tag: ", err)

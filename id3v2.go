@@ -45,7 +45,6 @@ package id3v2
 import (
 	"os"
 
-	"github.com/bogem/id3v2/frame"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -124,28 +123,6 @@ func Open(name string) (*Tag, error) {
 // 		tag.AddAttachedPicture(pic)
 //
 // Available picture types you can see in constants.
-func NewAttachedPicture() *frame.PictureFrame {
-	pf := new(frame.PictureFrame)
-	pf.SetEncoding(ENUTF8)
-	return pf
-}
-
-// NewCommentFrame creates and initializes a new comment frame.
-//
-// Example of setting a new comment frame to existing tag:
-//	comm := id3v2.NewCommentFrame()
-//	comm.SetLanguage("eng")
-//	comm.SetDescription("Short description")
-//	comm.SetText("The actual text")
-//	tag.AddCommentFrame(comm)
-//
-// You should choose a language code from
-// ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
-func NewCommentFrame() *frame.CommentFrame {
-	cf := new(frame.CommentFrame)
-	cf.SetEncoding(ENUTF8)
-	return cf
-}
 
 // NewTextFrame creates and initializes a new text frame. E.g. it is used by
 // such frames as artist, title and etc.
@@ -154,12 +131,6 @@ func NewCommentFrame() *frame.CommentFrame {
 //	textFrame := id3v2.NewTextFrame("Happy")
 //	id := "TMOO" // Mood frame ID
 //	tag.AddFrame(id, textFrame)
-func NewTextFrame(text string) *frame.TextFrame {
-	tf := new(frame.TextFrame)
-	tf.SetEncoding(ENUTF8)
-	tf.SetText(text)
-	return tf
-}
 
 // NewUnsynchronisedLyricsFrame creates and initializes a new
 // unsynchronised lyrics/text frame.
@@ -170,8 +141,3 @@ func NewTextFrame(text string) *frame.TextFrame {
 //	uslt.SetContentDescriptor("Content descriptor")
 //	uslt.SetLyrics("Lyrics")
 //	tag.AddUnsynchronisedLyricsFrame(uslt)
-func NewUnsynchronisedLyricsFrame() *frame.UnsynchronisedLyricsFrame {
-	uslf := new(frame.UnsynchronisedLyricsFrame)
-	uslf.SetEncoding(ENUTF8)
-	return uslf
-}

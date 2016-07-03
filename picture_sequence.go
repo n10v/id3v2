@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package frame
+package id3v2
 
 // PictureSequence stores several picture frames.
 // Key for PictureSequence is a picture type code,
@@ -11,34 +11,25 @@ package frame
 // It's only needed for internal operations. Users of library id3v2 should not
 // use any sequence in no case.
 type PictureSequence struct {
-	sequence map[int]PictureFramer
+	sequence map[int]PictureFrame
 }
 
 func NewPictureSequence() Sequencer {
 	return &PictureSequence{
-		sequence: make(map[int]PictureFramer),
+		sequence: make(map[int]PictureFrame),
 	}
 }
 
 func (ps PictureSequence) Frames() []Framer {
-	var (
-		i      = 0
-		frames = make([]Framer, len(ps.sequence))
-	)
-
-	for _, v := range ps.sequence {
-		frames[i] = v
-		i++
+	frames := make([]Framer, 0, len(ps.sequence))
+	for _, f := range ps.sequence {
+		frames = append(frames, f)
 	}
 	return frames
 }
 
-func (ps PictureSequence) Picture(pt byte) PictureFramer {
-	return ps.sequence[int(pt)]
-}
-
 func (ps *PictureSequence) AddFrame(f Framer) {
-	pf := f.(PictureFramer)
-	pt := pf.PictureType()
+	pf := f.(PictureFrame)
+	pt := pf.PictureType
 	ps.sequence[int(pt)] = pf
 }
