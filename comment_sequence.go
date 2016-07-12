@@ -4,24 +4,24 @@
 
 package id3v2
 
-// CommentSequence stores several comment frames.
-// Key for CommentSequence is language and description,
+// commentSequence stores several comment frames.
+// Key for commentSequence is language and description,
 // so there is only one comment frame with the same language and
 // description.
 //
 // It's only needed for internal operations. Users of library id3v2 should not
 // use any sequence in no case.
-type CommentSequence struct {
+type commentSequence struct {
 	sequence map[string]CommentFrame
 }
 
-func NewCommentSequence() Sequencer {
-	return &CommentSequence{
+func newCommentSequence() sequencer {
+	return &commentSequence{
 		sequence: make(map[string]CommentFrame),
 	}
 }
 
-func (cs CommentSequence) Frames() []Framer {
+func (cs commentSequence) Frames() []Framer {
 	frames := make([]Framer, 0, len(cs.sequence))
 	for _, f := range cs.sequence {
 		frames = append(frames, f)
@@ -29,7 +29,7 @@ func (cs CommentSequence) Frames() []Framer {
 	return frames
 }
 
-func (cs *CommentSequence) AddFrame(f Framer) {
+func (cs *commentSequence) AddFrame(f Framer) {
 	cf := f.(CommentFrame)
 	id := cf.Language + cf.Description
 	cs.sequence[id] = cf

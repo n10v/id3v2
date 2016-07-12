@@ -4,24 +4,24 @@
 
 package id3v2
 
-// USLFSequence stores several USLT frames.
-// Key for USLFSequence is language and content descriptor,
+// uslfSequence stores several USLT frames.
+// Key for uslfSequence is language and content descriptor,
 // so there is only one USLT frame with the same language and
 // content descriptor.
 //
 // It's only needed for internal operations. Users of library id3v2 should not
 // use any sequence in no case.
-type USLFSequence struct {
+type uslfSequence struct {
 	sequence map[string]UnsynchronisedLyricsFrame
 }
 
-func NewUSLFSequence() Sequencer {
-	return &USLFSequence{
+func newUSLFSequence() sequencer {
+	return &uslfSequence{
 		sequence: make(map[string]UnsynchronisedLyricsFrame),
 	}
 }
 
-func (us USLFSequence) Frames() []Framer {
+func (us uslfSequence) Frames() []Framer {
 	frames := make([]Framer, 0, len(us.sequence))
 	for _, f := range us.sequence {
 		frames = append(frames, f)
@@ -29,7 +29,7 @@ func (us USLFSequence) Frames() []Framer {
 	return frames
 }
 
-func (us *USLFSequence) AddFrame(f Framer) {
+func (us *uslfSequence) AddFrame(f Framer) {
 	uslf := f.(UnsynchronisedLyricsFrame)
 	id := uslf.Language + uslf.ContentDescriptor
 	us.sequence[id] = uslf

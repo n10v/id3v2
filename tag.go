@@ -17,7 +17,7 @@ import (
 
 type Tag struct {
 	frames       map[string]Framer
-	sequences    map[string]Sequencer
+	sequences    map[string]sequencer
 	commonIDs    map[string]string
 	file         *os.File
 	originalSize uint32
@@ -32,25 +32,25 @@ func (t *Tag) AddFrame(id string, f Framer) {
 
 func (t *Tag) AddAttachedPicture(pf PictureFrame) {
 	id := t.commonIDs["Attached picture"]
-	t.checkExistenceOfSequence(id, NewPictureSequence)
+	t.checkExistenceOfSequence(id, newPictureSequence)
 	t.addFrameToSequence(pf, id)
 }
 
 func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 	id := t.commonIDs["USLT"]
-	t.checkExistenceOfSequence(id, NewUSLFSequence)
+	t.checkExistenceOfSequence(id, newUSLFSequence)
 	t.addFrameToSequence(uslf, id)
 }
 
 func (t *Tag) AddCommentFrame(cf CommentFrame) {
 	id := t.commonIDs["Comment"]
-	t.checkExistenceOfSequence(id, NewCommentSequence)
+	t.checkExistenceOfSequence(id, newCommentSequence)
 	t.addFrameToSequence(cf, id)
 }
 
-func (t *Tag) checkExistenceOfSequence(id string, newSequence func() Sequencer) {
+func (t *Tag) checkExistenceOfSequence(id string, newSequence func() sequencer) {
 	if t.sequences == nil {
-		t.sequences = make(map[string]Sequencer)
+		t.sequences = make(map[string]sequencer)
 	}
 	if t.sequences[id] == nil {
 		t.sequences[id] = newSequence()

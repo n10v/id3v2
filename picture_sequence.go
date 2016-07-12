@@ -4,23 +4,23 @@
 
 package id3v2
 
-// PictureSequence stores several picture frames.
-// Key for PictureSequence is a picture type code,
+// pictureSequence stores several picture frames.
+// Key for pictureSequence is a picture type code,
 // so there is only one picture with the same picture type.
 //
 // It's only needed for internal operations. Users of library id3v2 should not
 // use any sequence in no case.
-type PictureSequence struct {
+type pictureSequence struct {
 	sequence map[int]PictureFrame
 }
 
-func NewPictureSequence() Sequencer {
-	return &PictureSequence{
+func newPictureSequence() sequencer {
+	return &pictureSequence{
 		sequence: make(map[int]PictureFrame),
 	}
 }
 
-func (ps PictureSequence) Frames() []Framer {
+func (ps pictureSequence) Frames() []Framer {
 	frames := make([]Framer, 0, len(ps.sequence))
 	for _, f := range ps.sequence {
 		frames = append(frames, f)
@@ -28,7 +28,7 @@ func (ps PictureSequence) Frames() []Framer {
 	return frames
 }
 
-func (ps *PictureSequence) AddFrame(f Framer) {
+func (ps *pictureSequence) AddFrame(f Framer) {
 	pf := f.(PictureFrame)
 	pt := pf.PictureType
 	ps.sequence[int(pt)] = pf
