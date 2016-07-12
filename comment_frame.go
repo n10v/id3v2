@@ -13,10 +13,10 @@ import (
 //
 // Example of setting a new comment frame to existing tag:
 //	comment := id3v2.CommentFrame{
-//		Encoding:		id3v2.ENUTF8,
-//		Language:		"eng",
+//		Encoding:   id3v2.ENUTF8,
+//		Language:   "eng",
 //		Desciption: "My opinion",
-//		Text:				"Very good song",
+//		Text:       "Very good song",
 //	}
 //	tag.AddCommentFrame(comment)
 //
