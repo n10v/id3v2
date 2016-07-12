@@ -29,10 +29,12 @@
 // 		tag.SetArtist("Artist")
 // 		tag.SetTitle("Title")
 //
-//		comment := id3v2.NewCommentFrame()
-//		comment.SetLanguage("eng")
-//		comment.SetDescription("Short description")
-//		comment.SetText("The actual text")
+//		comment := id3v2.CommentFrame{
+//			Encoding:		id3v2.ENUTF8,
+//			Language:		"eng",
+//			Desciption: "My opinion",
+//			Text:				"Very good song",
+//		}
 //		tag.AddCommentFrame(comment)
 //
 //		// Write it to file
