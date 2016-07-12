@@ -4,10 +4,6 @@ go:
   - 1.6
 
 script:
-  # build test for supported platforms
   - GOOS=linux go build
   - GOOS=freebsd go build
   - GOOS=windows go build
-
-  # run tests on a standard platform
-  - go test -v ./...
