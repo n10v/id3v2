@@ -6,10 +6,10 @@ package id3v2
 
 import (
 	"bufio"
+	"bytes"
 	"os"
 	"testing"
 
-	"github.com/bogem/id3v2/testutil"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -154,8 +154,8 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 		t.Error("Error while reading mp3 file: ", err)
 	}
 
-	if err = testutil.AreByteSlicesEqual(expected, got); err != nil {
-		t.Error(err)
+	if !bytes.Equal(expected, got) {
+		t.Fail()
 	}
 }
 
@@ -187,7 +187,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 		t.Error("Error while reading mp3 file: ", err)
 	}
 
-	if err = testutil.AreByteSlicesEqual(expected, got); err != nil {
-		t.Error(err)
+	if !bytes.Equal(expected, got) {
+		t.Fail()
 	}
 }

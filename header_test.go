@@ -7,8 +7,6 @@ package id3v2
 import (
 	"bytes"
 	"testing"
-
-	"github.com/bogem/id3v2/testutil"
 )
 
 var (
@@ -31,7 +29,7 @@ func TestParseHeader(t *testing.T) {
 
 func TestFormTagHeader(t *testing.T) {
 	formed := formTagHeader([]byte{0, 0, 0, 0})
-	if err := testutil.AreByteSlicesEqual(formed, thb); err != nil {
-		t.Error(err)
+	if !bytes.Equal(formed, thb) {
+		t.Fail()
 	}
 }

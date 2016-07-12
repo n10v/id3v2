@@ -5,7 +5,7 @@
 package util
 
 import (
-	"github.com/bogem/id3v2/testutil"
+	"bytes"
 	"testing"
 )
 
@@ -29,7 +29,7 @@ func TestFormSize(t *testing.T) {
 	if err != nil {
 		t.Fail()
 	}
-	if err := testutil.AreByteSlicesEqual(sizeBytes, size); err != nil {
+	if !bytes.Equal(sizeBytes, size) {
 		t.Errorf("Expected: %v, got: %v", sizeBytes, size)
 	}
 }
