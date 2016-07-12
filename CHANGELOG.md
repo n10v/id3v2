@@ -1,5 +1,8 @@
 # ID3v2 Changelog
 
+## 0.6
+* Huge update of API and documentation
+
 ## 0.5.1
 * Noticeable improvement in performance
 * Added panics in `util` package
