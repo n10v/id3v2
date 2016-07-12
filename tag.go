@@ -110,7 +110,7 @@ func parseTag(file *os.File) (*Tag, error) {
 // Flush writes tag to the file.
 func (t Tag) Flush() error {
 	// Forming new frames
-	frames := t.formFrames()
+	frames := t.formAllFrames()
 
 	// Forming size of new frames
 	framesSize := util.FormSize(uint32(len(frames)))
@@ -156,68 +156,47 @@ func (t Tag) Flush() error {
 	return nil
 }
 
-func (t Tag) formAllFrames() ([]byte, error) {
+func (t Tag) formAllFrames() []byte {
 	frames := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(frames)
 
-	f, err := t.formFrames()
-	if err != nil {
-		return nil, err
-	}
-	frames.Write(f)
+	t.writeFrames(frames)
+	t.writeSequences(frames)
 
-	s, err := t.formSequences()
-	if err != nil {
-		return nil, err
-	}
-	frames.Write(s)
-
-	return frames.Bytes(), nil
+	return frames.Bytes()
 }
 
-func (t Tag) formFrames() ([]byte, error) {
-	frames := bytesbufferpool.Get()
-	defer bytesbufferpool.Put(frames)
-
+func (t Tag) writeFrames(w io.Writer) {
 	for id, f := range t.frames {
-		if id == "" {
-			return nil, errors.New("Uncorrect ID in frames")
-		}
-		frameBody, err := f.Bytes()
-		if err != nil {
-			return nil, err
-		}
-		writeFrameHeader(frames, id, uint32(len(frameBody)))
-		frames.Write(frameBody)
+		w.Write(formFrame(id, f))
 	}
-
-	return frames.Bytes(), nil
 }
 
-func (t Tag) formSequences() ([]byte, error) {
-	frames := bytesbufferpool.Get()
-	defer bytesbufferpool.Put(frames)
-
+func (t Tag) writeSequences(w io.Writer) {
 	for id, s := range t.sequences {
-		if id == "" {
-			return nil, errors.New("Uncorrect ID in sequences")
-		}
 		for _, f := range s.Frames() {
-			frameBody, err := f.Bytes()
-			if err != nil {
-				return nil, err
-			}
-			writeFrameHeader(frames, id, uint32(len(frameBody)))
-			frames.Write(frameBody)
+			w.Write(formFrame(id, f))
 		}
 	}
+}
 
-	return frames.Bytes(), nil
+func formFrame(id string, frame Framer) []byte {
+	if id == "" {
+		panic("there is blank ID in frames")
+	}
+
+	frameBuffer := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(frameBuffer)
+
+	frameBody := frame.Bytes()
+	writeFrameHeader(frameBuffer, id, uint32(len(frameBody)))
+	frameBuffer.Write(frameBody)
+
+	return frameBuffer.Bytes()
 }
 
 func writeFrameHeader(framesBuffer *bytes.Buffer, id string, frameSize uint32) {
 	framesBuffer.WriteString(id)
 	framesBuffer.Write(util.FormSize(frameSize))
-	framesBuffer.WriteByte(0)
-	framesBuffer.WriteByte(0)
+	framesBuffer.Write([]byte{0, 0})
 }
