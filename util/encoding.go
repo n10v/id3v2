@@ -11,13 +11,15 @@ package util
 // For convenience, by default all frame constructors set UTF-8 encoding
 // to frames.
 // You can set by yourself encoding to frames via SetEncoding method.
+//
 // For example:
-//	comm := id3v2.NewCommentFrame()
-//	comm.SetEncoding(id3v2.ENISO)
-//	comm.SetLanguage("eng")
-//	comm.SetDescription(string([]byte{68, 101, 115, 99})) // "Desc" on ISO-8859-1
-//	comm.SetText(string([]byte{84, 101, 120, 116})) // "Text" on ISO-8859-1
-//	tag.AddCommentFrame(comm)
+//	comment := id3v2.CommentFrame{
+//		Encoding:		 id3v2.ENISO,
+//		Language:		 "eng",
+//		Description: string([]byte{68, 101, 115, 99}),
+//		Text:				 string([]byte{84, 101, 120, 116}),
+//	}
+//	tag.AddCommentFrame(comment)
 type Encoding struct {
 	Key              byte
 	TerminationBytes []byte
