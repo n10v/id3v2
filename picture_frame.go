@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"errors"
 	"io"
 
 	"github.com/bogem/id3v2/bytesbufferpool"
@@ -39,7 +38,7 @@ type PictureFrame struct {
 	PictureType byte
 }
 
-func (pf PictureFrame) Bytes() ([]byte, error) {
+func (pf PictureFrame) Bytes() []byte {
 	b := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(b)
 
@@ -47,15 +46,15 @@ func (pf PictureFrame) Bytes() ([]byte, error) {
 	b.WriteString(pf.MimeType)
 	b.WriteByte(0)
 	if pf.PictureType < 0 || pf.PictureType > 20 {
-		return nil, errors.New("Incorrect picture type in picture frame with description " + pf.Description)
+		panic("incorrect picture type in picture frame with description " + pf.Description)
 	}
 	b.WriteByte(pf.PictureType)
 	b.WriteString(pf.Description)
 	b.Write(pf.Encoding.TerminationBytes)
 
 	if _, err := b.ReadFrom(pf.Picture); err != nil {
-		return nil, err
+		panic("can't read a picture: " + err.Error())
 	}
 
-	return b.Bytes(), nil
+	return b.Bytes()
 }

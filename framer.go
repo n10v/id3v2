@@ -6,5 +6,5 @@ package id3v2
 
 // Framer provides a generic interface for frames.
 type Framer interface {
-	Bytes() ([]byte, error)
+	Bytes() []byte
 }

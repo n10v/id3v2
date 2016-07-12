@@ -5,8 +5,6 @@
 package id3v2
 
 import (
-	"errors"
-
 	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
@@ -28,18 +26,18 @@ type UnsynchronisedLyricsFrame struct {
 	Lyrics            string
 }
 
-func (uslf UnsynchronisedLyricsFrame) Bytes() ([]byte, error) {
+func (uslf UnsynchronisedLyricsFrame) Bytes() []byte {
 	b := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(b)
 
 	b.WriteByte(uslf.Encoding.Key)
 	if uslf.Language == "" {
-		return nil, errors.New("Language isn't set up in USLT frame with description " + uslf.ContentDescriptor)
+		panic("language isn't set up in USLT frame with description " + uslf.ContentDescriptor)
 	}
 	b.WriteString(uslf.Language)
 	b.WriteString(uslf.ContentDescriptor)
 	b.Write(uslf.Encoding.TerminationBytes)
 	b.WriteString(uslf.Lyrics)
 
-	return b.Bytes(), nil
+	return b.Bytes()
 }

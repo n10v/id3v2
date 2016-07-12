@@ -5,8 +5,6 @@
 package id3v2
 
 import (
-	"errors"
-
 	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
@@ -31,18 +29,18 @@ type CommentFrame struct {
 	Text        string
 }
 
-func (cf CommentFrame) Bytes() ([]byte, error) {
+func (cf CommentFrame) Bytes() []byte {
 	b := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(b)
 
 	b.WriteByte(cf.Encoding.Key)
 	if cf.Language == "" {
-		return nil, errors.New("Language isn't set up in comment frame with description " + cf.Description)
+		panic("language isn't set up in comment frame with description " + cf.Description)
 	}
 	b.WriteString(cf.Language)
 	b.WriteString(cf.Description)
 	b.Write(cf.Encoding.TerminationBytes)
 	b.WriteString(cf.Text)
 
-	return b.Bytes(), nil
+	return b.Bytes()
 }

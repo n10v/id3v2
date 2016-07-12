@@ -24,12 +24,12 @@ type TextFrame struct {
 	Text     string
 }
 
-func (tf TextFrame) Bytes() ([]byte, error) {
+func (tf TextFrame) Bytes() []byte {
 	b := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(b)
 
 	b.WriteByte(tf.Encoding.Key)
 	b.WriteString(tf.Text)
 
-	return b.Bytes(), nil
+	return b.Bytes()
 }

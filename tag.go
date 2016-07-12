@@ -110,10 +110,7 @@ func parseTag(file *os.File) (*Tag, error) {
 // Flush writes tag to the file.
 func (t Tag) Flush() error {
 	// Forming new frames
-	frames, err := t.formAllFrames()
-	if err != nil {
-		return err
-	}
+	frames := t.formFrames()
 
 	// Forming size of new frames
 	framesSize := util.FormSize(uint32(len(frames)))
