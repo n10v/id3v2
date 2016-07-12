@@ -109,35 +109,3 @@ func Open(name string) (*Tag, error) {
 
 	return parseTag(file)
 }
-
-// NewAttachedPicture creates and initializes a new attached picture frame.
-//
-// Example of setting a new picture frame to existing tag:
-// 		pic := id3v2.NewAttachedPicture()
-// 		pic.SetMimeType("image/jpeg")
-// 		pic.SetDescription("Cover")
-// 		pic.SetPictureType(id3v2.PTFrontCover)
-// 		if err := pic.SetPictureFromFile("artwork.jpg"); err != nil {
-// 			log.Fatal("Error while setting a picture from file: ", err)
-// 		}
-// 		tag.AddAttachedPicture(pic)
-//
-// Available picture types you can see in constants.
-
-// NewTextFrame creates and initializes a new text frame. E.g. it is used by
-// such frames as artist, title and etc.
-//
-// Example of setting a new text frame to existing tag:
-//	textFrame := id3v2.NewTextFrame("Happy")
-//	id := "TMOO" // Mood frame ID
-//	tag.AddFrame(id, textFrame)
-
-// NewUnsynchronisedLyricsFrame creates and initializes a new
-// unsynchronised lyrics/text frame.
-//
-// Example of setting a new unsynchronised lyrics/text frame to existing tag:
-//	uslt := id3v2.NewUnsynchronisedLyricsFrame()
-//	uslt.SetLanguage("eng")
-//	uslt.SetContentDescriptor("Content descriptor")
-//	uslt.SetLyrics("Lyrics")
-//	tag.AddUnsynchronisedLyricsFrame(uslt)

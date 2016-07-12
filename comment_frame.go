@@ -14,13 +14,13 @@ import (
 // CommentFramer is used to work with COMM frames.
 //
 // Example of setting a new comment frame to existing tag:
-//	comm := id3v2.CommentFrame{
-//
-//}
-//	comm.SetLanguage("eng")
-//	comm.SetDescription("Short description")
-//	comm.SetText("The actual text")
-//	tag.AddCommentFrame(comm)
+//	comment := id3v2.CommentFrame{
+//		Encoding:		id3v2.ENUTF8,
+//		Language:		"eng",
+//		Desciption: "My opinion",
+//		Text:				"Very good song",
+//	}
+//	tag.AddCommentFrame(comment)
 //
 // You should choose a language code from
 // ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php

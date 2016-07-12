@@ -10,7 +10,15 @@ import (
 )
 
 // TextFrame is used to work with all text frames
-// (all T*** frames like TIT2, TALB and so on).
+// (all T*** frames like TIT2 (title), TALB (album) and so on).
+//
+// Example of setting a new text frame to existing tag:
+//	textFrame := id3v2.TextFrame{
+//		Encoding: id3v2.ENUTF8,
+//		Text:			"Happy",
+//  }
+//	id := "TMOO" // Mood frame ID
+//	tag.AddFrame(id, textFrame)
 type TextFrame struct {
 	Encoding util.Encoding
 	Text     string

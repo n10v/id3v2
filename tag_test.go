@@ -17,7 +17,7 @@ const (
 	mp3Name        = "testdata/test.mp3"
 	frontCoverName = "testdata/front_cover.jpg"
 	backCoverName  = "testdata/back_cover.png"
-	framesSize     = 62988
+	framesSize     = 63009
 	tagSize        = tagHeaderSize + framesSize
 	musicSize      = 273310
 )

@@ -12,6 +12,15 @@ import (
 )
 
 // UnsynchronisedLyricsFrame is used to work with USLT frames.
+//
+// Example of setting a new unsynchronised lyrics/text frame to existing tag:
+//	uslt := id3v2.UnsynchronisedLyricsFrame{
+//		Encoding:          id3v2.ENUTF8,
+//		Language:          "ger",
+//		ContentDescriptor: "Deutsche Nationalhymne",
+//		Lyrics:            "Einigkeit und Recht und Freiheit...",
+//  }
+//	tag.AddUnsynchronisedLyricsFrame(uslt)
 type UnsynchronisedLyricsFrame struct {
 	ContentDescriptor string
 	Encoding          util.Encoding

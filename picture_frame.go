@@ -12,7 +12,25 @@ import (
 	"github.com/bogem/id3v2/util"
 )
 
-// PictureFrame is used to work with APIC frames.
+// PictureFrame structure is used for picture frames (APIC).
+//
+// Example of setting a new picture frame to existing tag:
+//	frontCover, err := os.Open("artwork.jpg")
+//	if err != nil {
+//		log.Fatal("Error while opening front cover file")
+//  }
+//	defer frontCover.Close()
+//
+//	pic := id3v2.PictureFrame{
+//		Encoding:    id3v2.ENUTF8,
+//		MimeType:    "image/jpeg",
+//		Description: "Front cover",
+//		Picture:     frontCover,
+//		PictureType: id3v2.PTFrontCover,
+//	}
+//	tag.AddAttachedPicture(pic)
+//
+// Available picture types you can see in constants.
 type PictureFrame struct {
 	Description string
 	Encoding    util.Encoding

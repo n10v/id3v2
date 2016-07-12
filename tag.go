@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bytes"
 	"errors"
 	"io"
 	"io/ioutil"
@@ -189,8 +190,7 @@ func (t Tag) formFrames() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		frameHeader := formFrameHeader(id, uint32(len(frameBody)))
-		frames.Write(frameHeader)
+		writeFrameHeader(frames, id, uint32(len(frameBody)))
 		frames.Write(frameBody)
 	}
 
@@ -210,8 +210,7 @@ func (t Tag) formSequences() ([]byte, error) {
 			if err != nil {
 				return nil, err
 			}
-			frameHeader := formFrameHeader(id, uint32(len(frameBody)))
-			frames.Write(frameHeader)
+			writeFrameHeader(frames, id, uint32(len(frameBody)))
 			frames.Write(frameBody)
 		}
 	}
@@ -219,14 +218,9 @@ func (t Tag) formSequences() ([]byte, error) {
 	return frames.Bytes(), nil
 }
 
-func formFrameHeader(id string, frameSize uint32) []byte {
-	b := bytesbufferpool.Get()
-	defer bytesbufferpool.Put(b)
-
-	b.WriteString(id)
-	b.Write(util.FormSize(frameSize))
-	b.WriteByte(0)
-	b.WriteByte(0)
-
-	return b.Bytes()
+func writeFrameHeader(framesBuffer *bytes.Buffer, id string, frameSize uint32) {
+	framesBuffer.WriteString(id)
+	framesBuffer.Write(util.FormSize(frameSize))
+	framesBuffer.WriteByte(0)
+	framesBuffer.WriteByte(0)
 }
