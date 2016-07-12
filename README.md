@@ -1,3 +1,6 @@
+[![GoDoc](https://godoc.org/github.com/bogem/id3v2?status.svg)](https://godoc.org/github.com/bogem/id3v2)
+[![Release](https://img.shields.io/github/release/bogem/id3v2.svg?maxAge=2592000)](https://github.com/bogem/id3v2/releases)
+
 # id3v2
 
 ## IMHO
