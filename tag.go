@@ -37,13 +37,13 @@ func (t *Tag) AddAttachedPicture(pf PictureFrame) {
 }
 
 func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
-	id := t.commonIDs["Unsynchronised lyrics/text"]
+	id := t.commonIDs["Unsynchronised lyrics/text transcription"]
 	t.checkExistenceOfSequence(id, newUSLFSequence)
 	t.addFrameToSequence(uslf, id)
 }
 
 func (t *Tag) AddCommentFrame(cf CommentFrame) {
-	id := t.commonIDs["Comment"]
+	id := t.commonIDs["Comments"]
 	t.checkExistenceOfSequence(id, newCommentSequence)
 	t.addFrameToSequence(cf, id)
 }
@@ -62,23 +62,23 @@ func (t *Tag) addFrameToSequence(f Framer, id string) {
 }
 
 func (t *Tag) SetTitle(title string) {
-	t.AddFrame(t.commonIDs["Title"], TextFrame{Encoding: ENUTF8, Text: title})
+	t.AddFrame(t.commonIDs["Title/Songname/Content description"], TextFrame{Encoding: ENUTF8, Text: title})
 }
 
 func (t *Tag) SetArtist(artist string) {
-	t.AddFrame(t.commonIDs["Artist"], TextFrame{Encoding: ENUTF8, Text: artist})
+	t.AddFrame(t.commonIDs["Lead artist/Lead performer/Soloist/Performing group"], TextFrame{Encoding: ENUTF8, Text: artist})
 }
 
 func (t *Tag) SetAlbum(album string) {
-	t.AddFrame(t.commonIDs["Album"], TextFrame{Encoding: ENUTF8, Text: album})
+	t.AddFrame(t.commonIDs["Album/Movie/Show title"], TextFrame{Encoding: ENUTF8, Text: album})
 }
 
 func (t *Tag) SetYear(year string) {
-	t.AddFrame(t.commonIDs["Year"], TextFrame{Encoding: ENUTF8, Text: year})
+	t.AddFrame(t.commonIDs["Recording time"], TextFrame{Encoding: ENUTF8, Text: year})
 }
 
 func (t *Tag) SetGenre(genre string) {
-	t.AddFrame(t.commonIDs["Genre"], TextFrame{Encoding: ENUTF8, Text: genre})
+	t.AddFrame(t.commonIDs["Content type"], TextFrame{Encoding: ENUTF8, Text: genre})
 }
 
 func newTag(file *os.File, size uint32) *Tag {
