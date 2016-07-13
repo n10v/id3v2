@@ -38,7 +38,7 @@ func BenchmarkSetCommonCase(b *testing.B) {
 	}
 }
 
-func BenchmarkSetManyTags(b *testing.B) {
+func BenchmarkSetManyFrames(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		tag, err := Open(mp3Name)
 		if tag == nil || err != nil {
