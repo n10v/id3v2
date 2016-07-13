@@ -37,7 +37,7 @@ func (t *Tag) AddAttachedPicture(pf PictureFrame) {
 }
 
 func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
-	id := t.commonIDs["USLT"]
+	id := t.commonIDs["Unsynchronised lyrics/text"]
 	t.checkExistenceOfSequence(id, newUSLFSequence)
 	t.addFrameToSequence(uslf, id)
 }
