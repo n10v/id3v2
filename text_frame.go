@@ -24,7 +24,7 @@ type TextFrame struct {
 	Text     string
 }
 
-func (tf TextFrame) Bytes() []byte {
+func (tf TextFrame) Body() []byte {
 	b := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(b)
 

@@ -38,7 +38,7 @@ type PictureFrame struct {
 	PictureType byte
 }
 
-func (pf PictureFrame) Bytes() []byte {
+func (pf PictureFrame) Body() []byte {
 	b := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(b)
 

@@ -29,7 +29,7 @@ type CommentFrame struct {
 	Text        string
 }
 
-func (cf CommentFrame) Bytes() []byte {
+func (cf CommentFrame) Body() []byte {
 	b := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(b)
 

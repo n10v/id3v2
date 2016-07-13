@@ -5,6 +5,8 @@
 package id3v2
 
 // Framer provides a generic interface for frames.
+// You can create your own frames. They must implement only this interface.
 type Framer interface {
-	Bytes() []byte
+	// Body returns byte slice, that contains only frame body
+	Body() []byte
 }

@@ -188,7 +188,7 @@ func formFrame(id string, frame Framer) []byte {
 	frameBuffer := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(frameBuffer)
 
-	frameBody := frame.Bytes()
+	frameBody := frame.Body()
 	writeFrameHeader(frameBuffer, id, uint32(len(frameBody)))
 	frameBuffer.Write(frameBody)
 

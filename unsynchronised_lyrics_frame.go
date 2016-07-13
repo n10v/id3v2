@@ -26,7 +26,7 @@ type UnsynchronisedLyricsFrame struct {
 	Lyrics            string
 }
 
-func (uslf UnsynchronisedLyricsFrame) Bytes() []byte {
+func (uslf UnsynchronisedLyricsFrame) Body() []byte {
 	b := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(b)
 
