@@ -16,8 +16,8 @@ import (
 const (
 	mp3Name        = "testdata/test.mp3"
 	frontCoverName = "testdata/front_cover.jpg"
-	backCoverName  = "testdata/back_cover.png"
-	framesSize     = 63009
+	backCoverName  = "testdata/back_cover.jpg"
+	framesSize     = 222479
 	tagSize        = tagHeaderSize + framesSize
 	musicSize      = 273310
 )
@@ -58,7 +58,7 @@ func TestSetTags(t *testing.T) {
 
 	pic = PictureFrame{
 		Encoding:    ENUTF8,
-		MimeType:    "image/png",
+		MimeType:    "image/jpeg",
 		Description: "Back cover",
 		Picture:     backCover,
 		PictureType: PTBackCover,
