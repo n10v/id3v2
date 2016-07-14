@@ -25,7 +25,7 @@ func FormSize(n uint32) []byte {
 
 	mask := uint32(1<<sizeBase - 1)
 
-	for i, _ := range byteSize {
+	for i := range byteSize {
 		byteSize[len(byteSize)-i-1] = byte(n & mask)
 		n >>= sizeBase
 	}
