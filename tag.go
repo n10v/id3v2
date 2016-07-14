@@ -117,6 +117,7 @@ func (t Tag) Flush() error {
 
 	// Creating a temp file for mp3 file, which will contain new tag
 	newFile, err := ioutil.TempFile("", "")
+	defer newFile.Close()
 	if err != nil {
 		return err
 	}
@@ -145,11 +146,6 @@ func (t Tag) Flush() error {
 
 	// Replacing original file with new file
 	if err = os.Rename(newFile.Name(), originalFile.Name()); err != nil {
-		return err
-	}
-
-	// And closing it
-	if err = newFile.Close(); err != nil {
 		return err
 	}
 
