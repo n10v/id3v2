@@ -13,12 +13,13 @@ import (
 // (all T*** frames like TIT2 (title), TALB (album) and so on).
 //
 // Example of setting a new text frame to existing tag:
-//  textFrame := id3v2.TextFrame{
-//    Encoding: id3v2.ENUTF8,
-//    Text:     "Happy",
-//  }
-//  id := id3v2.V24CommonIDs["Mood"]
-//  tag.AddFrame(id, textFrame)
+//
+//	textFrame := id3v2.TextFrame{
+//		Encoding: id3v2.ENUTF8,
+//		Text:     "Happy",
+//	}
+//	id := id3v2.V24CommonIDs["Mood"]
+//	tag.AddFrame(id, textFrame)
 type TextFrame struct {
 	Encoding util.Encoding
 	Text     string

@@ -13,11 +13,12 @@ package util
 // You can set by yourself encoding to frames via SetEncoding method.
 //
 // For example:
+//
 //	comment := id3v2.CommentFrame{
-//		Encoding:		 id3v2.ENISO,
-//		Language:		 "eng",
+//		Encoding:    id3v2.ENISO,
+//		Language:    "eng",
 //		Description: string([]byte{68, 101, 115, 99}),
-//		Text:				 string([]byte{84, 101, 120, 116}),
+//		Text:        string([]byte{84, 101, 120, 116}),
 //	}
 //	tag.AddCommentFrame(comment)
 type Encoding struct {

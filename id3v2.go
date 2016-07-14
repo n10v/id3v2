@@ -11,23 +11,24 @@
 // If version of the tag is smaller than 3, this library will return an error.
 //
 // Example of creating a new tag and writing it in file:
+//
 //	package main
 //
 //	import (
-// 		"github.com/bogem/id3v2"
-// 		"log"
-// 	)
+//		"github.com/bogem/id3v2"
+//		"log"
+//	)
 //
-// 	func main() {
+//	func main() {
 //		// Open file and find tag in it
-// 		tag, err := id3v2.Open("file.mp3")
-// 		if err != nil {
-// 		 log.Fatal("Error while opening mp3 file: ", err)
-// 		}
+//		tag, err := id3v2.Open("file.mp3")
+//		if err != nil {
+//			log.Fatal("Error while opening mp3 file: ", err)
+//		}
 //
 //		// Set tags
-// 		tag.SetArtist("Artist")
-// 		tag.SetTitle("Title")
+//		tag.SetArtist("Artist")
+//		tag.SetTitle("Title")
 //
 //		comment := id3v2.CommentFrame{
 //			Encoding:   id3v2.ENUTF8,
@@ -38,10 +39,10 @@
 //		tag.AddCommentFrame(comment)
 //
 //		// Write it to file
-// 		if err = tag.Flush(); err != nil {
-// 			log.Fatal("Error while flushing a tag: ", err)
-// 		}
-// 	}
+//		if err = tag.Flush(); err != nil {
+//			log.Fatal("Error while flushing a tag: ", err)
+//		}
+//	}
 package id3v2
 
 import (

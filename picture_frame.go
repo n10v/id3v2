@@ -14,20 +14,21 @@ import (
 // PictureFrame structure is used for picture frames (APIC).
 //
 // Example of setting a new picture frame to existing tag:
-//  frontCover, err := os.Open("artwork.jpg")
-//  if err != nil {
-//    log.Fatal("Error while opening front cover file")
-//  }
-//  defer frontCover.Close()
 //
-//  pic := id3v2.PictureFrame{
-//    Encoding:    id3v2.ENUTF8,
-//    MimeType:    "image/jpeg",
-//    PictureType: id3v2.PTFrontCover,
-//    Description: "Front cover",
-//    Picture:     frontCover,
-//  }
-//  tag.AddAttachedPicture(pic)
+//	frontCover, err := os.Open("artwork.jpg")
+//	if err != nil {
+//		log.Fatal("Error while opening front cover file")
+//	}
+//	defer frontCover.Close()
+//
+//	pic := id3v2.PictureFrame{
+//		Encoding:    id3v2.ENUTF8,
+//		MimeType:    "image/jpeg",
+//		PictureType: id3v2.PTFrontCover,
+//		Description: "Front cover",
+//		Picture:     frontCover,
+//	}
+//	tag.AddAttachedPicture(pic)
 //
 // Available picture types you can see in constants.
 type PictureFrame struct {
