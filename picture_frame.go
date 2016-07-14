@@ -23,9 +23,9 @@ import (
 //  pic := id3v2.PictureFrame{
 //    Encoding:    id3v2.ENUTF8,
 //    MimeType:    "image/jpeg",
+//    PictureType: id3v2.PTFrontCover,
 //    Description: "Front cover",
 //    Picture:     frontCover,
-//    PictureType: id3v2.PTFrontCover,
 //  }
 //  tag.AddAttachedPicture(pic)
 //
@@ -33,9 +33,9 @@ import (
 type PictureFrame struct {
 	Encoding    util.Encoding
 	MimeType    string
+	PictureType byte
 	Description string
 	Picture     io.Reader
-	PictureType byte
 }
 
 func (pf PictureFrame) Body() []byte {

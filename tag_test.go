@@ -43,9 +43,9 @@ func TestSetTags(t *testing.T) {
 	pic := PictureFrame{
 		Encoding:    ENUTF8,
 		MimeType:    "image/jpeg",
+		PictureType: PTFrontCover,
 		Description: "Front cover",
 		Picture:     frontCover,
-		PictureType: PTFrontCover,
 	}
 	tag.AddAttachedPicture(pic)
 
@@ -59,9 +59,9 @@ func TestSetTags(t *testing.T) {
 	pic = PictureFrame{
 		Encoding:    ENUTF8,
 		MimeType:    "image/jpeg",
+		PictureType: PTBackCover,
 		Description: "Back cover",
 		Picture:     backCover,
-		PictureType: PTBackCover,
 	}
 	tag.AddAttachedPicture(pic)
 

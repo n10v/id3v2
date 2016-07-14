@@ -26,9 +26,9 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		pic := PictureFrame{
 			Encoding:    ENUTF8,
 			MimeType:    "image/jpeg",
+			PictureType: PTFrontCover,
 			Description: "Front cover",
 			Picture:     frontCover,
-			PictureType: PTFrontCover,
 		}
 		tag.AddAttachedPicture(pic)
 
@@ -60,9 +60,9 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		pic := PictureFrame{
 			Encoding:    ENUTF8,
 			MimeType:    "image/jpeg",
+			PictureType: PTFrontCover,
 			Description: "Front cover",
 			Picture:     frontCover,
-			PictureType: PTFrontCover,
 		}
 		tag.AddAttachedPicture(pic)
 
