@@ -8,7 +8,7 @@
 // So if you only want to set tags, it fits you.
 // And if there is a tag of version 3 or 4, this library will just
 // delete this tag, because it can't parse tags yet.
-// If version of the tag is small than 3, this library will return an error.
+// If version of the tag is smaller than 3, this library will return an error.
 //
 // Example of creating a new tag and writing it in file:
 //	package main
@@ -50,7 +50,7 @@ import (
 	"github.com/bogem/id3v2/util"
 )
 
-// Possible picture types for picture frame.
+// Available picture types for picture frame.
 const (
 	PTOther                   = 0
 	PTFileIcon                = 1
@@ -75,7 +75,7 @@ const (
 	PTPublisherStudioLogotype = 20
 )
 
-// Possible encodings.
+// Available encodings.
 var (
 	// ISO-8859-1.
 	ENISO = util.Encoding{
