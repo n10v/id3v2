@@ -191,8 +191,8 @@ func formFrame(id string, frame Framer) []byte {
 	return frameBuffer.Bytes()
 }
 
-func writeFrameHeader(framesBuffer *bytes.Buffer, id string, frameSize uint32) {
-	framesBuffer.WriteString(id)
-	framesBuffer.Write(util.FormSize(frameSize))
-	framesBuffer.Write([]byte{0, 0})
+func writeFrameHeader(buf *bytes.Buffer, id string, frameSize uint32) {
+	buf.WriteString(id)
+	buf.Write(util.FormSize(frameSize))
+	buf.Write([]byte{0, 0})
 }
