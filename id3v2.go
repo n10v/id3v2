@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-// ID3v2 writing library for Go.
+// Package id3v2 is the ID3 writing library for Go.
 //
 // This library can only set and write tags, but can't read them.
 // So if you only want to set tags, it fits you.
@@ -109,5 +109,10 @@ func Open(name string) (*Tag, error) {
 		return nil, err
 	}
 
+	return ParseFile(file)
+}
+
+// ParseFile parses opened file and find tag in it.
+func ParseFile(file *os.File) (*Tag, error) {
 	return parseTag(file)
 }

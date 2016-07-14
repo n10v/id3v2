@@ -4,7 +4,7 @@
 
 package util
 
-// Primitive for encoding.
+// Encoding is a primitive for encodings.
 //
 // If you are user of id3v2 library, all list of allowed encodings you can find
 // in documentation in variables.
