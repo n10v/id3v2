@@ -1,3 +1,5 @@
+// Package bytesbufferpool is used only for internal usage. Users of
+// library id3v2 must not use it.
 package bytesbufferpool
 
 import (
