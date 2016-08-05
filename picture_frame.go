@@ -46,9 +46,6 @@ func (pf PictureFrame) Body() []byte {
 	b.WriteByte(pf.Encoding.Key)
 	b.WriteString(pf.MimeType)
 	b.WriteByte(0)
-	if pf.PictureType < 0 || pf.PictureType > 20 {
-		panic("incorrect picture type in picture frame with description " + pf.Description)
-	}
 	b.WriteByte(pf.PictureType)
 	b.WriteString(pf.Description)
 	b.Write(pf.Encoding.TerminationBytes)
