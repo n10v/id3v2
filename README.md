@@ -32,12 +32,12 @@ All benchmarks run on **MacBook Air 13" (early 2013, 1,4GHz Intel Core i5, 4GB 1
 
 #### Set title, artist, year and 112KB picture to 4,6 MP3:
 ```
-BenchmarkSetCommonCase-4	     100	  10002592 ns/op	   50707 B/op	      34 allocs/op
+BenchmarkSetCommonCase-4	     100	  10002592 ns/op	   50707 B/op	      35 allocs/op
 ```
 
 #### Set title, artist, album, year, genre, unsynchronised lyrics, comment and 112KB picture to 4,6MB MP3:
 ```
-BenchmarkSetManyFrames-4	     200	   9590827 ns/op	   52733 B/op	      50 allocs/op
+BenchmarkSetManyFrames-4	     200	   9590827 ns/op	   52733 B/op	      51 allocs/op
 ```
 
 ## Installation
