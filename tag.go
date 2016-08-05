@@ -140,7 +140,19 @@ func (t Tag) Flush() error {
 	}
 
 	// Writing to new file the music part
-	if _, err = io.Copy(newFile, originalFile); err != nil {
+	if _, err := io.Copy(newFile, originalFile); err != nil {
+		return err
+	}
+
+	// Getting original file mode
+	originalFileStat, err := originalFile.Stat()
+	if err != nil {
+		return err
+	}
+	originalFileMode := originalFileStat.Mode()
+
+	// Setting new file mode
+	if err := newFile.Chmod(originalFileMode); err != nil {
 		return err
 	}
 
