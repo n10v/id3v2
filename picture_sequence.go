@@ -30,6 +30,6 @@ func (ps pictureSequence) Frames() []Framer {
 
 func (ps *pictureSequence) AddFrame(f Framer) {
 	pf := f.(PictureFrame)
-	pt := pf.PictureType
-	ps.sequence[int(pt)] = pf
+	id := int(pf.PictureType)
+	ps.sequence[id] = pf
 }
