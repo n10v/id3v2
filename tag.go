@@ -123,24 +123,24 @@ func (t Tag) Flush() error {
 	}
 
 	// Writing to new file new tag header
-	if _, err := newFile.Write(formTagHeader(framesSize)); err != nil {
+	if _, err = newFile.Write(formTagHeader(framesSize)); err != nil {
 		return err
 	}
 
 	// Writing to new file new frames
-	if _, err := newFile.Write(frames); err != nil {
+	if _, err = newFile.Write(frames); err != nil {
 		return err
 	}
 
 	// Seeking to a music part of mp3
 	originalFile := t.file
 	defer originalFile.Close()
-	if _, err := originalFile.Seek(int64(t.originalSize), os.SEEK_SET); err != nil {
+	if _, err = originalFile.Seek(int64(t.originalSize), os.SEEK_SET); err != nil {
 		return err
 	}
 
 	// Writing to new file the music part
-	if _, err := io.Copy(newFile, originalFile); err != nil {
+	if _, err = io.Copy(newFile, originalFile); err != nil {
 		return err
 	}
 
@@ -152,7 +152,7 @@ func (t Tag) Flush() error {
 	originalFileMode := originalFileStat.Mode()
 
 	// Setting new file mode
-	if err := newFile.Chmod(originalFileMode); err != nil {
+	if err = newFile.Chmod(originalFileMode); err != nil {
 		return err
 	}
 
