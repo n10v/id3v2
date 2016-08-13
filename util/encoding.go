@@ -8,12 +8,7 @@ package util
 //
 // If you are user of id3v2 library, all list of allowed encodings you can find
 // in documentation in variables.
-// For convenience, by default all frame constructors set UTF-8 encoding
-// to frames.
-// You can set by yourself encoding to frames via SetEncoding method.
-//
-// For example:
-//
+// You can set by yourself encoding to frames:
 //	comment := id3v2.CommentFrame{
 //		Encoding:    id3v2.ENISO,
 //		Language:    "eng",
