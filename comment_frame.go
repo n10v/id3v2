@@ -9,7 +9,7 @@ import (
 	"github.com/bogem/id3v2/util"
 )
 
-// CommentFramer is used to work with COMM frames.
+// CommentFrame is used to work with COMM frames.
 //
 // Example of setting a new comment frame to existing tag:
 //
