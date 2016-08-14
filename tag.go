@@ -15,6 +15,7 @@ import (
 	"github.com/bogem/id3v2/util"
 )
 
+// Tag stores all frames of opened file.
 type Tag struct {
 	frames       map[string]Framer
 	sequences    map[string]sequencer
