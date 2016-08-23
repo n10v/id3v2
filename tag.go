@@ -107,17 +107,8 @@ func (t *Tag) GetLastFrame(id string) Framer {
 
 func (t *Tag) GetFrames(id string) []Framer {
 	// If frames with id didn't parsed yet, parse them
-	if fcs, exists := t.framesCoords[id]; exists {
-		parseFunc := t.findParseFunc(id)
-		if parseFunc != nil {
-			for _, fc := range fcs {
-				fr := readFrame(parseFunc, t.file, fc)
-				t.AddFrame(id, fr)
-			}
-		}
-		// Delete frames with id from t.framesCoords,
-		// because they are just being parsed
-		delete(t.framesCoords, id)
+	if _, exists := t.framesCoords[id]; exists {
+		t.parseFramesCoordsWithID(id)
 	}
 
 	if f, exists := t.frames[id]; exists {
