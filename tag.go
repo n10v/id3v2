@@ -81,6 +81,9 @@ func (t *Tag) addFrameToSequence(id string, f Framer) {
 
 func (t *Tag) GetLastFrame(id string) Framer {
 	fs := t.GetFrames(id)
+	if len(fs) == 0 || fs == nil {
+		return nil
+	}
 	return fs[len(fs)-1]
 }
 
