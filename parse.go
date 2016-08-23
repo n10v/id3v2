@@ -110,6 +110,8 @@ func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
 		return ParsePictureFrame
 	case t.commonIDs["Comments"]:
 		return ParseCommentFrame
+	case t.commonIDs["Unsynchronised lyrics/text transcription"]:
+		return ParseUnsynchronisedLyricsFrame
 	}
 	return nil
 }
