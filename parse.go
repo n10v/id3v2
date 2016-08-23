@@ -125,3 +125,27 @@ func readFrame(parseFunc func(io.Reader) (Framer, error), file *os.File, fc fram
 	}
 	return fr
 }
+
+func (t *Tag) parseAllFramesCoords() {
+	for id := range t.framesCoords {
+		t.parseFramesCoordsWithID(id)
+	}
+}
+
+func (t *Tag) parseFramesCoordsWithID(id string) {
+	fcs, exists := t.framesCoords[id]
+	if !exists {
+		return
+	}
+
+	parseFunc := t.findParseFunc(id)
+	if parseFunc != nil {
+		for _, fc := range fcs {
+			fr := readFrame(parseFunc, t.file, fc)
+			t.AddFrame(id, fr)
+		}
+	}
+	// Delete frames with id from t.framesCoords,
+	// because they are just being parsed
+	delete(t.framesCoords, id)
+}
