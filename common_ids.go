@@ -62,8 +62,8 @@ var (
 		"Performer sort order":                             "TSOP",
 		"Title sort order":                                 "TSOT",
 
-		"Attached picture":                         "APIC",
+		"Attached picture": "APIC",
+		"Comments":         "COMM",
 		"Unsynchronised lyrics/text transcription": "USLT",
-		"Comments": "COMM",
 	}
 )

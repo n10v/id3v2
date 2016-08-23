@@ -18,7 +18,7 @@ var (
 //
 // If size more than allowed (256MB), then panic occurs.
 func FormSize(n uint32) []byte {
-	allowedSize := uint32(268435455) // 4 * 0b01111111
+	allowedSize := uint32(268435455) // 0b11111... (28 digits)
 	if n > allowedSize {
 		panic("Size is more than allowed in id3 tag")
 	}

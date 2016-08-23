@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bytes"
 	"io"
 
 	"github.com/bogem/id3v2/bytesbufferpool"
@@ -55,4 +56,44 @@ func (pf PictureFrame) Body() []byte {
 	}
 
 	return b.Bytes()
+}
+
+func ParsePictureFrame(rd io.Reader) (Framer, error) {
+	bufRd := util.NewReader(rd)
+
+	encodingByte, err := bufRd.ReadByte()
+	if err != nil {
+		return nil, err
+	}
+	encoding := Encodings[encodingByte]
+
+	mimeType, err := bufRd.ReadTillAndWithDelim(0)
+	if err != nil {
+		return nil, err
+	}
+
+	pictureType, err := bufRd.ReadByte()
+	if err != nil {
+		return nil, err
+	}
+
+	description, err := bufRd.ReadTillAndWithDelims(encoding.TerminationBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	picture, err := bufRd.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	pf := PictureFrame{
+		Encoding:    encoding,
+		MimeType:    string(mimeType),
+		PictureType: pictureType,
+		Description: string(description),
+		Picture:     bytes.NewReader(picture),
+	}
+
+	return pf, nil
 }

@@ -101,6 +101,8 @@ var (
 		Key:              3,
 		TerminationBytes: []byte{0},
 	}
+
+	Encodings = []util.Encoding{ENISO, ENUTF16, ENUTF16BE, ENUTF8}
 )
 
 // Open opens file with string name and find tag in it.

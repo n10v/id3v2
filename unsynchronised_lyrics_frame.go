@@ -5,6 +5,8 @@
 package id3v2
 
 import (
+	"io"
+
 	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
@@ -41,4 +43,38 @@ func (uslf UnsynchronisedLyricsFrame) Body() []byte {
 	b.WriteString(uslf.Lyrics)
 
 	return b.Bytes()
+}
+
+func ParseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
+	bufRd := util.NewReader(rd)
+
+	encodingByte, err := bufRd.ReadByte()
+	if err != nil {
+		return nil, err
+	}
+	encoding := Encodings[encodingByte]
+
+	language, err := bufRd.ReadBytes(3)
+	if err != nil {
+		return nil, err
+	}
+
+	contentDescriptor, err := bufRd.ReadTillAndWithDelims(encoding.TerminationBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	lyrics, err := bufRd.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	uslf := UnsynchronisedLyricsFrame{
+		Encoding:          encoding,
+		Language:          string(language),
+		ContentDescriptor: string(contentDescriptor),
+		Lyrics:            string(lyrics),
+	}
+
+	return uslf, nil
 }

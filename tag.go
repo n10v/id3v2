@@ -6,7 +6,6 @@ package id3v2
 
 import (
 	"bytes"
-	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -17,9 +16,11 @@ import (
 
 // Tag stores all frames of opened file.
 type Tag struct {
+	framesCoords map[string][]frameCoordinates
 	frames       map[string]Framer
 	sequences    map[string]sequencer
 	commonIDs    map[string]string
+
 	file         *os.File
 	originalSize uint32
 }
@@ -28,25 +29,41 @@ func (t *Tag) AddFrame(id string, f Framer) {
 	if t.frames == nil {
 		t.frames = make(map[string]Framer)
 	}
-	t.frames[id] = f
+	if addFunc := t.findSpecificAddFunction(id); addFunc != nil {
+		addFunc(f)
+	} else {
+		t.frames[id] = f
+	}
 }
 
-func (t *Tag) AddAttachedPicture(pf PictureFrame) {
+func (t *Tag) findSpecificAddFunction(id string) func(Framer) {
+	switch id {
+	case t.commonIDs["Attached picture"]:
+		return t.addAttachedPicture
+	case t.commonIDs["Comments"]:
+		return t.addCommentFrame
+	case t.commonIDs["Unsynchronised lyrics/text transcription"]:
+		return t.addUnsynchronisedLyricsFrame
+	}
+	return nil
+}
+
+func (t *Tag) addAttachedPicture(f Framer) {
 	id := t.commonIDs["Attached picture"]
 	t.checkExistenceOfSequence(id, newPictureSequence)
-	t.addFrameToSequence(pf, id)
+	t.addFrameToSequence(id, f)
 }
 
-func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
-	id := t.commonIDs["Unsynchronised lyrics/text transcription"]
-	t.checkExistenceOfSequence(id, newUSLFSequence)
-	t.addFrameToSequence(uslf, id)
-}
-
-func (t *Tag) AddCommentFrame(cf CommentFrame) {
+func (t *Tag) addCommentFrame(f Framer) {
 	id := t.commonIDs["Comments"]
 	t.checkExistenceOfSequence(id, newCommentSequence)
-	t.addFrameToSequence(cf, id)
+	t.addFrameToSequence(id, f)
+}
+
+func (t *Tag) addUnsynchronisedLyricsFrame(f Framer) {
+	id := t.commonIDs["Unsynchronised lyrics/text transcription"]
+	t.checkExistenceOfSequence(id, newUSLFSequence)
+	t.addFrameToSequence(id, f)
 }
 
 func (t *Tag) checkExistenceOfSequence(id string, newSequence func() sequencer) {
@@ -58,54 +75,90 @@ func (t *Tag) checkExistenceOfSequence(id string, newSequence func() sequencer) 
 	}
 }
 
-func (t *Tag) addFrameToSequence(f Framer, id string) {
+func (t *Tag) addFrameToSequence(id string, f Framer) {
 	t.sequences[id].AddFrame(f)
+}
+
+func (t *Tag) GetLastFrame(id string) Framer {
+	fs := t.GetFrames(id)
+	return fs[len(fs)-1]
+}
+
+func (t *Tag) GetFrames(id string) []Framer {
+	// If frames with id didn't parsed yet, parse them
+	if fcs, exists := t.framesCoords[id]; exists {
+		parseFunc := t.findParseFunc(id)
+		if parseFunc != nil {
+			for _, fc := range fcs {
+				fr := readFrame(parseFunc, t.file, fc)
+				t.AddFrame(id, fr)
+			}
+		}
+	}
+
+	if f, exists := t.frames[id]; exists {
+		return []Framer{f}
+	}
+
+	if s, exists := t.sequences[id]; exists {
+		return s.Frames()
+	}
+
+	return nil
+}
+
+func (t Tag) GetTextFrame(id string) TextFrame {
+	f := t.GetLastFrame(id)
+	if f == nil {
+		return TextFrame{}
+	}
+	tf := f.(TextFrame)
+	return tf
+}
+
+func (t Tag) Title() string {
+	f := t.GetTextFrame(t.commonIDs["Title/Songname/Content description"])
+	return f.Text
 }
 
 func (t *Tag) SetTitle(title string) {
 	t.AddFrame(t.commonIDs["Title/Songname/Content description"], TextFrame{Encoding: ENUTF8, Text: title})
 }
 
+func (t Tag) Artist() string {
+	f := t.GetTextFrame(t.commonIDs["Lead artist/Lead performer/Soloist/Performing group"])
+	return f.Text
+}
+
 func (t *Tag) SetArtist(artist string) {
 	t.AddFrame(t.commonIDs["Lead artist/Lead performer/Soloist/Performing group"], TextFrame{Encoding: ENUTF8, Text: artist})
+}
+
+func (t Tag) Album() string {
+	f := t.GetTextFrame(t.commonIDs["Album/Movie/Show title"])
+	return f.Text
 }
 
 func (t *Tag) SetAlbum(album string) {
 	t.AddFrame(t.commonIDs["Album/Movie/Show title"], TextFrame{Encoding: ENUTF8, Text: album})
 }
 
+func (t Tag) Year() string {
+	f := t.GetTextFrame(t.commonIDs["Recording time"])
+	return f.Text
+}
+
 func (t *Tag) SetYear(year string) {
 	t.AddFrame(t.commonIDs["Recording time"], TextFrame{Encoding: ENUTF8, Text: year})
 }
 
+func (t Tag) Genre() string {
+	f := t.GetTextFrame(t.commonIDs["Content type"])
+	return f.Text
+}
+
 func (t *Tag) SetGenre(genre string) {
 	t.AddFrame(t.commonIDs["Content type"], TextFrame{Encoding: ENUTF8, Text: genre})
-}
-
-func newTag(file *os.File, size uint32) *Tag {
-	return &Tag{
-		commonIDs: V24CommonIDs,
-
-		file:         file,
-		originalSize: size,
-	}
-}
-
-func parseTag(file *os.File) (*Tag, error) {
-	header, err := parseHeader(file)
-	if err != nil {
-		err = errors.New("Trying to parse tag header: " + err.Error())
-		return nil, err
-	}
-	if header == nil {
-		return newTag(file, 0), nil
-	}
-	if header.Version < 3 {
-		err = errors.New("Unsupported version of ID3 tag")
-		return nil, err
-	}
-
-	return newTag(file, tagHeaderSize+header.FramesSize), nil
 }
 
 // Flush writes tag to the file.

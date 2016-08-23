@@ -30,7 +30,7 @@ func BenchmarkSetCommonCase(b *testing.B) {
 			Description: "Front cover",
 			Picture:     frontCover,
 		}
-		tag.AddAttachedPicture(pic)
+		tag.AddFrame(V24CommonIDs["Attched picture"], pic)
 
 		if err = tag.Flush(); err != nil {
 			b.Error("Error while closing a tag: ", err)
@@ -64,7 +64,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 			Description: "Front cover",
 			Picture:     frontCover,
 		}
-		tag.AddAttachedPicture(pic)
+		tag.AddFrame(V24CommonIDs["Attached picture"], pic)
 
 		// Setting USLT
 		uslt := UnsynchronisedLyricsFrame{
@@ -73,7 +73,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 			ContentDescriptor: "Content descriptor",
 			Lyrics:            "bogem/id3v2",
 		}
-		tag.AddUnsynchronisedLyricsFrame(uslt)
+		tag.AddFrame(V24CommonIDs["Unsynchronised lyrics/text transcription"], uslt)
 
 		// Setting comment
 		comm := CommentFrame{
@@ -82,7 +82,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 			Description: "Short description",
 			Text:        "The actual text",
 		}
-		tag.AddCommentFrame(comm)
+		tag.AddFrame(V24CommonIDs["Comments"], comm)
 
 		if err = tag.Flush(); err != nil {
 			b.Error("Error while closing a tag: ", err)

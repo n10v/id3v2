@@ -5,6 +5,8 @@
 package id3v2
 
 import (
+	"io"
+
 	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
@@ -44,4 +46,38 @@ func (cf CommentFrame) Body() []byte {
 	b.WriteString(cf.Text)
 
 	return b.Bytes()
+}
+
+func ParseCommentFrame(rd io.Reader) (Framer, error) {
+	bufRd := util.NewReader(rd)
+
+	encodingByte, err := bufRd.ReadByte()
+	if err != nil {
+		return nil, err
+	}
+	encoding := Encodings[encodingByte]
+
+	language, err := bufRd.ReadBytes(3)
+	if err != nil {
+		return nil, err
+	}
+
+	description, err := bufRd.ReadTillAndWithDelims(encoding.TerminationBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	text, err := bufRd.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	cf := CommentFrame{
+		Encoding:    encoding,
+		Language:    string(language),
+		Description: string(description),
+		Text:        string(text),
+	}
+
+	return cf, nil
 }
