@@ -79,6 +79,24 @@ func (t *Tag) addFrameToSequence(id string, f Framer) {
 	t.sequences[id].AddFrame(f)
 }
 
+func (t *Tag) AllFrames() map[string][]Framer {
+	frames := make(map[string][]Framer)
+
+	t.parseAllFramesCoords()
+
+	// Add frames from t.frames
+	for id, frame := range t.frames {
+		frames[id] = append(frames[id], frame)
+	}
+
+	// Add frames from t.sequences
+	for id, sequence := range t.sequences {
+		frames[id] = append(frames[id], sequence.Frames()...)
+	}
+
+	return frames
+}
+
 func (t *Tag) GetLastFrame(id string) Framer {
 	fs := t.GetFrames(id)
 	if len(fs) == 0 || fs == nil {
