@@ -97,6 +97,9 @@ func (t *Tag) GetFrames(id string) []Framer {
 				t.AddFrame(id, fr)
 			}
 		}
+		// Delete frames with id from t.framesCoords,
+		// because they are just being parsed
+		delete(t.framesCoords, id)
 	}
 
 	if f, exists := t.frames[id]; exists {
