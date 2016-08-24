@@ -47,7 +47,7 @@ func TestSetTags(t *testing.T) {
 		Description: "Front cover",
 		Picture:     frontCover,
 	}
-	tag.AddFrame(V24CommonIDs["Attached picture"], pic)
+	tag.AddFrame(tag.ID("Attached picture"), pic)
 
 	// Setting back cover
 	backCover, err := os.Open(backCoverName)
@@ -63,7 +63,7 @@ func TestSetTags(t *testing.T) {
 		Description: "Back cover",
 		Picture:     backCover,
 	}
-	tag.AddFrame(V24CommonIDs["Attached picture"], pic)
+	tag.AddFrame(tag.ID("Attached picture"), pic)
 
 	// Setting USLTs
 	uslt := UnsynchronisedLyricsFrame{
@@ -72,7 +72,7 @@ func TestSetTags(t *testing.T) {
 		ContentDescriptor: "Content descriptor",
 		Lyrics:            "bogem/id3v2",
 	}
-	tag.AddFrame(V24CommonIDs["Unsynchronised lyrics/text transcription"], uslt)
+	tag.AddFrame(tag.ID("Unsynchronised lyrics/text transcription"), uslt)
 
 	uslt = UnsynchronisedLyricsFrame{
 		Encoding:          ENUTF8,
@@ -80,7 +80,7 @@ func TestSetTags(t *testing.T) {
 		ContentDescriptor: "Inhaltsdeskriptor",
 		Lyrics:            "Einigkeit und Recht und Freiheit",
 	}
-	tag.AddFrame(V24CommonIDs["Unsynchronised lyrics/text transcription"], uslt)
+	tag.AddFrame(tag.ID("Unsynchronised lyrics/text transcription"), uslt)
 
 	// Setting comments
 	comm := CommentFrame{
@@ -89,7 +89,7 @@ func TestSetTags(t *testing.T) {
 		Description: "Short description",
 		Text:        "The actual text",
 	}
-	tag.AddFrame(V24CommonIDs["Comments"], comm)
+	tag.AddFrame(tag.ID("Comments"), comm)
 
 	comm = CommentFrame{
 		Encoding:    ENUTF8,
@@ -97,7 +97,7 @@ func TestSetTags(t *testing.T) {
 		Description: "Kurze Beschreibung",
 		Text:        "Der eigentliche Text",
 	}
-	tag.AddFrame(V24CommonIDs["Comments"], comm)
+	tag.AddFrame(tag.ID("Comments"), comm)
 
 	if err = tag.Flush(); err != nil {
 		t.Error("Error while closing a tag: ", err)
