@@ -5,9 +5,7 @@
 package id3v2
 
 import (
-	"bufio"
 	"io"
-	"io/ioutil"
 
 	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
@@ -39,14 +37,14 @@ func (tf TextFrame) Body() []byte {
 }
 
 func ParseTextFrame(rd io.Reader) (Framer, error) {
-	bufRd := bufio.NewReader(rd)
+	bufRd := util.NewReader(rd)
 
 	encoding, err := bufRd.ReadByte()
 	if err != nil {
 		return nil, err
 	}
 
-	text, err := ioutil.ReadAll(bufRd)
+	text, err := bufRd.ReadAll()
 	if err != nil {
 		return nil, err
 	}
