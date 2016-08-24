@@ -41,7 +41,7 @@ func parseTag(file *os.File) (*Tag, error) {
 
 func newTag(file *os.File, originalSize uint32) *Tag {
 	return &Tag{
-		commonIDs: V24CommonIDs,
+		ids: V24IDs,
 
 		file:         file,
 		originalSize: originalSize,
@@ -106,11 +106,11 @@ func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
 		return ParseTextFrame
 	}
 	switch id {
-	case t.commonIDs["Attached picture"]:
+	case t.ids["Attached picture"]:
 		return ParsePictureFrame
-	case t.commonIDs["Comments"]:
+	case t.ids["Comments"]:
 		return ParseCommentFrame
-	case t.commonIDs["Unsynchronised lyrics/text transcription"]:
+	case t.ids["Unsynchronised lyrics/text transcription"]:
 		return ParseUnsynchronisedLyricsFrame
 	}
 	return nil
