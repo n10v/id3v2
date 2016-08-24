@@ -6,7 +6,7 @@ package id3v2
 
 // Actual IDs for ID3v2.4
 var (
-	V24CommonIDs = map[string]string{
+	V24IDs = map[string]string{
 		// Identification frames
 		"Content group description":          "TIT1",
 		"Title/Songname/Content description": "TIT2",
@@ -36,7 +36,7 @@ var (
 		"Length":       "TLEN",
 		"Initial key":  "TKEY",
 		"Language":     "TLAN",
-		"Content type": "TCON", // Genre
+		"Content type": "TCON",
 		"File type":    "TFLT",
 		"Media type":   "TMED",
 		"Mood":         "TMOO",
