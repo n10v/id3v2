@@ -29,7 +29,7 @@ import (
 //		Description: "Front cover",
 //		Picture:     frontCover,
 //	}
-//	tag.AddAttachedPicture(pic)
+//	tag.AddFrame(tag.ID("Attached picture"), pic)
 //
 // Available picture types you can see in constants.
 type PictureFrame struct {

@@ -21,7 +21,7 @@ import (
 //		ContentDescriptor: "Deutsche Nationalhymne",
 //		Lyrics:            "Einigkeit und Recht und Freiheit...",
 //	}
-//	tag.AddUnsynchronisedLyricsFrame(uslt)
+//	tag.AddFrame(tag.ID("Unsynchronised lyrics/text transcription"), uslt)
 type UnsynchronisedLyricsFrame struct {
 	Encoding          util.Encoding
 	Language          string
