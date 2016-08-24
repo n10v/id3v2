@@ -12,7 +12,7 @@ const frameHeaderSize = 10
 
 type frameHeader struct {
 	ID        string
-	FrameSize uint32
+	FrameSize int64
 }
 
 func parseTag(file *os.File) (*Tag, error) {
@@ -39,7 +39,7 @@ func parseTag(file *os.File) (*Tag, error) {
 	return t, err
 }
 
-func newTag(file *os.File, originalSize uint32) *Tag {
+func newTag(file *os.File, originalSize int64) *Tag {
 	return &Tag{
 		ids: V24IDs,
 
@@ -53,12 +53,12 @@ func (t *Tag) findAllFrames() error {
 		t.framesCoords = make(map[string][]frameCoordinates)
 	}
 
-	pos := uint32(tagHeaderSize) // initial position of read - end of tag header (beginning of first frame)
+	pos := int64(tagHeaderSize) // initial position of read - end of tag header (beginning of first frame)
 	tagSize := t.originalSize
 	f := t.file
 
 	for pos < tagSize {
-		if _, err := f.Seek(int64(pos), os.SEEK_SET); err != nil {
+		if _, err := f.Seek(pos, os.SEEK_SET); err != nil {
 			return err
 		}
 
@@ -69,8 +69,8 @@ func (t *Tag) findAllFrames() error {
 		pos += frameHeaderSize
 
 		fc := frameCoordinates{
-			Len: int64(header.FrameSize),
-			Pos: int64(pos),
+			Len: header.FrameSize,
+			Pos: pos,
 		}
 		fcs := t.framesCoords[header.ID]
 		fcs = append(fcs, fc)

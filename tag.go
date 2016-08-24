@@ -22,7 +22,7 @@ type Tag struct {
 	ids          map[string]string
 
 	file         *os.File
-	originalSize uint32
+	originalSize int64
 }
 
 func (t *Tag) AddFrame(id string, f Framer) {
@@ -193,7 +193,7 @@ func (t Tag) Flush() error {
 	frames := t.formAllFrames()
 
 	// Forming size of new frames
-	framesSize := util.FormSize(uint32(len(frames)))
+	framesSize := util.FormSize(int64(len(frames)))
 
 	// Creating a temp file for mp3 file, which will contain new tag
 	newFile, err := ioutil.TempFile("", "")
@@ -215,7 +215,7 @@ func (t Tag) Flush() error {
 	// Seeking to a music part of mp3
 	originalFile := t.file
 	defer originalFile.Close()
-	if _, err = originalFile.Seek(int64(t.originalSize), os.SEEK_SET); err != nil {
+	if _, err = originalFile.Seek(t.originalSize, os.SEEK_SET); err != nil {
 		return err
 	}
 
@@ -277,13 +277,13 @@ func formFrame(id string, frame Framer) []byte {
 	defer bytesbufferpool.Put(frameBuffer)
 
 	frameBody := frame.Body()
-	writeFrameHeader(frameBuffer, id, uint32(len(frameBody)))
+	writeFrameHeader(frameBuffer, id, int64(len(frameBody)))
 	frameBuffer.Write(frameBody)
 
 	return frameBuffer.Bytes()
 }
 
-func writeFrameHeader(buf *bytes.Buffer, id string, frameSize uint32) {
+func writeFrameHeader(buf *bytes.Buffer, id string, frameSize int64) {
 	buf.WriteString(id)
 	buf.Write(util.FormSize(frameSize))
 	buf.Write([]byte{0, 0})
