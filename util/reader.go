@@ -65,7 +65,7 @@ func (r *Reader) ReadTillAndWithDelim(delim byte) ([]byte, error) {
 // delim.
 func (r *Reader) ReadTillAndWithDelims(delims []byte) ([]byte, error) {
 	if len(delims) == 0 {
-		return nil, nil
+		return r.ReadAll()
 	}
 	if len(delims) == 1 {
 		return r.ReadTillAndWithDelim(delims[0])
