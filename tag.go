@@ -36,6 +36,13 @@ func (t *Tag) AddFrame(id string, f Framer) {
 	}
 }
 
+// ID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
+// from given description.
+// For example, ID("Mood") will return "TMOO".
+func (t Tag) ID(description string) string {
+	return t.commonIDs[description]
+}
+
 func (t *Tag) findSpecificAddFunction(id string) func(Framer) {
 	switch id {
 	case t.commonIDs["Attached picture"]:
@@ -79,6 +86,7 @@ func (t *Tag) addFrameToSequence(id string, f Framer) {
 	t.sequences[id].AddFrame(f)
 }
 
+// AllFrames returns all frames in tag, that can be parsed.
 func (t *Tag) AllFrames() map[string][]Framer {
 	frames := make(map[string][]Framer)
 
@@ -97,6 +105,7 @@ func (t *Tag) AllFrames() map[string][]Framer {
 	return frames
 }
 
+// GetLastFrame returns last frame from slice, which is returned from GetFrames function.
 func (t *Tag) GetLastFrame(id string) Framer {
 	fs := t.GetFrames(id)
 	if len(fs) == 0 || fs == nil {
@@ -105,6 +114,7 @@ func (t *Tag) GetLastFrame(id string) Framer {
 	return fs[len(fs)-1]
 }
 
+// GetFrames returns frames with corresponding id.
 func (t *Tag) GetFrames(id string) []Framer {
 	// If frames with id didn't parsed yet, parse them
 	if _, exists := t.framesCoords[id]; exists {
@@ -122,6 +132,7 @@ func (t *Tag) GetFrames(id string) []Framer {
 	return nil
 }
 
+// GetFrames returns text frame with corresponding id.
 func (t Tag) GetTextFrame(id string) TextFrame {
 	f := t.GetLastFrame(id)
 	if f == nil {
