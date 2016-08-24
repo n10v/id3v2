@@ -53,7 +53,7 @@ func (t *Tag) findAllFrames() error {
 		t.framesCoords = make(map[string][]frameCoordinates)
 	}
 
-	pos := int64(tagHeaderSize) // initial position of read - end of tag header (beginning of first frame)
+	pos := int64(tagHeaderSize) // initial position of read - beginning of first frame
 	tagSize := t.originalSize
 	f := t.file
 
@@ -101,31 +101,6 @@ func parseFrameHeader(rd io.Reader) (*frameHeader, error) {
 
 }
 
-func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
-	if id[0] == 'T' {
-		return ParseTextFrame
-	}
-	switch id {
-	case t.ids["Attached picture"]:
-		return ParsePictureFrame
-	case t.ids["Comments"]:
-		return ParseCommentFrame
-	case t.ids["Unsynchronised lyrics/text transcription"]:
-		return ParseUnsynchronisedLyricsFrame
-	}
-	return nil
-}
-
-func readFrame(parseFunc func(io.Reader) (Framer, error), file *os.File, fc frameCoordinates) Framer {
-	file.Seek(fc.Pos, os.SEEK_SET)
-	rd := &io.LimitedReader{R: file, N: fc.Len}
-	fr, err := parseFunc(rd)
-	if err != nil {
-		panic(err)
-	}
-	return fr
-}
-
 func (t *Tag) parseAllFramesCoords() {
 	for id := range t.framesCoords {
 		t.parseFramesCoordsWithID(id)
@@ -148,4 +123,30 @@ func (t *Tag) parseFramesCoordsWithID(id string) {
 	// Delete frames with id from t.framesCoords,
 	// because they are just being parsed
 	delete(t.framesCoords, id)
+}
+
+func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
+	if id[0] == 'T' {
+		return ParseTextFrame
+	}
+
+	switch id {
+	case t.ids["Attached picture"]:
+		return ParsePictureFrame
+	case t.ids["Comments"]:
+		return ParseCommentFrame
+	case t.ids["Unsynchronised lyrics/text transcription"]:
+		return ParseUnsynchronisedLyricsFrame
+	}
+	return nil
+}
+
+func readFrame(parseFunc func(io.Reader) (Framer, error), rs io.ReadSeeker, fc frameCoordinates) Framer {
+	rs.Seek(fc.Pos, os.SEEK_SET)
+	rd := &io.LimitedReader{R: rs, N: fc.Len}
+	fr, err := parseFunc(rd)
+	if err != nil {
+		panic(err)
+	}
+	return fr
 }
