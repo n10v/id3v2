@@ -36,7 +36,7 @@ func parseTag(file *os.File) (*Tag, error) {
 	t := newTag(file, tagHeaderSize+header.FramesSize)
 	err = t.findAllFrames()
 
-	return t, nil
+	return t, err
 }
 
 func newTag(file *os.File, originalSize uint32) *Tag {
