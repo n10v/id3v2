@@ -72,27 +72,24 @@ func (r *Reader) ReadTillAndWithDelims(delims []byte) ([]byte, error) {
 	}
 
 	buf := make([]byte, 0)
+	firstDelim := delims[0]
 
 	for {
-		read, err := r.ReadTillAndWithDelim(delims[0])
-		if err == io.EOF {
-			break
-		}
+		b, err := r.ReadByte()
 		if err != nil {
 			return buf, err
 		}
+		buf = append(buf, b)
 
-		buf = append(buf, read...)
-
-		read, err = r.ReadBytes(len(delims) - 1)
-		if err != nil {
-			return buf, err
-		}
-
-		buf = append(buf, read...)
-
-		if bytes.Equal(read, delims[1:]) {
-			break
+		if b == firstDelim {
+			peeked, err := r.buf.Peek(len(delims) - 1)
+			if err != nil {
+				return buf, err
+			}
+			if bytes.Equal(peeked, delims[1:]) {
+				buf = append(buf, peeked...)
+				break
+			}
 		}
 	}
 
