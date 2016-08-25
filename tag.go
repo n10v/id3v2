@@ -181,8 +181,8 @@ func (t *Tag) SetGenre(genre string) {
 	t.AddFrame(t.ids["Content type"], TextFrame{Encoding: ENUTF8, Text: genre})
 }
 
-// Flush writes tag to the file.
-func (t Tag) Flush() error {
+// Save writes tag to the file.
+func (t *Tag) Save() error {
 	// Forming new frames
 	frames := t.formAllFrames()
 
@@ -191,7 +191,6 @@ func (t Tag) Flush() error {
 
 	// Creating a temp file for mp3 file, which will contain new tag
 	newFile, err := ioutil.TempFile("", "")
-	defer newFile.Close()
 	if err != nil {
 		return err
 	}
@@ -234,8 +233,13 @@ func (t Tag) Flush() error {
 	if err = os.Rename(newFile.Name(), originalFile.Name()); err != nil {
 		return err
 	}
+	t.file = newFile
 
 	return nil
+}
+
+func (t *Tag) Close() error {
+	return t.file.Close()
 }
 
 func (t Tag) formAllFrames() []byte {

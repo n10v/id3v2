@@ -27,6 +27,7 @@ func TestSetTags(t *testing.T) {
 	if tag == nil || err != nil {
 		t.Error("Error while opening mp3 file: ", err)
 	}
+	defer tag.Close()
 	tag.SetTitle("Title")
 	tag.SetArtist("Artist")
 	tag.SetAlbum("Album")
@@ -99,7 +100,7 @@ func TestSetTags(t *testing.T) {
 	}
 	tag.AddFrame(tag.ID("Comments"), comm)
 
-	if err = tag.Flush(); err != nil {
+	if err = tag.Save(); err != nil {
 		t.Error("Error while closing a tag: ", err)
 	}
 
