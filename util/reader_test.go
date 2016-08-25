@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	bs   = []byte{0, 11, 22, 33, 44, 55, 77, 88, 55, 66, 77, 88}
+	bs   = []byte{0, 11, 22, 33, 44, 55, 77, 88, 55, 55, 66, 77, 88}
 	bsRd = bytes.NewReader(bs)
 )
 
@@ -34,7 +34,7 @@ func TestReadBytes(t *testing.T) {
 func TestReadTillAndWithDelims(t *testing.T) {
 	bsRd.Reset(bs)
 	bsReader := NewReader(bsRd)
-	n := 10
+	n := 11
 	delims := []byte{bs[n-2], bs[n-1]}
 
 	read, err := bsReader.ReadTillAndWithDelims(delims)
