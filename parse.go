@@ -41,7 +41,10 @@ func parseTag(file *os.File) (*Tag, error) {
 
 func newTag(file *os.File, originalSize int64) *Tag {
 	return &Tag{
-		ids: V24IDs,
+		framesCoords: make(map[string][]frameCoordinates),
+		frames:       make(map[string]Framer),
+		sequences:    make(map[string]sequencer),
+		ids:          V24IDs,
 
 		file:         file,
 		originalSize: originalSize,
@@ -49,10 +52,6 @@ func newTag(file *os.File, originalSize int64) *Tag {
 }
 
 func (t *Tag) findAllFrames() error {
-	if t.framesCoords == nil {
-		t.framesCoords = make(map[string][]frameCoordinates)
-	}
-
 	pos := int64(tagHeaderSize) // initial position of read - beginning of first frame
 	tagSize := t.originalSize
 	f := t.file

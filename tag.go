@@ -26,9 +26,6 @@ type Tag struct {
 }
 
 func (t *Tag) AddFrame(id string, f Framer) {
-	if t.frames == nil {
-		t.frames = make(map[string]Framer)
-	}
 	if addFunc := t.findSpecificAddFunction(id); addFunc != nil {
 		addFunc(f)
 	} else {
@@ -74,9 +71,6 @@ func (t *Tag) addUnsynchronisedLyricsFrame(f Framer) {
 }
 
 func (t *Tag) checkExistenceOfSequence(id string, newSequence func() sequencer) {
-	if t.sequences == nil {
-		t.sequences = make(map[string]sequencer)
-	}
 	if t.sequences[id] == nil {
 		t.sequences[id] = newSequence()
 	}
