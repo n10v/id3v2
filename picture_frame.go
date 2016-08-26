@@ -67,7 +67,7 @@ func ParsePictureFrame(rd io.Reader) (Framer, error) {
 	}
 	encoding := Encodings[encodingByte]
 
-	mimeType, err := bufRd.ReadTillAndWithDelim(0)
+	mimeType, err := bufRd.ReadTillDelim(0)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func ParsePictureFrame(rd io.Reader) (Framer, error) {
 		return nil, err
 	}
 
-	description, err := bufRd.ReadTillAndWithDelims(encoding.TerminationBytes)
+	description, err := bufRd.ReadTillDelims(encoding.TerminationBytes)
 	if err != nil {
 		return nil, err
 	}

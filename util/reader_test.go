@@ -31,20 +31,20 @@ func TestReadBytes(t *testing.T) {
 	}
 }
 
-func TestReadTillAndWithDelims(t *testing.T) {
+func TestReadTillDelims(t *testing.T) {
 	bsRd.Reset(bs)
 	bsReader := NewReader(bsRd)
-	n := 11
-	delims := []byte{bs[n-2], bs[n-1]}
+	delims := []byte{55, 66}
+	expectedLen := 9
 
-	read, err := bsReader.ReadTillAndWithDelims(delims)
+	read, err := bsReader.ReadTillDelims(delims)
 	if err != nil {
 		t.Error(err)
 	}
-	if n != len(read) {
-		t.Errorf("Expecting to read: %v, got: %v", n, len(read))
+	if expectedLen != len(read) {
+		t.Errorf("Expecting to read: %v, got: %v", expectedLen, len(read))
 	}
-	if !bytes.Equal(bs[:n], read) {
-		t.Error("Expecting: %v, got: %v", bs[:n], read)
+	if !bytes.Equal(bs[:expectedLen], read) {
+		t.Error("Expecting: %v, got: %v", bs[:expectedLen], read)
 	}
 }

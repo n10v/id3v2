@@ -62,7 +62,7 @@ func ParseCommentFrame(rd io.Reader) (Framer, error) {
 		return nil, err
 	}
 
-	description, err := bufRd.ReadTillAndWithDelims(encoding.TerminationBytes)
+	description, err := bufRd.ReadTillDelims(encoding.TerminationBytes)
 	if err != nil {
 		return nil, err
 	}

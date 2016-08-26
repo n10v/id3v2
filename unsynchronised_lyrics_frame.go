@@ -59,7 +59,7 @@ func ParseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
 		return nil, err
 	}
 
-	contentDescriptor, err := bufRd.ReadTillAndWithDelims(encoding.TerminationBytes)
+	contentDescriptor, err := bufRd.ReadTillDelims(encoding.TerminationBytes)
 	if err != nil {
 		return nil, err
 	}
