@@ -153,7 +153,7 @@ func (t *Tag) GetFrames(id string) []Framer {
 	return nil
 }
 
-// GetFrames returns text frame with corresponding id.
+// GetTextFrame returns text frame with corresponding id.
 func (t Tag) GetTextFrame(id string) TextFrame {
 	f := t.GetLastFrame(id)
 	if f == nil {
