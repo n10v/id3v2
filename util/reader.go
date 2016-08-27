@@ -49,6 +49,8 @@ func (r *Reader) ReadBytes(n int) ([]byte, error) {
 
 // ReadTillDelim reads until the first occurrence of delim in the input,
 // returning a slice containing the data up to the delimiter.
+// ReadTillDelim advances buffer up to and including delimiter
+// but returns only a slice containing the data without the delimiter though.
 // If ReadTillDelim encounters an error before finding a delimiter,
 // it returns the data read before the error and the error itself (often io.EOF).
 // ReadTillDelim returns err != nil if and only if the returned data does not end in
@@ -63,6 +65,8 @@ func (r *Reader) ReadTillDelim(delim byte) ([]byte, error) {
 
 // ReadTillDelims reads until the first occurrence of delims in the input,
 // returning a slice containing the data up to the delimiters.
+// ReadTillDelims advances buffer up to and including delimiters
+// but returns only a slice containing the data without the delimiters though.
 // If ReadTillDelims encounters an error before finding a delimiters,
 // it returns the data read before the error and the error itself (often io.EOF).
 // ReadTillAndWithDelims returns err != nil if and only if the returned data does not end in
