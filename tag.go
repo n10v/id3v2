@@ -243,24 +243,17 @@ func (t *Tag) Close() error {
 }
 
 func (t Tag) formAllFrames() []byte {
-	frames := bytesbufferpool.Get()
+	framesBuffer := bytesbufferpool.Get()
 	defer bytesbufferpool.Put(frames)
 
-	t.writeFrames(frames)
-	t.writeSequences(frames)
+	t.writeFrames(framesBuffer)
 
-	return frames.Bytes()
+	return framesBuffer.Bytes()
 }
 
 func (t Tag) writeFrames(w io.Writer) {
-	for id, f := range t.frames {
-		w.Write(formFrame(id, f))
-	}
-}
-
-func (t Tag) writeSequences(w io.Writer) {
-	for id, s := range t.sequences {
-		for _, f := range s.Frames() {
+	for id, frames := range t.AllFrames() {
+		for _, f := range frames {
 			w.Write(formFrame(id, f))
 		}
 	}
