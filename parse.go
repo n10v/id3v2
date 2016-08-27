@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -82,14 +83,20 @@ func (t *Tag) findAllFrames() error {
 }
 
 func parseFrameHeader(rd io.Reader) (*frameHeader, error) {
-	byteHeader := make([]byte, frameHeaderSize)
-	n, err := rd.Read(byteHeader)
+	fhBuf := bytesbufferpool.Get()
+	defer bytesbufferpool.Put(fhBuf)
+
+	limitedRd := &io.LimitedReader{R: rd, N: frameHeaderSize}
+
+	n, err := fhBuf.ReadFrom(limitedRd)
 	if err != nil {
 		return nil, err
 	}
 	if n < frameHeaderSize {
 		err = errors.New("Size of frame header is less than expected")
 	}
+
+	byteHeader := fhBuf.Bytes()
 
 	header := &frameHeader{
 		ID:        string(byteHeader[:4]),
