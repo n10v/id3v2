@@ -93,7 +93,7 @@ func parseFrameHeader(rd io.Reader) (*frameHeader, error) {
 		return nil, err
 	}
 	if n < frameHeaderSize {
-		err = errors.New("Size of frame header is less than expected")
+		return nil, errors.New("Size of frame header is less than expected")
 	}
 
 	byteHeader := fhBuf.Bytes()
