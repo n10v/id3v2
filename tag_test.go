@@ -78,16 +78,16 @@ func TestSetTags(t *testing.T) {
 
 	// Setting picture frames
 	resetPictureReaders()
-	tag.AddFrame(tag.ID("Attached picture"), frontCover)
-	tag.AddFrame(tag.ID("Attached picture"), backCover)
+	tag.AddAttachedPicture(frontCover)
+	tag.AddAttachedPicture(backCover)
 
 	// Setting USLTs
-	tag.AddFrame(tag.ID("Unsynchronised lyrics/text transcription"), engUSLF)
-	tag.AddFrame(tag.ID("Unsynchronised lyrics/text transcription"), gerUSLF)
+	tag.AddUnsynchronisedLyricsFrame(engUSLF)
+	tag.AddUnsynchronisedLyricsFrame(gerUSLF)
 
 	// Setting comments
-	tag.AddFrame(tag.ID("Comments"), engComm)
-	tag.AddFrame(tag.ID("Comments"), gerComm)
+	tag.AddCommentFrame(engComm)
+	tag.AddCommentFrame(gerComm)
 
 	if err = tag.Save(); err != nil {
 		t.Error("Error while saving a tag: ", err)
