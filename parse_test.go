@@ -42,7 +42,7 @@ func TestParse(t *testing.T) {
 	for _, f := range picFrames {
 		pf, ok := f.(PictureFrame)
 		if !ok {
-			t.Error("Couldn't asserted picture frame")
+			t.Error("Couldn't assert picture frame")
 		}
 		if pf.PictureType == PTFrontCover {
 			parsedFrontCover = pf
@@ -69,7 +69,7 @@ func TestParse(t *testing.T) {
 	for _, f := range usltFrames {
 		uslf, ok := f.(UnsynchronisedLyricsFrame)
 		if !ok {
-			t.Error("Couldn't asserted USLT frame")
+			t.Error("Couldn't assert USLT frame")
 		}
 		if uslf.Language == "eng" {
 			parsedEngUSLF = uslf
@@ -96,7 +96,7 @@ func TestParse(t *testing.T) {
 	for _, f := range commFrames {
 		cf, ok := f.(CommentFrame)
 		if !ok {
-			t.Error("Couldn't asserted comment frame")
+			t.Error("Couldn't assert comment frame")
 		}
 		if cf.Language == "eng" {
 			parsedEngComm = cf
@@ -162,7 +162,6 @@ func testUSLTFrames(actual, expected UnsynchronisedLyricsFrame) error {
 }
 
 func testCommentFrames(actual, expected CommentFrame) error {
-	fmt.Println(actual.Encoding, expected.Encoding)
 	if err := testTwoBytes(actual.Encoding.Key, expected.Encoding.Key); err != nil {
 		return err
 	}
