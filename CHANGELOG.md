@@ -1,5 +1,9 @@
 # ID3v2 Changelog
 
+## 0.7
+* Now ID3v2 can parse tags! See documentation for details
+* Some changes in API for convenice and fliexibility
+
 ## 0.6
 * Huge update of API and documentation
 

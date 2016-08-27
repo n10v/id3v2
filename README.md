@@ -84,7 +84,8 @@ You can find it here: https://godoc.org/github.com/bogem/id3v2
 
 ## TODO
 
-- [ ] Work with extended header, flags, padding ***(Does anyone really use it?)***
+- [ ] ID3v2.3 Support
+- [ ] Work with extended header, flags, padding, footer ***(Does anyone really use it?)***
 - [x] Parse tags
 - [x] Documentation
 - [x] Work with other encodings
