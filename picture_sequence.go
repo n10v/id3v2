@@ -13,7 +13,7 @@ package id3v2
 // descriptor.(TODO:) There may only be one picture with the picture type
 // declared as picture type $01 and $02 respectively."
 type pictureSequence struct {
-	sequence map[int]PictureFrame
+	sequence map[string]PictureFrame
 }
 
 func newPictureSequence() sequencer {
