@@ -28,7 +28,7 @@ What it **can't** do:
 
 **If you want some functionality, that library can't do,
 or you have some question, just write an issue.
-I will implement it as fast as I can**
+I will implement it as fast as I can.**
 
 **And of course, pull requests are welcome!**
 
