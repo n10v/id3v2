@@ -17,13 +17,13 @@ var (
 // ID3v2 size (4 * 0b0xxxxxxx).
 //
 // If size more than allowed (256MB), then panic occurs.
-func FormSize(n uint32) []byte {
-	allowedSize := uint32(268435455) // 4 * 0b01111111
+func FormSize(n int64) []byte {
+	allowedSize := int64(268435455) // 0b11111... (28 digits)
 	if n > allowedSize {
 		panic("Size is more than allowed in id3 tag")
 	}
 
-	mask := uint32(1<<sizeBase - 1)
+	mask := int64(1<<sizeBase - 1)
 
 	for i := range byteSize {
 		byteSize[len(byteSize)-i-1] = byte(n & mask)
@@ -38,8 +38,8 @@ func FormSize(n uint32) []byte {
 //
 // If length of slice is more than 4 or if there is invalid size format (e.g.
 // one byte in slice is like 0b1xxxxxxx), then panic occurs.
-func ParseSize(data []byte) uint32 {
-	var size uint32
+func ParseSize(data []byte) int64 {
+	var size int64
 
 	if len(data) > bytesPerInt {
 		panic("Invalid data length (it must be equal or less than 4)")
@@ -50,7 +50,7 @@ func ParseSize(data []byte) uint32 {
 			panic("Invalid size format")
 		}
 
-		size = (size << sizeBase) | uint32(b)
+		size = (size << sizeBase) | int64(b)
 	}
 
 	return size

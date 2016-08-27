@@ -22,85 +22,75 @@ const (
 	musicSize      = 4557971
 )
 
+var (
+	frontCover = PictureFrame{
+		Encoding:    ENUTF8,
+		MimeType:    "image/jpeg",
+		PictureType: PTFrontCover,
+		Description: "Front cover",
+	}
+	backCover = PictureFrame{
+		Encoding:    ENUTF8,
+		MimeType:    "image/jpeg",
+		PictureType: PTBackCover,
+		Description: "Back cover",
+	}
+
+	engUSLF = UnsynchronisedLyricsFrame{
+		Encoding:          ENUTF8,
+		Language:          "eng",
+		ContentDescriptor: "Content descriptor",
+		Lyrics:            "bogem/id3v2",
+	}
+	gerUSLF = UnsynchronisedLyricsFrame{
+		Encoding:          ENUTF8,
+		Language:          "ger",
+		ContentDescriptor: "Inhaltsdeskriptor",
+		Lyrics:            "Einigkeit und Recht und Freiheit",
+	}
+
+	engComm = CommentFrame{
+		Encoding:    ENUTF8,
+		Language:    "eng",
+		Description: "Short description",
+		Text:        "The actual text",
+	}
+	gerComm = CommentFrame{
+		Encoding:    ENUTF8,
+		Language:    "ger",
+		Description: "Kurze Beschreibung",
+		Text:        "Der eigentliche Text",
+	}
+)
+
 func TestSetTags(t *testing.T) {
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {
 		t.Error("Error while opening mp3 file: ", err)
 	}
+	defer tag.Close()
+
 	tag.SetTitle("Title")
 	tag.SetArtist("Artist")
 	tag.SetAlbum("Album")
 	tag.SetYear("2016")
 	tag.SetGenre("Genre")
 
-	// Setting front cover
-	frontCover, err := os.Open(frontCoverName)
-	if err != nil {
-		t.Error("Error while opening front cover file")
-	}
-	defer frontCover.Close()
-
-	pic := PictureFrame{
-		Encoding:    ENUTF8,
-		MimeType:    "image/jpeg",
-		PictureType: PTFrontCover,
-		Description: "Front cover",
-		Picture:     frontCover,
-	}
-	tag.AddAttachedPicture(pic)
-
-	// Setting back cover
-	backCover, err := os.Open(backCoverName)
-	if err != nil {
-		t.Error("Error while opening back cover file")
-	}
-	defer backCover.Close()
-
-	pic = PictureFrame{
-		Encoding:    ENUTF8,
-		MimeType:    "image/jpeg",
-		PictureType: PTBackCover,
-		Description: "Back cover",
-		Picture:     backCover,
-	}
-	tag.AddAttachedPicture(pic)
+	// Setting picture frames
+	resetPictureReaders()
+	tag.AddFrame(tag.ID("Attached picture"), frontCover)
+	tag.AddFrame(tag.ID("Attached picture"), backCover)
 
 	// Setting USLTs
-	uslt := UnsynchronisedLyricsFrame{
-		Encoding:          ENUTF8,
-		Language:          "eng",
-		ContentDescriptor: "Content descriptor",
-		Lyrics:            "bogem/id3v2",
-	}
-	tag.AddUnsynchronisedLyricsFrame(uslt)
-
-	uslt = UnsynchronisedLyricsFrame{
-		Encoding:          ENUTF8,
-		Language:          "ger",
-		ContentDescriptor: "Inhaltsdeskriptor",
-		Lyrics:            "Einigkeit und Recht und Freiheit",
-	}
-	tag.AddUnsynchronisedLyricsFrame(uslt)
+	tag.AddFrame(tag.ID("Unsynchronised lyrics/text transcription"), engUSLF)
+	tag.AddFrame(tag.ID("Unsynchronised lyrics/text transcription"), gerUSLF)
 
 	// Setting comments
-	comm := CommentFrame{
-		Encoding:    ENUTF8,
-		Language:    "eng",
-		Description: "Short description",
-		Text:        "The actual text",
-	}
-	tag.AddCommentFrame(comm)
+	tag.AddFrame(tag.ID("Comments"), engComm)
+	tag.AddFrame(tag.ID("Comments"), gerComm)
 
-	comm = CommentFrame{
-		Encoding:    ENUTF8,
-		Language:    "ger",
-		Description: "Kurze Beschreibung",
-		Text:        "Der eigentliche Text",
-	}
-	tag.AddCommentFrame(comm)
-
-	if err = tag.Flush(); err != nil {
-		t.Error("Error while closing a tag: ", err)
+	if err = tag.Save(); err != nil {
+		t.Error("Error while saving a tag: ", err)
 	}
 }
 
@@ -125,6 +115,20 @@ func TestCorrectnessOfSettingTag(t *testing.T) {
 	if framesSize != size {
 		t.Errorf("Expected size of frames: %v, got: %v", framesSize, size)
 	}
+}
+
+func resetPictureReaders() {
+	frontCoverFile, err := os.Open(frontCoverName)
+	if err != nil {
+		panic("Error while opening front cover file: " + err.Error())
+	}
+	frontCover.Picture = frontCoverFile
+
+	backCoverFile, err := os.Open(backCoverName)
+	if err != nil {
+		panic("Error while opening back cover file: " + err.Error())
+	}
+	backCover.Picture = backCoverFile
 }
 
 // Check integrity at the beginning of mp3's music part

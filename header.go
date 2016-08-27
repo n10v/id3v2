@@ -18,7 +18,7 @@ const (
 )
 
 type tagHeader struct {
-	FramesSize uint32
+	FramesSize int64
 	Version    byte
 }
 

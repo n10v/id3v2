@@ -4,13 +4,14 @@
 
 package id3v2
 
-// uslfSequence stores several USLT frames.
+// uslfSequence stores several unique USLT frames.
 // Key for uslfSequence is language and content descriptor,
 // so there is only one USLT frame with the same language and
 // content descriptor.
 //
-// It's only needed for internal operations. Users of library id3v2 should not
-// use any sequence in no case.
+// ID3v2 Documentation: "There may be more than one 'Unsynchronised
+// lyrics/text transcription' frame in each tag, but only one with the
+// same language and content descriptor."
 type uslfSequence struct {
 	sequence map[string]UnsynchronisedLyricsFrame
 }

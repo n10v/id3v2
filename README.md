@@ -6,39 +6,31 @@
 # id3v2
 
 ## IMHO
-I think, **ID3** is a very overwhelmed standard: it does **more than it really should do**. There are a lot of aspects, which developer should take into consideration. And that's why it's pretty complicated to write a **good library**. So if you have some thoughts about writing a **new simply and elegant standard** for providing information for digital music tracks, just write me. I think, it's a good time to write an appropriate standard for it 😉
+I think, **ID3** is a very overwhelmed standard: it does **more than it really should do**.
+There are a lot of aspects, which developer should take into consideration.
+And that's why it's pretty complicated to write a **good library**.
+So if you have some thoughts about writing a **new simply and elegant standard**
+for providing information for digital music tracks, just write me.
+I think, it's a good time to write an appropriate standard for it 😉
 
 ## Information
-**Fast and stable ID3 writing library for Go**
-
-This library can only set and write tags, but can't read them. So if you only want to set tags, it fits you. And if there is a tag of version 3 or 4, this library will just delete this tag, because it can't parse tags yet. If version of the tag is smaller than 3, this library will return an error.
+**Fast and stable ID3 parsing and writing library for Go**
 
 What it **can** do:
-* Set artist, album, year, genre, unsynchronised lyrics/text (USLT), comments and **attached pictures** (e.g. album covers) and write all to file
+* Parse tags
+* Set artist, album, year, genre, unsynchronised lyrics/text (USLT),
+comments and **attached pictures** (e.g. album covers) and write all to file
 * Set several USLT, comments and attached pictures
 * Work with all allowed encodings
 
 What it **can't** do:
-* Parse tags
-* Work with extended header, flags, padding
+* Work with extended header, flags, padding, footer.
 
-**If you want some functionality, that library can't do, just write an issue. I will implement it as fast as I can**
+**If you want some functionality, that library can't do,
+or you have some question just write an issue.
+I will implement it as fast as I can**
 
 **And of course, pull requests are welcome!**
-
-## Benchmarks
-
-All benchmarks run on **MacBook Air 13" (early 2013, 1,4GHz Intel Core i5, 4GB 1600MHz DDR3)**
-
-#### Set title, artist, year and 112KB picture to 4,6 MP3:
-```
-BenchmarkSetCommonCase-4	     100	  10002592 ns/op	   50707 B/op	      35 allocs/op
-```
-
-#### Set title, artist, album, year, genre, unsynchronised lyrics, comment and 112KB picture to 4,6MB MP3:
-```
-BenchmarkSetManyFrames-4	     200	   9590827 ns/op	   52733 B/op	      51 allocs/op
-```
 
 ## Installation
   	$ go get -u github.com/bogem/id3v2
@@ -48,8 +40,10 @@ BenchmarkSetManyFrames-4	     200	   9590827 ns/op	   52733 B/op	      51 allocs
 package main
 
 import (
-  "github.com/bogem/id3v2"
+	"fmt"
   "log"
+
+  "github.com/bogem/id3v2"
 )
 
 func main() {
@@ -58,10 +52,15 @@ func main() {
   if err != nil {
    log.Fatal("Error while opening mp3 file: ", err)
   }
+	defer tag.Close()
+
+	// Read tags
+	fmt.Println(tag.Artist())
+	fmt.Println(tag.Title())
 
   // Set tags
-  tag.SetArtist("Artist")
-  tag.SetTitle("Title")
+  tag.SetArtist("New artist")
+  tag.SetTitle("New song")
 
   comment := id3v2.CommentFrame{
     Encoding:   id3v2.ENUTF8,
@@ -69,11 +68,11 @@ func main() {
     Desciption: "My opinion",
     Text:       "Very good song",
   }
-  tag.AddCommentFrame(comment)
+  tag.AddFrame(tag.ID("Comments"), comment)
 
   // Write it to file
-  if err = tag.Flush(); err != nil {
-    log.Fatal("Error while flushing a tag: ", err)
+  if err = tag.Save(); err != nil {
+    log.Fatal("Error while saving a tag: ", err)
   }
 }
 
@@ -85,8 +84,9 @@ You can find it here: https://godoc.org/github.com/bogem/id3v2
 
 ## TODO
 
-- [ ] Parse tags
-- [ ] Work with extended header, flags, padding ***(Does anyone really use it?)***
+- [ ] ID3v2.3 Support
+- [ ] Work with extended header, flags, padding, footer ***(Does anyone really use it?)***
+- [x] Parse tags
 - [x] Documentation
 - [x] Work with other encodings
 

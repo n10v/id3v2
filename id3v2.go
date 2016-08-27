@@ -2,21 +2,17 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-// Package id3v2 is the ID3 writing library for Go.
+// Package id3v2 is the ID3 parsing and writing library for Go.
 //
-// This library can only set and write tags, but can't read them.
-// So if you only want to set tags, it fits you.
-// And if there is a tag of version 3 or 4, this library will just
-// delete this tag, because it can't parse tags yet.
-// If version of the tag is smaller than 3, this library will return an error.
-//
-// Example of creating a new tag and writing it in file:
+// Example of usage:
 //
 //	package main
 //
 //	import (
-//		"github.com/bogem/id3v2"
+//		"fmt"
 //		"log"
+//
+//		"github.com/bogem/id3v2"
 //	)
 //
 //	func main() {
@@ -25,6 +21,11 @@
 //		if err != nil {
 //			log.Fatal("Error while opening mp3 file: ", err)
 //		}
+//		defer tag.Close()
+//
+//		// Read tags
+//		fmt.Println(tag.Artist())
+//		fmt.Println(tag.Title())
 //
 //		// Set tags
 //		tag.SetArtist("Artist")
@@ -36,11 +37,11 @@
 //			Desciption: "My opinion",
 //			Text:       "Very good song",
 //		}
-//		tag.AddCommentFrame(comment)
+//		tag.AddFrame(tag.ID("Comments"), comment)
 //
 //		// Write it to file
-//		if err = tag.Flush(); err != nil {
-//			log.Fatal("Error while flushing a tag: ", err)
+//		if err = tag.Save(); err != nil {
+//			log.Fatal("Error while saving a tag: ", err)
 //		}
 //	}
 package id3v2
@@ -101,6 +102,8 @@ var (
 		Key:              3,
 		TerminationBytes: []byte{0},
 	}
+
+	Encodings = []util.Encoding{ENISO, ENUTF16, ENUTF16BE, ENUTF8}
 )
 
 // Open opens file with string name and find tag in it.

@@ -5,6 +5,8 @@
 package id3v2
 
 import (
+	"io"
+
 	"github.com/bogem/id3v2/bytesbufferpool"
 	"github.com/bogem/id3v2/util"
 )
@@ -18,8 +20,7 @@ import (
 //		Encoding: id3v2.ENUTF8,
 //		Text:     "Happy",
 //	}
-//	id := id3v2.V24CommonIDs["Mood"]
-//	tag.AddFrame(id, textFrame)
+//	tag.AddFrame(tag.ID("Mood"), textFrame)
 type TextFrame struct {
 	Encoding util.Encoding
 	Text     string
@@ -33,4 +34,25 @@ func (tf TextFrame) Body() []byte {
 	b.WriteString(tf.Text)
 
 	return b.Bytes()
+}
+
+func ParseTextFrame(rd io.Reader) (Framer, error) {
+	bufRd := util.NewReader(rd)
+
+	encoding, err := bufRd.ReadByte()
+	if err != nil {
+		return nil, err
+	}
+
+	text, err := bufRd.ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	tf := TextFrame{
+		Encoding: Encodings[encoding],
+		Text:     string(text),
+	}
+
+	return tf, nil
 }

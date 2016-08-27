@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	sizeInt   uint32 = 15351
-	sizeBytes        = []byte{0, 0, 0x77, 0x77}
+	sizeInt   int64 = 15351
+	sizeBytes       = []byte{0, 0, 0x77, 0x77}
 )
 
 func TestParseSize(t *testing.T) {
