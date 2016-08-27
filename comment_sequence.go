@@ -4,13 +4,13 @@
 
 package id3v2
 
-// commentSequence stores several comment frames.
+// commentSequence stores several unique comment frames.
 // Key for commentSequence is language and description,
 // so there is only one comment frame with the same language and
 // description.
 //
-// It's only needed for internal operations. Users of library id3v2 should not
-// use any sequence in no case.
+// ID3v2 Documentation: "There may be more than one comment frame in each tag,
+// but only one with the same language and content descriptor."
 type commentSequence struct {
 	sequence map[string]CommentFrame
 }

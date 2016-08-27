@@ -4,19 +4,21 @@
 
 package id3v2
 
-// pictureSequence stores several picture frames.
-// Key for pictureSequence is a picture type code,
-// so there is only one picture with the same picture type.
+// pictureSequence stores several unique picture frames.
+// Key for pictureSequence is a description,
+// so there is only one picture with the same description.
 //
-// It's only needed for internal operations. Users of library id3v2 should not
-// use any sequence in no case.
+// ID3v2 Documentation: "There may be several pictures attached to one file,
+// each in their individual "APIC" frame, but only one with the same content
+// descriptor.(TODO:) There may only be one picture with the picture type
+// declared as picture type $01 and $02 respectively."
 type pictureSequence struct {
 	sequence map[int]PictureFrame
 }
 
 func newPictureSequence() sequencer {
 	return &pictureSequence{
-		sequence: make(map[int]PictureFrame),
+		sequence: make(map[string]PictureFrame),
 	}
 }
 
@@ -30,6 +32,5 @@ func (ps pictureSequence) Frames() []Framer {
 
 func (ps *pictureSequence) AddFrame(f Framer) {
 	pf := f.(PictureFrame)
-	id := int(pf.PictureType)
-	ps.sequence[id] = pf
+	ps.sequence[pf.Description] = pf
 }
