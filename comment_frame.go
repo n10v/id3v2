@@ -48,7 +48,7 @@ func (cf CommentFrame) Body() []byte {
 	return b.Bytes()
 }
 
-func ParseCommentFrame(rd io.Reader) (Framer, error) {
+func parseCommentFrame(rd io.Reader) (Framer, error) {
 	bufRd := util.NewReader(rd)
 
 	encodingByte, err := bufRd.ReadByte()

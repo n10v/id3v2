@@ -133,16 +133,16 @@ func (t *Tag) parseFramesCoordsWithID(id string) {
 
 func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
 	if id[0] == 'T' {
-		return ParseTextFrame
+		return parseTextFrame
 	}
 
 	switch id {
 	case t.ids["Attached picture"]:
-		return ParsePictureFrame
+		return parsePictureFrame
 	case t.ids["Comments"]:
-		return ParseCommentFrame
+		return parseCommentFrame
 	case t.ids["Unsynchronised lyrics/text transcription"]:
-		return ParseUnsynchronisedLyricsFrame
+		return parseUnsynchronisedLyricsFrame
 	}
 	return nil
 }

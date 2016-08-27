@@ -45,7 +45,7 @@ func (uslf UnsynchronisedLyricsFrame) Body() []byte {
 	return b.Bytes()
 }
 
-func ParseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
+func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
 	bufRd := util.NewReader(rd)
 
 	encodingByte, err := bufRd.ReadByte()

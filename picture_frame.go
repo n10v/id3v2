@@ -58,7 +58,7 @@ func (pf PictureFrame) Body() []byte {
 	return b.Bytes()
 }
 
-func ParsePictureFrame(rd io.Reader) (Framer, error) {
+func parsePictureFrame(rd io.Reader) (Framer, error) {
 	bufRd := util.NewReader(rd)
 
 	encodingByte, err := bufRd.ReadByte()

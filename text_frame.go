@@ -36,7 +36,7 @@ func (tf TextFrame) Body() []byte {
 	return b.Bytes()
 }
 
-func ParseTextFrame(rd io.Reader) (Framer, error) {
+func parseTextFrame(rd io.Reader) (Framer, error) {
 	bufRd := util.NewReader(rd)
 
 	encoding, err := bufRd.ReadByte()
