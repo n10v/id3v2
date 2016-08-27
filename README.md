@@ -68,7 +68,7 @@ func main() {
     Desciption: "My opinion",
     Text:       "Very good song",
   }
-  tag.AddFrame(tag.ID("Comments"), comment)
+  tag.AddCommentFrame(comment)
 
   // Write it to file
   if err = tag.Save(); err != nil {

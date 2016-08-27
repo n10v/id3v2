@@ -43,28 +43,28 @@ func (t Tag) ID(description string) string {
 func (t *Tag) findSpecificAddFunction(id string) func(Framer) {
 	switch id {
 	case t.ids["Attached picture"]:
-		return t.addAttachedPicture
+		return t.AddAttachedPicture
 	case t.ids["Comments"]:
-		return t.addCommentFrame
+		return t.AddCommentFrame
 	case t.ids["Unsynchronised lyrics/text transcription"]:
-		return t.addUnsynchronisedLyricsFrame
+		return t.AddUnsynchronisedLyricsFrame
 	}
 	return nil
 }
 
-func (t *Tag) addAttachedPicture(f Framer) {
+func (t *Tag) AddAttachedPicture(f Framer) {
 	id := t.ids["Attached picture"]
 	t.checkExistenceOfSequence(id, newPictureSequence)
 	t.addFrameToSequence(id, f)
 }
 
-func (t *Tag) addCommentFrame(f Framer) {
+func (t *Tag) AddCommentFrame(f Framer) {
 	id := t.ids["Comments"]
 	t.checkExistenceOfSequence(id, newCommentSequence)
 	t.addFrameToSequence(id, f)
 }
 
-func (t *Tag) addUnsynchronisedLyricsFrame(f Framer) {
+func (t *Tag) AddUnsynchronisedLyricsFrame(f Framer) {
 	id := t.ids["Unsynchronised lyrics/text transcription"]
 	t.checkExistenceOfSequence(id, newUSLFSequence)
 	t.addFrameToSequence(id, f)

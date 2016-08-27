@@ -21,7 +21,7 @@ import (
 //		Desciption: "My opinion",
 //		Text:       "Very good song",
 //	}
-//	tag.AddFrame(tag.ID("Comments"), comment)
+//	tag.AddCommentFrame(comment)
 //
 // You should choose a language code from
 // ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
