@@ -80,11 +80,12 @@ func (t *Tag) addFrameToSequence(id string, f Framer) {
 	t.sequences[id].AddFrame(f)
 }
 
-// AllFrames returns all frames in tag, that can be parsed.
+// AllFrames returns map, that contains all frames in tag, that could be parsed.
+// The key of this map is an ID of frame and value is an array of frames.
 func (t *Tag) AllFrames() map[string][]Framer {
-	frames := make(map[string][]Framer)
-
 	t.parseAllFramesCoords()
+
+	frames := make(map[string][]Framer)
 
 	// Add frames from t.frames
 	for id, frame := range t.frames {
@@ -99,7 +100,17 @@ func (t *Tag) AllFrames() map[string][]Framer {
 	return frames
 }
 
-// GetLastFrame returns last frame from slice, which is returned from GetFrames function.
+// GetLastFrame returns last frame from slice, that is returned from GetFrames function.
+// GetLastFrame is suitable for frames, that can be only one in whole tag.
+// For example, for text frames.
+//
+// Example of usage:
+//	bpmFramer := t.GetLastFrame(t.ID("BPM"))
+//	bpm, ok := bpmFramer.(id3v2.TextFrame)
+//	if !ok {
+//		log.Fatal("Couldn't assert bpm frame")
+//	}
+//	fmt.Println(bpm.Text)
 func (t *Tag) GetLastFrame(id string) Framer {
 	fs := t.GetFrames(id)
 	if len(fs) == 0 || fs == nil {
@@ -109,6 +120,22 @@ func (t *Tag) GetLastFrame(id string) Framer {
 }
 
 // GetFrames returns frames with corresponding id.
+//
+// Example of usage:
+//	pictures := tag.GetFrames(tag.ID("Attached picture"))
+//	for _, f := range pictures {
+//		pic, ok := f.(id3v2.PictureFrame)
+//		if !ok {
+//			log.Fatal("Couldn't assert picture frame")
+//		}
+//
+//		// Do some operations with picture frame:
+//		fmt.Println(pic.Description) // For example, print description of picture frame
+//		image, err := ioutil.ReadAll(pic.Picture) // Or read a picture from picture frame
+//		if err != nil {
+//			log.Fatal("Error while reading a picture from picture frame: ", err)
+//		}
+//	}
 func (t *Tag) GetFrames(id string) []Framer {
 	// If frames with id didn't parsed yet, parse them
 	if _, exists := t.framesCoords[id]; exists {
@@ -238,13 +265,15 @@ func (t *Tag) Save() error {
 	return nil
 }
 
+// Close closes the tag's file, rendering it unusable for I/O.
+// It returns an error, if any.
 func (t *Tag) Close() error {
 	return t.file.Close()
 }
 
 func (t Tag) formAllFrames() []byte {
 	framesBuffer := bytesbufferpool.Get()
-	defer bytesbufferpool.Put(frames)
+	defer bytesbufferpool.Put(framesBuffer)
 
 	t.writeFrames(framesBuffer)
 
