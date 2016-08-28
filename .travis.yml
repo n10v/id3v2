@@ -1,7 +1,6 @@
 language: go
 
 go:
-  - 1.4
   - 1.5
   - 1.6
   - 1.7
@@ -11,10 +10,6 @@ env:
     - GOOS=linux
     - GOOS=freebsd
     - GOOS=windows
-
-matrix:
-  allow_failures:
-    - go: 1.4
 
 script:
   - go build && go test
