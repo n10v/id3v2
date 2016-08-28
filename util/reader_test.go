@@ -23,7 +23,7 @@ func TestReadBytes(t *testing.T) {
 		t.Errorf("Expecting to read: %v, got: %v", n, read)
 	}
 	if !bytes.Equal(bs[:n], read) {
-		t.Error("Expecting: %v, got: %v", bs[:n], len(read))
+		t.Errorf("Expecting: %v, got: %v", bs[:n], len(read))
 	}
 
 	if bsReader.buf.Buffered() != len(bs)-n {
@@ -45,6 +45,6 @@ func TestReadTillDelims(t *testing.T) {
 		t.Errorf("Expecting to read: %v, got: %v", expectedLen, len(read))
 	}
 	if !bytes.Equal(bs[:expectedLen], read) {
-		t.Error("Expecting: %v, got: %v", bs[:expectedLen], read)
+		t.Errorf("Expecting: %v, got: %v", bs[:expectedLen], read)
 	}
 }
