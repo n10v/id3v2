@@ -40,40 +40,40 @@ I will implement it as fast as I can.**
 package main
 
 import (
-  "fmt"
-  "log"
+	"fmt"
+	"log"
 
-  "github.com/bogem/id3v2"
+	"github.com/bogem/id3v2"
 )
 
 func main() {
-  // Open file and find tag in it
-  tag, err := id3v2.Open("file.mp3")
-  if err != nil {
-   log.Fatal("Error while opening mp3 file: ", err)
-  }
-  defer tag.Close()
+	// Open file and find tag in it
+	tag, err := id3v2.Open("file.mp3")
+	if err != nil {
+ 		log.Fatal("Error while opening mp3 file: ", err)
+ 	}
+	defer tag.Close()
 	
-  // Read tags
-  fmt.Println(tag.Artist())
-  fmt.Println(tag.Title())
+	// Read tags
+	fmt.Println(tag.Artist())
+	fmt.Println(tag.Title())
 
-  // Set tags
-  tag.SetArtist("New artist")
-  tag.SetTitle("New song")
+  	// Set tags
+	tag.SetArtist("New artist")
+	tag.SetTitle("New song")
 
-  comment := id3v2.CommentFrame{
-    Encoding:   id3v2.ENUTF8,
-    Language:   "eng",
-    Desciption: "My opinion",
-    Text:       "Very good song",
-  }
-  tag.AddCommentFrame(comment)
+	comment := id3v2.CommentFrame{
+		Encoding:   id3v2.ENUTF8,
+		Language:   "eng",
+		Desciption: "My opinion",
+		Text:       "Very good song",
+	}
+	tag.AddCommentFrame(comment)
 
-  // Write it to file
-  if err = tag.Save(); err != nil {
-    log.Fatal("Error while saving a tag: ", err)
-  }
+	// Write it to file
+	if err = tag.Save(); err != nil {
+		log.Fatal("Error while saving a tag: ", err)
+	}
 }
 
 ```
