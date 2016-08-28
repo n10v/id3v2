@@ -40,7 +40,7 @@ I will implement it as fast as I can.**
 package main
 
 import (
-	"fmt"
+  "fmt"
   "log"
 
   "github.com/bogem/id3v2"
@@ -52,11 +52,11 @@ func main() {
   if err != nil {
    log.Fatal("Error while opening mp3 file: ", err)
   }
-	defer tag.Close()
-
-	// Read tags
-	fmt.Println(tag.Artist())
-	fmt.Println(tag.Title())
+  defer tag.Close()
+	
+  // Read tags
+  fmt.Println(tag.Artist())
+  fmt.Println(tag.Title())
 
   // Set tags
   tag.SetArtist("New artist")
