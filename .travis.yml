@@ -5,15 +5,17 @@ go:
   - 1.5
   - 1.6
   - 1.7
-allow_failures:
-  go:
-    - 1.4
 
 env:
   matrix:
     - GOOS=linux
     - GOOS=freebsd
     - GOOS=windows
+
+matrix:
+  allow_failures:
+    go:
+      - 1.4
 
 script:
   - go build
