@@ -1,13 +1,22 @@
 language: go
 
 go:
+  - 1.4
+  - 1.5
   - 1.6
+  - 1.7
+allow_failures:
+  go:
+    - 1.4
+
+env:
+  matrix:
+    - GOOS=linux
+    - GOOS=freebsd
+    - GOOS=windows
 
 script:
-  - GOOS=linux go build
-  - GOOS=freebsd go build
-  - GOOS=windows go build
+  - go build
 
 notifications:
   email: false
-
