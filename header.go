@@ -8,7 +8,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/bogem/id3v2/bytesbufferpool"
+	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -55,8 +55,8 @@ func isID3Tag(data []byte) bool {
 }
 
 func formTagHeader(framesSize []byte) []byte {
-	b := bytesbufferpool.Get()
-	defer bytesbufferpool.Put(b)
+	b := bbpool.Get()
+	defer bbpool.Put(b)
 
 	// Identifier
 	b.WriteString(id3Identifier)

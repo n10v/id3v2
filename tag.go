@@ -10,7 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/bogem/id3v2/bytesbufferpool"
+	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -272,8 +272,8 @@ func (t *Tag) Close() error {
 }
 
 func (t Tag) formAllFrames() []byte {
-	framesBuffer := bytesbufferpool.Get()
-	defer bytesbufferpool.Put(framesBuffer)
+	framesBuffer := bbpool.Get()
+	defer bbpool.Put(framesBuffer)
 
 	t.writeFrames(framesBuffer)
 
@@ -293,8 +293,8 @@ func formFrame(id string, frame Framer) []byte {
 		panic("there is blank ID in frames")
 	}
 
-	frameBuffer := bytesbufferpool.Get()
-	defer bytesbufferpool.Put(frameBuffer)
+	frameBuffer := bbpool.Get()
+	defer bbpool.Put(frameBuffer)
 
 	frameBody := frame.Body()
 	writeFrameHeader(frameBuffer, id, int64(len(frameBody)))

@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/bogem/id3v2/bytesbufferpool"
+	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -83,8 +83,8 @@ func (t *Tag) findAllFrames() error {
 }
 
 func parseFrameHeader(rd io.Reader) (*frameHeader, error) {
-	fhBuf := bytesbufferpool.Get()
-	defer bytesbufferpool.Put(fhBuf)
+	fhBuf := bbpool.Get()
+	defer bbpool.Put(fhBuf)
 
 	limitedRd := &io.LimitedReader{R: rd, N: frameHeaderSize}
 
