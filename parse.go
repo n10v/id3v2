@@ -137,11 +137,11 @@ func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
 	}
 
 	switch id {
-	case t.ids["Attached picture"]:
+	case t.ID("Attached picture"):
 		return parsePictureFrame
-	case t.ids["Comments"]:
+	case t.ID("Comments"):
 		return parseCommentFrame
-	case t.ids["Unsynchronised lyrics/text transcription"]:
+	case t.ID("Unsynchronised lyrics/text transcription"):
 		return parseUnsynchronisedLyricsFrame
 	}
 	return nil

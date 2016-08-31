@@ -42,30 +42,30 @@ func (t Tag) ID(description string) string {
 
 func (t *Tag) findSpecificAddFunction(id string) func(Framer) {
 	switch id {
-	case t.ids["Attached picture"]:
+	case t.ID("Attached picture"):
 		return t.AddAttachedPicture
-	case t.ids["Comments"]:
+	case t.ID("Comments"):
 		return t.AddCommentFrame
-	case t.ids["Unsynchronised lyrics/text transcription"]:
+	case t.ID("Unsynchronised lyrics/text transcription"):
 		return t.AddUnsynchronisedLyricsFrame
 	}
 	return nil
 }
 
 func (t *Tag) AddAttachedPicture(f Framer) {
-	id := t.ids["Attached picture"]
+	id := t.ID("Attached picture")
 	t.checkExistenceOfSequence(id, newPictureSequence)
 	t.addFrameToSequence(id, f)
 }
 
 func (t *Tag) AddCommentFrame(f Framer) {
-	id := t.ids["Comments"]
+	id := t.ID("Comments")
 	t.checkExistenceOfSequence(id, newCommentSequence)
 	t.addFrameToSequence(id, f)
 }
 
 func (t *Tag) AddUnsynchronisedLyricsFrame(f Framer) {
-	id := t.ids["Unsynchronised lyrics/text transcription"]
+	id := t.ID("Unsynchronised lyrics/text transcription")
 	t.checkExistenceOfSequence(id, newUSLFSequence)
 	t.addFrameToSequence(id, f)
 }
@@ -164,48 +164,48 @@ func (t Tag) GetTextFrame(id string) TextFrame {
 }
 
 func (t Tag) Title() string {
-	f := t.GetTextFrame(t.ids["Title/Songname/Content description"])
+	f := t.GetTextFrame(t.ID("Title/Songname/Content description"))
 	return f.Text
 }
 
 func (t *Tag) SetTitle(title string) {
-	t.AddFrame(t.ids["Title/Songname/Content description"], TextFrame{Encoding: ENUTF8, Text: title})
+	t.AddFrame(t.ID("Title/Songname/Content description"), TextFrame{Encoding: ENUTF8, Text: title})
 }
 
 func (t Tag) Artist() string {
-	f := t.GetTextFrame(t.ids["Lead artist/Lead performer/Soloist/Performing group"])
+	f := t.GetTextFrame(t.ID("Lead artist/Lead performer/Soloist/Performing group"))
 	return f.Text
 }
 
 func (t *Tag) SetArtist(artist string) {
-	t.AddFrame(t.ids["Lead artist/Lead performer/Soloist/Performing group"], TextFrame{Encoding: ENUTF8, Text: artist})
+	t.AddFrame(t.ID("Lead artist/Lead performer/Soloist/Performing group"), TextFrame{Encoding: ENUTF8, Text: artist})
 }
 
 func (t Tag) Album() string {
-	f := t.GetTextFrame(t.ids["Album/Movie/Show title"])
+	f := t.GetTextFrame(t.ID("Album/Movie/Show title"))
 	return f.Text
 }
 
 func (t *Tag) SetAlbum(album string) {
-	t.AddFrame(t.ids["Album/Movie/Show title"], TextFrame{Encoding: ENUTF8, Text: album})
+	t.AddFrame(t.ID("Album/Movie/Show title"), TextFrame{Encoding: ENUTF8, Text: album})
 }
 
 func (t Tag) Year() string {
-	f := t.GetTextFrame(t.ids["Recording time"])
+	f := t.GetTextFrame(t.ID("Recording time"))
 	return f.Text
 }
 
 func (t *Tag) SetYear(year string) {
-	t.AddFrame(t.ids["Recording time"], TextFrame{Encoding: ENUTF8, Text: year})
+	t.AddFrame(t.ID("Recording time"), TextFrame{Encoding: ENUTF8, Text: year})
 }
 
 func (t Tag) Genre() string {
-	f := t.GetTextFrame(t.ids["Content type"])
+	f := t.GetTextFrame(t.ID("Content type"))
 	return f.Text
 }
 
 func (t *Tag) SetGenre(genre string) {
-	t.AddFrame(t.ids["Content type"], TextFrame{Encoding: ENUTF8, Text: genre})
+	t.AddFrame(t.ID("Content type"), TextFrame{Encoding: ENUTF8, Text: genre})
 }
 
 // Save writes tag to the file.
