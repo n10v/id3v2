@@ -21,7 +21,7 @@ What it **can** do:
 * Set artist, album, year, genre, unsynchronised lyrics/text (USLT),
 comments and **attached pictures** (e.g. album covers) and write all to file
 * Set several USLT, comments and attached pictures
-* Work with all allowed encodings
+* Work with all available encodings
 
 What it **can't** do:
 * Work with extended header, flags, padding, footer.
