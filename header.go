@@ -54,7 +54,7 @@ func isID3Tag(data []byte) bool {
 	return string(data[0:3]) == id3Identifier
 }
 
-func formTagHeader(framesSize []byte) []byte {
+func formTagHeader(framesSize []byte, version byte) []byte {
 	b := bbpool.Get()
 	defer bbpool.Put(b)
 
@@ -62,7 +62,7 @@ func formTagHeader(framesSize []byte) []byte {
 	b.WriteString(id3Identifier)
 
 	// Version
-	b.WriteByte(4)
+	b.WriteByte(version)
 
 	// Revision
 	b.WriteByte(0)

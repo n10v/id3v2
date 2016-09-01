@@ -28,7 +28,7 @@ func TestParseHeader(t *testing.T) {
 }
 
 func TestFormTagHeader(t *testing.T) {
-	formed := formTagHeader([]byte{0, 0, 0, 0})
+	formed := formTagHeader([]byte{0, 0, 0, 0}, 4)
 	if !bytes.Equal(formed, thb) {
 		t.Fail()
 	}

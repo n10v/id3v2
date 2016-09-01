@@ -27,29 +27,37 @@ func parseTag(file *os.File) (*Tag, error) {
 		return nil, err
 	}
 	if header == nil {
-		return newTag(file, 0), nil
+		return newTag(file, 0, 4), nil
 	}
 	if header.Version < 3 {
 		err = errors.New("Unsupported version of ID3 tag")
 		return nil, err
 	}
 
-	t := newTag(file, tagHeaderSize+header.FramesSize)
+	t := newTag(file, tagHeaderSize+header.FramesSize, header.Version)
 	err = t.findAllFrames()
 
 	return t, err
 }
 
-func newTag(file *os.File, originalSize int64) *Tag {
-	return &Tag{
+func newTag(file *os.File, originalSize int64, version byte) *Tag {
+	t := &Tag{
 		framesCoords: make(map[string][]frameCoordinates),
 		frames:       make(map[string]Framer),
 		sequences:    make(map[string]sequencer),
-		ids:          V24IDs,
 
 		file:         file,
 		originalSize: originalSize,
+		version:      version,
 	}
+
+	if version == 3 {
+		t.ids = V23IDs
+	} else {
+		t.ids = V24IDs
+	}
+
+	return t
 }
 
 func (t *Tag) findAllFrames() error {

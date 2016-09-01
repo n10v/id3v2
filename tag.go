@@ -224,7 +224,7 @@ func (t *Tag) Save() error {
 	}
 
 	// Writing to new file new tag header
-	if _, err = newFile.Write(formTagHeader(framesSize)); err != nil {
+	if _, err = newFile.Write(formTagHeader(framesSize, t.version)); err != nil {
 		return err
 	}
 
