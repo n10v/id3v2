@@ -192,12 +192,12 @@ func (t *Tag) SetAlbum(album string) {
 }
 
 func (t Tag) Year() string {
-	f := t.GetTextFrame(t.ID("Recording time"))
+	f := t.GetTextFrame(t.ID("Year"))
 	return f.Text
 }
 
 func (t *Tag) SetYear(year string) {
-	t.AddFrame(t.ID("Recording time"), TextFrame{Encoding: ENUTF8, Text: year})
+	t.AddFrame(t.ID("Year"), TextFrame{Encoding: ENUTF8, Text: year})
 }
 
 func (t Tag) Genre() string {
