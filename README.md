@@ -16,15 +16,13 @@ I think, it's a good time to write an appropriate standard for it 😉
 ## Information
 **Fast and stable ID3 parsing and writing library for Go**
 
-What it **can** do:
-* Parse tags
+It can:
+* Support ID3v2.3 and ID3v2.4 tags
+* Parse and write tags
 * Set artist, album, year, genre, unsynchronised lyrics/text (USLT),
 comments and **attached pictures** (e.g. album covers) and write all to file
 * Set several USLT, comments and attached pictures
 * Work with all available encodings
-
-What it **can't** do:
-* Work with extended header, flags, padding, footer.
 
 **If you want some functionality, that library can't do,
 or you have some question, just write an issue.
@@ -84,8 +82,8 @@ You can find it here: https://godoc.org/github.com/bogem/id3v2
 
 ## TODO
 
-- [ ] ID3v2.3 Support
 - [ ] Work with extended header, flags, padding, footer ***(Does anyone really use it?)***
+- [x] ID3v2.3 Support
 - [x] Parse tags
 - [x] Documentation
 - [x] Work with other encodings
