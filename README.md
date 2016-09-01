@@ -53,14 +53,14 @@ func main() {
  		log.Fatal("Error while opening mp3 file: ", err)
  	}
 	defer tag.Close()
-	
+
 	// Read tags
 	fmt.Println(tag.Artist())
 	fmt.Println(tag.Title())
 
   	// Set tags
 	tag.SetArtist("New artist")
-	tag.SetTitle("New song")
+	tag.SetTitle("New title")
 
 	comment := id3v2.CommentFrame{
 		Encoding:   id3v2.ENUTF8,
