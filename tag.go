@@ -36,7 +36,7 @@ func (t *Tag) AddFrame(id string, f Framer) {
 
 // ID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
 // from given description.
-// For example, ID("Mood") will return "TMOO".
+// For example, ID("Language") will return "TLAN".
 func (t Tag) ID(description string) string {
 	return t.ids[description]
 }
