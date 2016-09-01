@@ -23,6 +23,7 @@ type Tag struct {
 
 	file         *os.File
 	originalSize int64
+	version      byte
 }
 
 func (t *Tag) AddFrame(id string, f Framer) {
