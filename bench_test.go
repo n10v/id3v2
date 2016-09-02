@@ -4,8 +4,25 @@
 
 package id3v2
 
-import "os"
-import "testing"
+import (
+	"os"
+	"testing"
+)
+
+func BenchmarkParseAllFrames(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		tag, err := Open(mp3Name)
+		if tag == nil || err != nil {
+			b.Error("Error while opening mp3 file: ", err)
+		}
+
+		tag.AllFrames()
+
+		if err = tag.Close(); err != nil {
+			b.Error("Error while closing a tag: ", err)
+		}
+	}
+}
 
 func BenchmarkSetCommonCase(b *testing.B) {
 	for n := 0; n < b.N; n++ {
@@ -13,7 +30,6 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		if tag == nil || err != nil {
 			b.Error("Error while opening mp3 file: ", err)
 		}
-		defer tag.Close()
 		tag.SetTitle("Title")
 		tag.SetArtist("Artist")
 		tag.SetYear("2016")
@@ -34,6 +50,9 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		tag.AddAttachedPicture(pic)
 
 		if err = tag.Save(); err != nil {
+			b.Error("Error while saving a tag: ", err)
+		}
+		if err = tag.Close(); err != nil {
 			b.Error("Error while closing a tag: ", err)
 		}
 	}
@@ -45,7 +64,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		if tag == nil || err != nil {
 			b.Error("Error while opening mp3 file: ", err)
 		}
-		defer tag.Close()
+
 		tag.SetTitle("Title")
 		tag.SetArtist("Artist")
 		tag.SetAlbum("Album")
@@ -87,6 +106,9 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		tag.AddCommentFrame(comm)
 
 		if err = tag.Save(); err != nil {
+			b.Error("Error while saving a tag: ", err)
+		}
+		if err = tag.Close(); err != nil {
 			b.Error("Error while closing a tag: ", err)
 		}
 	}
