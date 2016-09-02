@@ -3,6 +3,7 @@
 ## 0.8
 * Major underhood changes: more perfomance and stability,
 less bugs and memory consumption
+* Added support of ID3v2.3
 
 ## 0.7.1
 * Returned Add(AttachedPicture/Comment/UnsynchronisedLyrics)Frame functions
