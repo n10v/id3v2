@@ -39,16 +39,15 @@ func parseTag(file *os.File) (*Tag, error) {
 	}
 
 	t := newTag(file, tagHeaderSize+header.FramesSize, header.Version)
-	err = t.findAllFrames()
+	err = t.parseAllFrames()
 
 	return t, err
 }
 
 func newTag(file *os.File, originalSize int64, version byte) *Tag {
 	t := &Tag{
-		framesCoords: make(map[string][]frameCoordinates),
-		frames:       make(map[string]Framer),
-		sequences:    make(map[string]sequencer),
+		frames:    make(map[string]Framer),
+		sequences: make(map[string]sequencer),
 
 		file:         file,
 		originalSize: originalSize,
@@ -64,7 +63,7 @@ func newTag(file *os.File, originalSize int64, version byte) *Tag {
 	return t
 }
 
-func (t *Tag) findAllFrames() error {
+func (t *Tag) parseAllFrames() error {
 	pos := int64(tagHeaderSize) // initial position of read - beginning of first frame
 	tagSize := t.originalSize
 	f := t.file
@@ -74,21 +73,26 @@ func (t *Tag) findAllFrames() error {
 			return err
 		}
 
-		header, err := parseFrameHeader(f)
+		frameHeader := &io.LimitedReader{R: f, N: frameHeaderSize}
+		header, err := parseFrameHeader(frameHeader)
 		if err != nil {
 			return err
 		}
-		pos += frameHeaderSize
 
-		fc := frameCoordinates{
-			Len: header.FrameSize,
-			Pos: pos,
+		pos += frameHeaderSize + header.FrameSize
+
+		parseFunc := t.findParseFunc(header.ID)
+		if parseFunc == nil {
+			continue
 		}
-		fcs := t.framesCoords[header.ID]
-		fcs = append(fcs, fc)
-		t.framesCoords[header.ID] = fcs
 
-		pos += header.FrameSize
+		rd := &io.LimitedReader{R: f, N: header.FrameSize}
+		frame, err := parseFunc(rd)
+		if err != nil {
+			return err
+		}
+
+		t.AddFrame(header.ID, frame)
 	}
 
 	return nil
@@ -98,49 +102,23 @@ func parseFrameHeader(rd io.Reader) (*frameHeader, error) {
 	fhBuf := bbpool.Get()
 	defer bbpool.Put(fhBuf)
 
-	limitedRd := &io.LimitedReader{R: rd, N: frameHeaderSize}
-
-	n, err := fhBuf.ReadFrom(limitedRd)
+	n, err := fhBuf.ReadFrom(rd)
 	if err != nil {
 		return nil, err
 	}
-	if n < frameHeaderSize {
-		return nil, errors.New("Size of frame header is less than expected")
+	if n != frameHeaderSize {
+		return nil, errors.New("Unexpected frame header size")
 	}
 
-	byteHeader := fhBuf.Bytes()
+	byteFH := fhBuf.Bytes()
 
 	header := &frameHeader{
-		ID:        string(byteHeader[:4]),
-		FrameSize: util.ParseSize(byteHeader[4:8]),
+		ID:        string(byteFH[:4]),
+		FrameSize: util.ParseSize(byteFH[4:8]),
 	}
 
 	return header, nil
 
-}
-
-func (t *Tag) parseAllFramesCoords() {
-	for id := range t.framesCoords {
-		t.parseFramesCoordsWithID(id)
-	}
-}
-
-func (t *Tag) parseFramesCoordsWithID(id string) {
-	fcs, exists := t.framesCoords[id]
-	if !exists {
-		return
-	}
-
-	parseFunc := t.findParseFunc(id)
-	if parseFunc != nil {
-		for _, fc := range fcs {
-			fr := readFrame(parseFunc, t.file, fc)
-			t.AddFrame(id, fr)
-		}
-	}
-	// Delete frames with id from t.framesCoords,
-	// because they are just being parsed
-	delete(t.framesCoords, id)
 }
 
 func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
@@ -156,15 +134,5 @@ func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
 	case t.ID("Unsynchronised lyrics/text transcription"):
 		return parseUnsynchronisedLyricsFrame
 	}
-	return nil
-}
-
-func readFrame(parseFunc func(io.Reader) (Framer, error), rs io.ReadSeeker, fc frameCoordinates) Framer {
-	rs.Seek(fc.Pos, os.SEEK_SET)
-	rd := &io.LimitedReader{R: rs, N: fc.Len}
-	fr, err := parseFunc(rd)
-	if err != nil {
-		panic(err)
-	}
-	return fr
+	return nil // TODO: Return ParseUnknownFrame function
 }

@@ -16,10 +16,9 @@ import (
 
 // Tag stores all frames of opened file.
 type Tag struct {
-	framesCoords map[string][]frameCoordinates
-	frames       map[string]Framer
-	sequences    map[string]sequencer
-	ids          map[string]string
+	frames    map[string]Framer
+	sequences map[string]sequencer
+	ids       map[string]string
 
 	file         *os.File
 	originalSize int64
@@ -84,16 +83,12 @@ func (t *Tag) addFrameToSequence(id string, f Framer) {
 // AllFrames returns map, that contains all frames in tag, that could be parsed.
 // The key of this map is an ID of frame and value is an array of frames.
 func (t *Tag) AllFrames() map[string][]Framer {
-	t.parseAllFramesCoords()
-
 	frames := make(map[string][]Framer)
 
-	// Add frames from t.frames
 	for id, frame := range t.frames {
 		frames[id] = append(frames[id], frame)
 	}
 
-	// Add frames from t.sequences
 	for id, sequence := range t.sequences {
 		frames[id] = append(frames[id], sequence.Frames()...)
 	}
@@ -138,16 +133,9 @@ func (t *Tag) GetLastFrame(id string) Framer {
 //		}
 //	}
 func (t *Tag) GetFrames(id string) []Framer {
-	// If frames with id didn't parsed yet, parse them
-	if _, exists := t.framesCoords[id]; exists {
-		t.parseFramesCoordsWithID(id)
-	}
-
 	if f, exists := t.frames[id]; exists {
 		return []Framer{f}
-	}
-
-	if s, exists := t.sequences[id]; exists {
+	} else if s, exists := t.sequences[id]; exists {
 		return s.Frames()
 	}
 
