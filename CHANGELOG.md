@@ -1,9 +1,13 @@
 # ID3v2 Changelog
 
+## 0.8
+* Major underhood changes: more perfomance and stability,
+less bugs and memory consumption
+
 ## 0.7.1
 * Returned Add(AttachedPicture/Comment/UnsynchronisedLyrics)Frame functions
-for convenience and less errors. See [GitHub issue](https://github.com/bogem/id3v2/issues/5)
-for details
+for convenience and less errors.
+See [GitHub issue](https://github.com/bogem/id3v2/issues/5) for details
 
 ## 0.7
 * Now ID3v2 can parse tags! See documentation for details
