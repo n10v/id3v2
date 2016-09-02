@@ -39,7 +39,6 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		if err != nil {
 			b.Error("Error while opening front cover file")
 		}
-		defer frontCover.Close()
 		pic := PictureFrame{
 			Encoding:    ENUTF8,
 			MimeType:    "image/jpeg",
@@ -54,6 +53,9 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		}
 		if err = tag.Close(); err != nil {
 			b.Error("Error while closing a tag: ", err)
+		}
+		if err = frontCover.Close(); err != nil {
+			b.Error("Error while closing a front cover: ", err)
 		}
 	}
 }
@@ -76,7 +78,6 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		if err != nil {
 			b.Error("Error while opening front cover file")
 		}
-		defer frontCover.Close()
 
 		pic := PictureFrame{
 			Encoding:    ENUTF8,
@@ -110,6 +111,9 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		}
 		if err = tag.Close(); err != nil {
 			b.Error("Error while closing a tag: ", err)
+		}
+		if err = frontCover.Close(); err != nil {
+			b.Error("Error while closing a front cover: ", err)
 		}
 	}
 }
