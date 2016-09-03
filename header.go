@@ -5,10 +5,10 @@
 package id3v2
 
 import (
+	"bytes"
 	"errors"
 	"io"
 
-	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -55,23 +55,22 @@ func isID3Tag(data []byte) bool {
 }
 
 func formTagHeader(framesSize []byte, version byte) []byte {
-	b := bbpool.Get()
-	defer bbpool.Put(b)
+	header := new(bytes.Buffer)
 
 	// Identifier
-	b.WriteString(id3Identifier)
+	header.WriteString(id3Identifier)
 
 	// Version
-	b.WriteByte(version)
+	header.WriteByte(version)
 
 	// Revision
-	b.WriteByte(0)
+	header.WriteByte(0)
 
 	// Flags
-	b.WriteByte(0)
+	header.WriteByte(0)
 
 	// Size of frames
-	b.Write(framesSize)
+	header.Write(framesSize)
 
-	return b.Bytes()
+	return header.Bytes()
 }
