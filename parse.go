@@ -134,5 +134,5 @@ func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
 	case t.ID("Unsynchronised lyrics/text transcription"):
 		return parseUnsynchronisedLyricsFrame
 	}
-	return nil // TODO: Return ParseUnknownFrame function
+	return parseUnknownFrame
 }
