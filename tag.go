@@ -33,13 +33,6 @@ func (t *Tag) AddFrame(id string, f Framer) {
 	}
 }
 
-// ID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
-// from given description.
-// For example, ID("Language") will return "TLAN".
-func (t Tag) ID(description string) string {
-	return t.ids[description]
-}
-
 func (t *Tag) findSpecificAddFunction(id string) func(Framer) {
 	switch id {
 	case t.ID("Attached picture"):
@@ -80,6 +73,13 @@ func (t *Tag) addFrameToSequence(id string, f Framer) {
 	t.sequences[id].AddFrame(f)
 }
 
+// ID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
+// from given description.
+// For example, ID("Language") will return "TLAN".
+func (t Tag) ID(description string) string {
+	return t.ids[description]
+}
+
 // AllFrames returns map, that contains all frames in tag, that could be parsed.
 // The key of this map is an ID of frame and value is an array of frames.
 func (t *Tag) AllFrames() map[string][]Framer {
@@ -102,11 +102,13 @@ func (t *Tag) AllFrames() map[string][]Framer {
 //
 // Example of usage:
 //	bpmFramer := t.GetLastFrame(t.ID("BPM"))
-//	bpm, ok := bpmFramer.(id3v2.TextFrame)
-//	if !ok {
-//		log.Fatal("Couldn't assert bpm frame")
+//	if bpmFramer != nil {
+//		bpm, ok := bpmFramer.(id3v2.TextFrame)
+//		if !ok {
+//			log.Fatal("Couldn't assert bpm frame")
+//		}
+//		fmt.Println(bpm.Text)
 //	}
-//	fmt.Println(bpm.Text)
 func (t *Tag) GetLastFrame(id string) Framer {
 	fs := t.GetFrames(id)
 	if len(fs) == 0 || fs == nil {
@@ -119,17 +121,19 @@ func (t *Tag) GetLastFrame(id string) Framer {
 //
 // Example of usage:
 //	pictures := tag.GetFrames(tag.ID("Attached picture"))
-//	for _, f := range pictures {
-//		pic, ok := f.(id3v2.PictureFrame)
-//		if !ok {
-//			log.Fatal("Couldn't assert picture frame")
-//		}
+//	if pictures != nil {
+//		for _, f := range pictures {
+//			pic, ok := f.(id3v2.PictureFrame)
+//			if !ok {
+//				log.Fatal("Couldn't assert picture frame")
+//			}
 //
-//		// Do some operations with picture frame:
-//		fmt.Println(pic.Description) // For example, print description of picture frame
-//		image, err := ioutil.ReadAll(pic.Picture) // Or read a picture from picture frame
-//		if err != nil {
-//			log.Fatal("Error while reading a picture from picture frame: ", err)
+//			// Do some operations with picture frame:
+//			fmt.Println(pic.Description) // For example, print description of picture frame
+//			image, err := ioutil.ReadAll(pic.Picture) // Or read a picture from picture frame
+//			if err != nil {
+//				log.Fatal("Error while reading a picture from picture frame: ", err)
+//			}
 //		}
 //	}
 func (t *Tag) GetFrames(id string) []Framer {
