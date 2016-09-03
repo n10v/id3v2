@@ -73,7 +73,7 @@ func (t *Tag) parseAllFrames() error {
 			return err
 		}
 
-		frameHeader := &io.LimitedReader{R: f, N: frameHeaderSize}
+		frameHeader := io.LimitReader(f, frameHeaderSize)
 		header, err := parseFrameHeader(frameHeader)
 		if err != nil {
 			return err
@@ -86,7 +86,7 @@ func (t *Tag) parseAllFrames() error {
 			continue
 		}
 
-		rd := &io.LimitedReader{R: f, N: header.FrameSize}
+		rd := io.LimitReader(f, header.FrameSize)
 		frame, err := parseFunc(rd)
 		if err != nil {
 			return err
