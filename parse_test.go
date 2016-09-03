@@ -136,7 +136,6 @@ func testPictureFrames(actual, expected PictureFrame) error {
 	if err != nil {
 		return fmt.Errorf("Error while reading picture of expected picture frame: %v", err)
 	}
-
 	if !bytes.Equal(actualBytes, expectedBytes) {
 		return errors.New("Pictures of picture frames' are different")
 	}
