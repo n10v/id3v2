@@ -8,6 +8,7 @@ import (
 	"io"
 
 	"github.com/bogem/id3v2/bbpool"
+	"github.com/bogem/id3v2/rdpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -46,7 +47,8 @@ func (uslf UnsynchronisedLyricsFrame) Body() []byte {
 }
 
 func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
-	bufRd := util.NewReader(rd)
+	bufRd := rdpool.Get(rd)
+	defer rdpool.Put(bufRd)
 
 	encodingByte, err := bufRd.ReadByte()
 	if err != nil {

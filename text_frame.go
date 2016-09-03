@@ -8,6 +8,7 @@ import (
 	"io"
 
 	"github.com/bogem/id3v2/bbpool"
+	"github.com/bogem/id3v2/rdpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -37,7 +38,8 @@ func (tf TextFrame) Body() []byte {
 }
 
 func parseTextFrame(rd io.Reader) (Framer, error) {
-	bufRd := util.NewReader(rd)
+	bufRd := rdpool.Get(rd)
+	defer rdpool.Put(bufRd)
 
 	encoding, err := bufRd.ReadByte()
 	if err != nil {
