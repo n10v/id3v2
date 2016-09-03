@@ -102,3 +102,9 @@ func (r *Reader) ReadTillDelims(delims []byte) ([]byte, error) {
 
 	return buf, nil
 }
+
+// Reset discards any buffered data, resets all state,
+// and switches the buffered reader to read from r.
+func (r *Reader) Reset(rd io.Reader) {
+	r.buf.Reset(rd)
+}
