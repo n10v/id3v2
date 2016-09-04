@@ -20,8 +20,8 @@ It can:
 * Support ID3v2.3 and ID3v2.4 tags
 * Parse and write tags
 * Set artist, album, year, genre, unsynchronised lyrics/text (USLT),
-comments and **attached pictures** (e.g. album covers) and write all to file
-* Set several USLT, comments and attached pictures
+comments and attached pictures
+* Set several USLTs, comments and attached pictures
 * Work with all available encodings
 
 **If you want some functionality, that library can't do,
