@@ -1,5 +1,9 @@
 # ID3v2 Changelog
 
+## 0.8.1
+* Add DeleteAllFrames and DeleteFrames methods
+* More performance and stability
+
 ## 0.8
 * Major underhood changes: more perfomance and stability,
 less bugs and memory consumption
