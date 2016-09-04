@@ -15,6 +15,15 @@ func NewReader(rd io.Reader) *Reader {
 	return &Reader{buf: bufio.NewReader(rd)}
 }
 
+// Read reads data into p.
+// It returns the number of bytes read into p.
+// The bytes are taken from at most one Read on the underlying Reader,
+// hence n may be less than len(p).
+// At EOF, the count will be zero and err will be io.EOF.
+func (r *Reader) Read(p []byte) (n int, err error) {
+	return r.buf.Read(p)
+}
+
 // ReadAll reads from Reader until an error or EOF and returns the data it read.
 // A successful call returns err == nil, not err == EOF. Because ReadAll is
 // defined to read from Reader until EOF, it does not treat an EOF from Read
