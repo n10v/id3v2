@@ -30,6 +30,9 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		if tag == nil || err != nil {
 			b.Error("Error while opening mp3 file: ", err)
 		}
+
+		tag.DeleteAllFrames()
+
 		tag.SetTitle("Title")
 		tag.SetArtist("Artist")
 		tag.SetYear("2016")
@@ -66,6 +69,8 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		if tag == nil || err != nil {
 			b.Error("Error while opening mp3 file: ", err)
 		}
+
+		tag.DeleteAllFrames()
 
 		tag.SetTitle("Title")
 		tag.SetArtist("Artist")
