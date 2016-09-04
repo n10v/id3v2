@@ -96,6 +96,18 @@ func (t *Tag) AllFrames() map[string][]Framer {
 	return frames
 }
 
+// DeleteAllFrames deletes all frames in tag.
+func (t *Tag) DeleteAllFrames() {
+	t.frames = make(map[string]Framer)
+	t.sequences = make(map[string]sequencer)
+}
+
+// DeleteFrames deletes frames in tag with given id.
+func (t *Tag) DeleteFrames(id string) {
+	delete(t.frames, id)
+	delete(t.sequences, id)
+}
+
 // GetLastFrame returns last frame from slice, that is returned from GetFrames function.
 // GetLastFrame is suitable for frames, that can be only one in whole tag.
 // For example, for text frames.
