@@ -64,35 +64,33 @@ func newTag(file *os.File, originalSize int64, version byte) *Tag {
 }
 
 func (t *Tag) parseAllFrames() error {
-	pos := int64(tagHeaderSize) // initial position of read - beginning of first frame
-	tagSize := t.originalSize
+	size := t.originalSize - tagHeaderSize // Size of all frames = Size of tag - tag header
 	f := t.file
 
-	for pos < tagSize {
-		if _, err := f.Seek(pos, os.SEEK_SET); err != nil {
-			return err
-		}
+	// Initial position of read - beginning of first frame
+	if _, err := f.Seek(tagHeaderSize, os.SEEK_SET); err != nil {
+		return err
+	}
 
-		frameHeader := io.LimitReader(f, frameHeaderSize)
-		header, err := parseFrameHeader(frameHeader)
+	limFile := &io.LimitedReader{R: f}
+	for size > 0 {
+		limFile.N = frameHeaderSize
+		header, err := parseFrameHeader(limFile)
 		if err != nil {
 			return err
 		}
 
-		pos += frameHeaderSize + header.FrameSize
-
 		parseFunc := t.findParseFunc(header.ID)
-		if parseFunc == nil {
-			continue
-		}
 
-		rd := io.LimitReader(f, header.FrameSize)
-		frame, err := parseFunc(rd)
+		limFile.N = header.FrameSize
+		frame, err := parseFunc(limFile)
 		if err != nil {
 			return err
 		}
 
 		t.AddFrame(header.ID, frame)
+
+		size -= frameHeaderSize + header.FrameSize
 	}
 
 	return nil
