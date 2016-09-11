@@ -91,6 +91,16 @@ func (r *Reader) ReadTillDelims(delims []byte) ([]byte, error) {
 	buf := make([]byte, 0)
 
 	for {
+		read, err := r.ReadTillDelim(delims[0])
+		if err != nil {
+			return buf, err
+		}
+		buf = append(buf, read...)
+		err = r.buf.UnreadByte()
+		if err != nil {
+			return buf, err
+		}
+
 		b, err := r.buf.ReadByte()
 		if err != nil {
 			return buf, err
