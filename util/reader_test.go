@@ -10,12 +10,12 @@ var (
 	bsRd = bytes.NewReader(bs)
 )
 
-func TestReadBytes(t *testing.T) {
+func TestReadSeveralBytes(t *testing.T) {
 	bsRd.Reset(bs)
 	bsReader := NewReader(bsRd)
 	n := 5 // Read 5 elements
 
-	read, err := bsReader.ReadBytes(n)
+	read, err := bsReader.ReadSeveralBytes(n)
 	if err != nil {
 		t.Error(err)
 	}

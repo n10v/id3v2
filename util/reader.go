@@ -38,8 +38,8 @@ func (r *Reader) ReadByte() (byte, error) {
 	return r.buf.ReadByte()
 }
 
-// ReadBytes reads n bytes.
-func (r *Reader) ReadBytes(n int) ([]byte, error) {
+// ReadSeveralBytes reads n bytes.
+func (r *Reader) ReadSeveralBytes(n int) ([]byte, error) {
 	if n == 0 {
 		return nil, nil
 	}

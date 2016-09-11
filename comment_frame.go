@@ -59,7 +59,7 @@ func parseCommentFrame(rd io.Reader) (Framer, error) {
 	}
 	encoding := Encodings[encodingByte]
 
-	language, err := bufRd.ReadBytes(3)
+	language, err := bufRd.ReadSeveralBytes(3)
 	if err != nil {
 		return nil, err
 	}
