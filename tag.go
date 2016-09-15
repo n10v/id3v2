@@ -227,6 +227,9 @@ func (t *Tag) Save() error {
 		return err
 	}
 
+	// Make sure we clean up the temp file if it is still around.
+	defer os.Remove(newFile.Name())
+
 	// Writing to new file new tag header
 	if _, err = newFile.Write(formTagHeader(framesSize, t.version)); err != nil {
 		return err
