@@ -26,41 +26,37 @@ type Tag struct {
 }
 
 func (t *Tag) AddFrame(id string, f Framer) {
-	if addFunc := t.findSpecificAddFunction(id); addFunc != nil {
-		addFunc(f)
-	} else {
+	switch id {
+	case t.ID("Attached picture"):
+		pf := f.(PictureFrame)
+		t.AddAttachedPicture(pf)
+	case t.ID("Comments"):
+		cf := f.(CommentFrame)
+		t.AddCommentFrame(cf)
+	case t.ID("Unsynchronised lyrics/text transcription"):
+		uslf := f.(UnsynchronisedLyricsFrame)
+		t.AddUnsynchronisedLyricsFrame(uslf)
+	default:
 		t.frames[id] = f
 	}
 }
 
-func (t *Tag) findSpecificAddFunction(id string) func(Framer) {
-	switch id {
-	case t.ID("Attached picture"):
-		return t.AddAttachedPicture
-	case t.ID("Comments"):
-		return t.AddCommentFrame
-	case t.ID("Unsynchronised lyrics/text transcription"):
-		return t.AddUnsynchronisedLyricsFrame
-	}
-	return nil
-}
-
-func (t *Tag) AddAttachedPicture(f Framer) {
+func (t *Tag) AddAttachedPicture(pf PictureFrame) {
 	id := t.ID("Attached picture")
 	t.checkExistenceOfSequence(id, newPictureSequence)
-	t.addFrameToSequence(id, f)
+	t.addFrameToSequence(id, pf)
 }
 
-func (t *Tag) AddCommentFrame(f Framer) {
+func (t *Tag) AddCommentFrame(cf CommentFrame) {
 	id := t.ID("Comments")
 	t.checkExistenceOfSequence(id, newCommentSequence)
-	t.addFrameToSequence(id, f)
+	t.addFrameToSequence(id, cf)
 }
 
-func (t *Tag) AddUnsynchronisedLyricsFrame(f Framer) {
+func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 	id := t.ID("Unsynchronised lyrics/text transcription")
 	t.checkExistenceOfSequence(id, newUSLFSequence)
-	t.addFrameToSequence(id, f)
+	t.addFrameToSequence(id, uslf)
 }
 
 func (t *Tag) checkExistenceOfSequence(id string, newSequence func() sequencer) {
