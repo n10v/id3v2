@@ -34,9 +34,6 @@ func (uslf UnsynchronisedLyricsFrame) Body() []byte {
 	b := new(bytes.Buffer)
 
 	b.WriteByte(uslf.Encoding.Key)
-	if uslf.Language == "" {
-		panic("language isn't set up in USLT frame with description " + uslf.ContentDescriptor)
-	}
 	b.WriteString(uslf.Language)
 	b.WriteString(uslf.ContentDescriptor)
 	b.Write(uslf.Encoding.TerminationBytes)

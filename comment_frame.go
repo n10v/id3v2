@@ -37,9 +37,6 @@ func (cf CommentFrame) Body() []byte {
 	b := new(bytes.Buffer)
 
 	b.WriteByte(cf.Encoding.Key)
-	if cf.Language == "" {
-		panic("language isn't set up in comment frame with description " + cf.Description)
-	}
 	b.WriteString(cf.Language)
 	b.WriteString(cf.Description)
 	b.Write(cf.Encoding.TerminationBytes)
