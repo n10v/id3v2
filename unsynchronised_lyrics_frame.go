@@ -5,9 +5,9 @@
 package id3v2
 
 import (
+	"bytes"
 	"io"
 
-	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/rdpool"
 	"github.com/bogem/id3v2/util"
 )
@@ -31,13 +31,9 @@ type UnsynchronisedLyricsFrame struct {
 }
 
 func (uslf UnsynchronisedLyricsFrame) Body() []byte {
-	b := bbpool.Get()
-	defer bbpool.Put(b)
+	b := new(bytes.Buffer)
 
 	b.WriteByte(uslf.Encoding.Key)
-	if uslf.Language == "" {
-		panic("language isn't set up in USLT frame with description " + uslf.ContentDescriptor)
-	}
 	b.WriteString(uslf.Language)
 	b.WriteString(uslf.ContentDescriptor)
 	b.Write(uslf.Encoding.TerminationBytes)
