@@ -211,56 +211,56 @@ func (t *Tag) SetGenre(genre string) {
 
 // Save writes tag to the file.
 func (t *Tag) Save() error {
-	// Forming new frames
+	// Form new frames
 	frames := t.formAllFrames()
 
-	// Forming size of new frames
+	// Form size of new frames
 	framesSize := util.FormSize(int64(len(frames)))
 
-	// Creating a temp file for mp3 file, which will contain new tag
+	// Create a temp file for mp3 file, which will contain new tag
 	newFile, err := ioutil.TempFile("", "")
 	if err != nil {
 		return err
 	}
 
-	// Make sure we clean up the temp file if it is still around.
+	// Make sure we clean up the temp file if it's still around
 	defer os.Remove(newFile.Name())
 
-	// Writing to new file new tag header
+	// Write to new file new tag header
 	if _, err = newFile.Write(formTagHeader(framesSize, t.version)); err != nil {
 		return err
 	}
 
-	// Writing to new file new frames
+	// Write to new file new frames
 	if _, err = newFile.Write(frames); err != nil {
 		return err
 	}
 
-	// Seeking to a music part of mp3
+	// Seek to a music part of original file
 	originalFile := t.file
 	defer originalFile.Close()
 	if _, err = originalFile.Seek(t.originalSize, os.SEEK_SET); err != nil {
 		return err
 	}
 
-	// Writing to new file the music part
+	// Write to new file the music part
 	if _, err = io.Copy(newFile, originalFile); err != nil {
 		return err
 	}
 
-	// Getting original file mode
+	// Get original file mode
 	originalFileStat, err := originalFile.Stat()
 	if err != nil {
 		return err
 	}
 	originalFileMode := originalFileStat.Mode()
 
-	// Setting new file mode
+	// Set new file mode
 	if err = newFile.Chmod(originalFileMode); err != nil {
 		return err
 	}
 
-	// Replacing original file with new file
+	// Replace original file with new file
 	if err = os.Rename(newFile.Name(), originalFile.Name()); err != nil {
 		return err
 	}
