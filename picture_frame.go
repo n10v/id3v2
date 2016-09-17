@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"io"
 
-	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/rdpool"
 	"github.com/bogem/id3v2/util"
 )
@@ -42,8 +41,7 @@ type PictureFrame struct {
 }
 
 func (pf PictureFrame) Body() []byte {
-	b := bbpool.Get()
-	defer bbpool.Put(b)
+	b := new(bytes.Buffer)
 
 	b.WriteByte(pf.Encoding.Key)
 	b.WriteString(pf.MimeType)
