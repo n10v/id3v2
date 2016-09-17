@@ -1,5 +1,10 @@
 # ID3v2 Changelog
 
+## 0.8.2
+* Some stability improvements:
+	* [Clean up temp files on the way out](https://github.com/bogem/id3v2/pull/10) (thanks to [gabek](https://github.com/gabek) for PR)
+	* [Now frames' body can't suddenly be changed](https://github.com/bogem/id3v2/pull/11)
+
 ## 0.8.1
 * Add DeleteAllFrames and DeleteFrames methods
 * More performance and stability
