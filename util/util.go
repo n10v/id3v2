@@ -20,7 +20,7 @@ var (
 func FormSize(n int64) []byte {
 	allowedSize := int64(268435455) // 0b11111... (28 digits)
 	if n > allowedSize {
-		panic("Size is more than allowed in id3 tag")
+		panic("size of tag/frame is more than allowed in id3 tag")
 	}
 
 	mask := int64(1<<sizeBase - 1)
@@ -42,12 +42,12 @@ func ParseSize(data []byte) int64 {
 	var size int64
 
 	if len(data) > bytesPerInt {
-		panic("Invalid data length (it must be equal or less than 4)")
+		panic("invalid length of tag's/frame's size (it must be equal or less than 4)")
 	}
 
 	for _, b := range data {
 		if b&0x80 > 0 { // 0x80 = 0b1000_0000
-			panic("Invalid size format")
+			panic("invalid format of tag's/frame's size")
 		}
 
 		size = (size << sizeBase) | int64(b)
