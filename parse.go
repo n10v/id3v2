@@ -9,7 +9,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -64,55 +63,58 @@ func newTag(file *os.File, originalSize int64, version byte) *Tag {
 }
 
 func (t *Tag) parseAllFrames() error {
-	size := t.originalSize - tagHeaderSize // Size of all frames = Size of tag - tag header
-	f := t.file
-
 	// Initial position of read - beginning of first frame
-	if _, err := f.Seek(tagHeaderSize, os.SEEK_SET); err != nil {
+	if _, err := t.file.Seek(tagHeaderSize, os.SEEK_SET); err != nil {
 		return err
 	}
 
-	limFile := &io.LimitedReader{R: f}
-	for size > 0 {
-		limFile.N = frameHeaderSize
-		header, err := parseFrameHeader(limFile)
+	size := t.originalSize - tagHeaderSize // Size of all frames = Size of tag - tag header
+	fileReader := io.LimitReader(t.file, size)
+
+	for {
+		id, frame, err := t.parseFrame(fileReader)
+		if err == io.EOF {
+			break
+		}
 		if err != nil {
 			return err
 		}
 
-		parseFunc := t.findParseFunc(header.ID)
-
-		limFile.N = header.FrameSize
-		frame, err := parseFunc(limFile)
-		if err != nil {
-			return err
-		}
-
-		t.AddFrame(header.ID, frame)
-
-		size -= frameHeaderSize + header.FrameSize
+		t.AddFrame(id, frame)
 	}
 
 	return nil
 }
 
-func parseFrameHeader(rd io.Reader) (*frameHeader, error) {
-	fhBuf := bbpool.Get()
-	defer bbpool.Put(fhBuf)
+var frameBody = new(io.LimitedReader)
 
-	n, err := fhBuf.ReadFrom(rd)
+func (t Tag) parseFrame(rd io.Reader) (id string, frame Framer, err error) {
+	header, err := parseFrameHeader(rd)
+	if err != nil {
+		return
+	}
+	id = header.ID
+
+	parseFunc := t.findParseFunc(id)
+
+	frameBody.R = rd
+	frameBody.N = header.FrameSize
+
+	frame, err = parseFunc(frameBody)
+	return
+}
+
+var fhBuf = make([]byte, frameHeaderSize)
+
+func parseFrameHeader(rd io.Reader) (*frameHeader, error) {
+	_, err := rd.Read(fhBuf)
 	if err != nil {
 		return nil, err
 	}
-	if n != frameHeaderSize {
-		return nil, errors.New("Unexpected frame header size")
-	}
-
-	byteFH := fhBuf.Bytes()
 
 	header := &frameHeader{
-		ID:        string(byteFH[:4]),
-		FrameSize: util.ParseSize(byteFH[4:8]),
+		ID:        string(fhBuf[:4]),
+		FrameSize: util.ParseSize(fhBuf[4:8]),
 	}
 
 	return header, nil
