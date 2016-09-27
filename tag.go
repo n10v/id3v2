@@ -294,7 +294,7 @@ func (t Tag) writeFrames(w io.Writer) {
 
 func formFrame(id string, frame Framer) []byte {
 	if id == "" {
-		panic("there is blank ID in frames")
+		return []byte{}
 	}
 
 	frameBuffer := bbpool.Get()
