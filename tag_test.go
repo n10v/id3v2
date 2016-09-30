@@ -7,6 +7,7 @@ package id3v2
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"os"
 	"testing"
 
@@ -71,7 +72,7 @@ var (
 func TestSetTags(t *testing.T) {
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {
-		t.Error("Error while opening mp3 file: ", err)
+		t.Fatal("Error while opening mp3 file: ", err)
 	}
 	defer tag.Close()
 
@@ -82,7 +83,9 @@ func TestSetTags(t *testing.T) {
 	tag.SetGenre("Genre")
 
 	// Set picture frames
-	resetPictureReaders()
+	if err := resetPictureReaders(); err != nil {
+		t.Fatal(err)
+	}
 	tag.AddAttachedPicture(frontCover)
 	tag.AddAttachedPicture(backCover)
 
@@ -105,7 +108,7 @@ func TestSetTags(t *testing.T) {
 func TestCorrectnessOfSettingTag(t *testing.T) {
 	mp3, err := os.Open(mp3Name)
 	if err != nil {
-		t.Error("Error while opening mp3 file: ", err)
+		t.Fatal("Error while opening mp3 file: ", err)
 	}
 	defer mp3.Close()
 
@@ -125,25 +128,27 @@ func TestCorrectnessOfSettingTag(t *testing.T) {
 	}
 }
 
-func resetPictureReaders() {
+func resetPictureReaders() error {
 	frontCoverFile, err := os.Open(frontCoverName)
 	if err != nil {
-		panic("Error while opening front cover file: " + err.Error())
+		return errors.New("Error while opening front cover file: " + err.Error())
 	}
 	frontCover.Picture = frontCoverFile
 
 	backCoverFile, err := os.Open(backCoverName)
 	if err != nil {
-		panic("Error while opening back cover file: " + err.Error())
+		return errors.New("Error while opening back cover file: " + err.Error())
 	}
 	backCover.Picture = backCoverFile
+
+	return nil
 }
 
 // Check integrity at the beginning of mp3's music part
 func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 	mp3, err := os.Open(mp3Name)
 	if err != nil {
-		t.Error("Error while opening mp3 file: ", err)
+		t.Fatal("Error while opening mp3 file: ", err)
 	}
 	defer mp3.Close()
 
@@ -153,7 +158,7 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 		t.Errorf("Expected length of discarded bytes %v, got %v", tagSize, n)
 	}
 	if err != nil {
-		t.Error("Error while reading mp3 file: ", err)
+		t.Fatal("Error while reading mp3 file: ", err)
 	}
 
 	expected := []byte{255, 251, 144, 68, 0, 0, 0}
@@ -163,7 +168,7 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 		t.Errorf("Expected length of read bytes %v, got %v", len(expected), n)
 	}
 	if err != nil {
-		t.Error("Error while reading mp3 file: ", err)
+		t.Fatal("Error while reading mp3 file: ", err)
 	}
 
 	if !bytes.Equal(expected, got) {
@@ -175,7 +180,7 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 	mp3, err := os.Open(mp3Name)
 	if err != nil {
-		t.Error("Error while opening mp3 file: ", err)
+		t.Fatal("Error while opening mp3 file: ", err)
 	}
 	defer mp3.Close()
 
@@ -187,7 +192,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 		t.Errorf("Expected length of discarded bytes %v, got %v", toDiscard, n)
 	}
 	if err != nil {
-		t.Error("Error while discarding: ", err)
+		t.Fatal("Error while discarding: ", err)
 	}
 
 	got := make([]byte, len(expected))
@@ -196,7 +201,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 		t.Errorf("Expected length of read bytes %v, got %v", len(expected), n)
 	}
 	if err != nil {
-		t.Error("Error while reading mp3 file: ", err)
+		t.Fatal("Error while reading mp3 file: ", err)
 	}
 
 	if !bytes.Equal(expected, got) {

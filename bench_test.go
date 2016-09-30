@@ -13,7 +13,7 @@ func BenchmarkParseAllFrames(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		tag, err := Open(mp3Name)
 		if tag == nil || err != nil {
-			b.Error("Error while opening mp3 file: ", err)
+			b.Fatal("Error while opening mp3 file: ", err)
 		}
 
 		tag.AllFrames()
@@ -28,7 +28,7 @@ func BenchmarkSetCommonCase(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		tag, err := Open(mp3Name)
 		if tag == nil || err != nil {
-			b.Error("Error while opening mp3 file: ", err)
+			b.Fatal("Error while opening mp3 file: ", err)
 		}
 
 		tag.DeleteAllFrames()
@@ -40,7 +40,7 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		// Set front cover
 		frontCover, err := os.Open(frontCoverName)
 		if err != nil {
-			b.Error("Error while opening front cover file")
+			b.Fatal("Error while opening front cover file")
 		}
 		pic := PictureFrame{
 			Encoding:    ENUTF8,
@@ -67,7 +67,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		tag, err := Open(mp3Name)
 		if tag == nil || err != nil {
-			b.Error("Error while opening mp3 file: ", err)
+			b.Fatal("Error while opening mp3 file: ", err)
 		}
 
 		tag.DeleteAllFrames()

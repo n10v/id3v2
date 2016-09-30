@@ -32,7 +32,9 @@ func TestParse(t *testing.T) {
 	}
 
 	// Check picture frames
-	resetPictureReaders()
+	if err := resetPictureReaders(); err != nil {
+		t.Fatal(err)
+	}
 	picFrames := tag.GetFrames(tag.ID("Attached picture"))
 	if len(picFrames) != 2 {
 		t.Errorf("Expected picture frames: %v, got %v", 2, len(picFrames))
@@ -42,7 +44,7 @@ func TestParse(t *testing.T) {
 	for _, f := range picFrames {
 		pf, ok := f.(PictureFrame)
 		if !ok {
-			t.Error("Couldn't assert picture frame")
+			t.Fatal("Couldn't assert picture frame")
 		}
 		if pf.PictureType == PTFrontCover {
 			parsedFrontCover = pf
@@ -69,7 +71,7 @@ func TestParse(t *testing.T) {
 	for _, f := range usltFrames {
 		uslf, ok := f.(UnsynchronisedLyricsFrame)
 		if !ok {
-			t.Error("Couldn't assert USLT frame")
+			t.Fatal("Couldn't assert USLT frame")
 		}
 		if uslf.Language == "eng" {
 			parsedEngUSLF = uslf
@@ -96,7 +98,7 @@ func TestParse(t *testing.T) {
 	for _, f := range commFrames {
 		cf, ok := f.(CommentFrame)
 		if !ok {
-			t.Error("Couldn't assert comment frame")
+			t.Fatal("Couldn't assert comment frame")
 		}
 		if cf.Language == "eng" {
 			parsedEngComm = cf
@@ -141,11 +143,11 @@ func testPictureFrames(actual, expected PictureFrame) error {
 
 	actualBytes, err := ioutil.ReadAll(actual.Picture)
 	if err != nil {
-		return fmt.Errorf("Error while reading picture of actual picture frame: %v", err)
+		return errors.New("Error while reading picture of actual picture frame: " + err.Error())
 	}
 	expectedBytes, err := ioutil.ReadAll(expected.Picture)
 	if err != nil {
-		return fmt.Errorf("Error while reading picture of expected picture frame: %v", err)
+		return errors.New("Error while reading picture of expected picture frame: " + err.Error())
 	}
 	if !bytes.Equal(actualBytes, expectedBytes) {
 		return errors.New("Pictures of picture frames' are different")
