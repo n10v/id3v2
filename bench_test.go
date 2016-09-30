@@ -37,7 +37,7 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		tag.SetArtist("Artist")
 		tag.SetYear("2016")
 
-		// Setting front cover
+		// Set front cover
 		frontCover, err := os.Open(frontCoverName)
 		if err != nil {
 			b.Error("Error while opening front cover file")
@@ -78,7 +78,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		tag.SetYear("2016")
 		tag.SetGenre("Genre")
 
-		// Setting front cover
+		// Set front cover
 		frontCover, err := os.Open(frontCoverName)
 		if err != nil {
 			b.Error("Error while opening front cover file")
@@ -93,7 +93,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		}
 		tag.AddAttachedPicture(pic)
 
-		// Setting USLT
+		// Set USLT
 		uslt := UnsynchronisedLyricsFrame{
 			Encoding:          ENUTF8,
 			Language:          "eng",
@@ -102,7 +102,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		}
 		tag.AddUnsynchronisedLyricsFrame(uslt)
 
-		// Setting comment
+		// Set comment
 		comm := CommentFrame{
 			Encoding:    ENUTF8,
 			Language:    "eng",

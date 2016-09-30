@@ -31,7 +31,7 @@ func TestParse(t *testing.T) {
 		t.Error(err)
 	}
 
-	// Checking picture frames
+	// Check picture frames
 	resetPictureReaders()
 	picFrames := tag.GetFrames(tag.ID("Attached picture"))
 	if len(picFrames) != 2 {
@@ -59,7 +59,7 @@ func TestParse(t *testing.T) {
 		t.Error(err)
 	}
 
-	// Checking USLT frames
+	// Check USLT frames
 	usltFrames := tag.GetFrames(tag.ID("Unsynchronised lyrics/text transcription"))
 	if len(picFrames) != 2 {
 		t.Errorf("Expected USLT frames: %v, got %v", 2, len(usltFrames))
@@ -86,7 +86,7 @@ func TestParse(t *testing.T) {
 		t.Error(err)
 	}
 
-	// Checking comment frames
+	// Check comment frames
 	commFrames := tag.GetFrames(tag.ID("Comments"))
 	if len(commFrames) != 2 {
 		t.Errorf("Expected comment frames: %v, got: %v", 2, len(commFrames))
