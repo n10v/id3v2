@@ -17,7 +17,7 @@ const (
 	mp3Name        = "testdata/test.mp3"
 	frontCoverName = "testdata/front_cover.jpg"
 	backCoverName  = "testdata/back_cover.jpg"
-	framesSize     = 222479
+	framesSize     = 222524
 	tagSize        = tagHeaderSize + framesSize
 	musicSize      = 4557971
 )
@@ -61,6 +61,11 @@ var (
 		Description: "Kurze Beschreibung",
 		Text:        "Der eigentliche Text",
 	}
+
+	unknownFrameID = "WPUB"
+	unknownFrame   = UnknownFrame{
+		body: []byte("https://soundcloud.com/suicidepart2"),
+	}
 )
 
 func TestSetTags(t *testing.T) {
@@ -76,18 +81,21 @@ func TestSetTags(t *testing.T) {
 	tag.SetYear("2016")
 	tag.SetGenre("Genre")
 
-	// Setting picture frames
+	// Set picture frames
 	resetPictureReaders()
 	tag.AddAttachedPicture(frontCover)
 	tag.AddAttachedPicture(backCover)
 
-	// Setting USLTs
+	// Set USLTs
 	tag.AddUnsynchronisedLyricsFrame(engUSLF)
 	tag.AddUnsynchronisedLyricsFrame(gerUSLF)
 
-	// Setting comments
+	// Set comments
 	tag.AddCommentFrame(engComm)
 	tag.AddCommentFrame(gerComm)
+
+	// Set unknown frame
+	tag.AddFrame(unknownFrameID, unknownFrame)
 
 	if err = tag.Save(); err != nil {
 		t.Error("Error while saving a tag: ", err)

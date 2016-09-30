@@ -112,6 +112,17 @@ func TestParse(t *testing.T) {
 	if err := testCommentFrames(parsedGerComm, gerComm); err != nil {
 		t.Error(err)
 	}
+
+	// Check unknown frame
+	parsedUnknownFramer := tag.GetLastFrame(unknownFrameID)
+	if parsedUnknownFramer == nil {
+		t.Fatal("Parsed unknown frame is nil")
+	}
+	parsedUnknownFrame := parsedUnknownFramer.(UnknownFrame)
+	if err := testUnknownFrames(parsedUnknownFrame, unknownFrame); err != nil {
+		t.Error(err)
+	}
+
 }
 
 func testPictureFrames(actual, expected PictureFrame) error {
@@ -174,6 +185,13 @@ func testCommentFrames(actual, expected CommentFrame) error {
 		return err
 	}
 
+	return nil
+}
+
+func testUnknownFrames(actual, expected UnknownFrame) error {
+	if !bytes.Equal(actual.Body(), expected.Body()) {
+		return errors.New("Body of unknown frame isn't the same as expected")
+	}
 	return nil
 }
 
