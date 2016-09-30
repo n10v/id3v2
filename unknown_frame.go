@@ -7,22 +7,22 @@ package id3v2
 import (
 	"io"
 
-	"github.com/bogem/id3v2/util"
+	"github.com/bogem/id3v2/rdpool"
 )
 
 type UnknownFrame struct {
-	body io.Reader
+	body []byte
 }
 
 func (uk UnknownFrame) Body() []byte {
-	bufRd := util.NewReader(uk.body)
-	body, err := bufRd.ReadAll()
-	if err != nil {
-		panic(err)
-	}
-	return body
+	return uk.body
 }
 
 func parseUnknownFrame(rd io.Reader) (Framer, error) {
-	return UnknownFrame{body: rd}, nil
+	bufRd := rdpool.Get(rd)
+	defer rdpool.Put(bufRd)
+
+	body, err := bufRd.ReadAll()
+
+	return UnknownFrame{body: body}, err
 }
