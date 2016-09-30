@@ -211,12 +211,6 @@ func (t *Tag) SetGenre(genre string) {
 
 // Save writes tag to the file.
 func (t *Tag) Save() error {
-	// Form new frames
-	frames := t.formAllFrames()
-
-	// Form size of new frames
-	framesSize := util.FormSize(int64(len(frames)))
-
 	// Create a temp file for mp3 file, which will contain new tag
 	newFile, err := ioutil.TempFile("", "")
 	if err != nil {
@@ -225,6 +219,12 @@ func (t *Tag) Save() error {
 
 	// Make sure we clean up the temp file if it's still around
 	defer os.Remove(newFile.Name())
+
+	// Form new frames
+	frames := t.formAllFrames()
+
+	// Form size of new frames
+	framesSize := util.FormSize(int64(len(frames)))
 
 	// Write to new file new tag header
 	if _, err = newFile.Write(formTagHeader(framesSize, t.version)); err != nil {
