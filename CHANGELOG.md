@@ -1,5 +1,8 @@
 # ID3v2 Changelog
 
+## 0.8.3
+* Rename `tag.ID()` to `tag.CommonID()`, `V23IDs` and `V24IDs` to `V23CommonIDs` and `V24CommonIDs` respectively
+
 ## 0.8.2
 * Some stability improvements:
 	* [Clean up temp files on the way out](https://github.com/bogem/id3v2/pull/10) (thanks to [gabek](https://github.com/gabek) for PR)
