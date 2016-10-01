@@ -54,9 +54,9 @@ func newTag(file *os.File, originalSize int64, version byte) *Tag {
 	}
 
 	if version == 3 {
-		t.ids = V23IDs
+		t.commonIDs = V23CommonIDs
 	} else {
-		t.ids = V24IDs
+		t.commonIDs = V24CommonIDs
 	}
 
 	return t
@@ -127,11 +127,11 @@ func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
 	}
 
 	switch id {
-	case t.ID("Attached picture"):
+	case t.CommonID("Attached picture"):
 		return parsePictureFrame
-	case t.ID("Comments"):
+	case t.CommonID("Comments"):
 		return parseCommentFrame
-	case t.ID("Unsynchronised lyrics/text transcription"):
+	case t.CommonID("Unsynchronised lyrics/text transcription"):
 		return parseUnsynchronisedLyricsFrame
 	}
 	return parseUnknownFrame

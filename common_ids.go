@@ -4,9 +4,9 @@
 
 package id3v2
 
-// Actual IDs for ID3v2.4
+// Common IDs for ID3v2.3 and ID3v2.4
 var (
-	V23IDs = map[string]string{
+	V23CommonIDs = map[string]string{
 		"Attached picture":       "APIC",
 		"Comments":               "COMM",
 		"Album/Movie/Show title": "TALB",
@@ -51,7 +51,7 @@ var (
 		"Unsynchronised lyrics/text transcription": "USLT",
 	}
 
-	V24IDs = map[string]string{
+	V24CommonIDs = map[string]string{
 		"Attached picture":       "APIC",
 		"Comments":               "COMM",
 		"Album/Movie/Show title": "TALB",
