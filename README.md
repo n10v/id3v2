@@ -25,8 +25,7 @@ comments and attached pictures
 * Work with all available encodings
 
 **If you want some functionality, that library can't do,
-or you have some question, just write an issue.
-I will implement it as fast as I can.**
+or you have some questions, just write an issue.**
 
 **And of course, pull requests are welcome!**
 
