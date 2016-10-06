@@ -54,27 +54,27 @@ import (
 
 // Available picture types for picture frame.
 const (
-	PTOther                   = 0
-	PTFileIcon                = 1
-	PTOtherFileIcon           = 2
-	PTFrontCover              = 3
-	PTBackCover               = 4
-	PTLeafletPage             = 5
-	PTMedia                   = 6
-	PTLeadArtistSoloist       = 7
-	PTArtistPerformer         = 8
-	PTConductor               = 9
-	PTBandOrchestra           = 10
-	PTComposer                = 11
-	PTLyricistTextWriter      = 12
-	PTRecordingLocation       = 13
-	PTDuringRecording         = 14
-	PTDuringPerformance       = 15
-	PTMovieScreenCapture      = 16
-	PTBrightColouredFish      = 17
-	PTIllustration            = 18
-	PTBandArtistLogotype      = 19
-	PTPublisherStudioLogotype = 20
+	PTOther = iota
+	PTFileIcon
+	PTOtherFileIcon
+	PTFrontCover
+	PTBackCover
+	PTLeafletPage
+	PTMedia
+	PTLeadArtistSoloist
+	PTArtistPerformer
+	PTConductor
+	PTBandOrchestra
+	PTComposer
+	PTLyricistTextWriter
+	PTRecordingLocation
+	PTDuringRecording
+	PTDuringPerformance
+	PTMovieScreenCapture
+	PTBrightColouredFish
+	PTIllustration
+	PTBandArtistLogotype
+	PTPublisherStudioLogotype
 )
 
 // Available encodings.
