@@ -24,6 +24,9 @@ comments and attached pictures
 * Set several USLTs, comments and attached pictures
 * Work with all available encodings
 
+It can't:
+* Do unsyncronization
+
 **If you want some functionality, that library can't do,
 or you have some questions, just write an issue.**
 
