@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-// Package rdpool is used only for internal usage. Users of
+// Package rdpool is used only for internal usage in library id3v2. Users of
 // library id3v2 must not use it.
 package rdpool
 
