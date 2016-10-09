@@ -13,7 +13,7 @@ So if you have some thoughts about writing a **new simply and elegant standard**
 for providing information for digital music tracks, just write me.
 I think, it's a good time to write an appropriate standard for it 😉
 
-## Information
+## Description
 **Fast and stable ID3 parsing and writing library for Go**
 
 It can:
