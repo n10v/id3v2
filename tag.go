@@ -6,6 +6,7 @@ package id3v2
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -281,35 +282,31 @@ func (t *Tag) Close() error {
 	return t.file.Close()
 }
 
+var blankID = errors.New("blank ID")
+
 func (t Tag) formAllFrames() ([]byte, error) {
 	framesBuffer := bbpool.Get()
 	defer bbpool.Put(framesBuffer)
 
-	if err := t.writeFrames(framesBuffer); err != nil {
-		return nil, err
+	for id, frames := range t.AllFrames() {
+		for _, f := range frames {
+			formedFrame, err := formFrame(id, f)
+			if err == blankID {
+				continue
+			}
+			if err != nil {
+				return nil, err
+			}
+			framesBuffer.Write(formedFrame)
+		}
 	}
 
 	return framesBuffer.Bytes(), nil
 }
 
-func (t Tag) writeFrames(w io.Writer) error {
-	for id, frames := range t.AllFrames() {
-		for _, f := range frames {
-			formedFrame, err := formFrame(id, f)
-			if err != nil {
-				return err
-			}
-			if err := w.Write(formedFrame); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 func formFrame(id string, frame Framer) ([]byte, error) {
 	if id == "" {
-		return []byte{}, nil
+		return []byte{}, blankID
 	}
 
 	frameBuffer := bbpool.Get()
