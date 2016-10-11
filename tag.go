@@ -221,10 +221,16 @@ func (t *Tag) Save() error {
 	defer os.Remove(newFile.Name())
 
 	// Form new frames
-	frames := t.formAllFrames()
+	frames, err := t.formAllFrames()
+	if err != nil {
+		return err
+	}
 
 	// Form size of new frames
-	framesSize := util.FormSize(int64(len(frames)))
+	framesSize, err := util.FormSize(int64(len(frames)))
+	if err != nil {
+		return err
+	}
 
 	// Write to new file new tag header
 	if _, err = newFile.Write(formTagHeader(framesSize, t.version)); err != nil {
@@ -255,7 +261,7 @@ func (t *Tag) Save() error {
 	}
 	originalFileMode := originalFileStat.Mode()
 
-	// Set new file mode
+	// Set original file mode to new file
 	if err = newFile.Chmod(originalFileMode); err != nil {
 		return err
 	}
@@ -275,40 +281,57 @@ func (t *Tag) Close() error {
 	return t.file.Close()
 }
 
-func (t Tag) formAllFrames() []byte {
+func (t Tag) formAllFrames() ([]byte, error) {
 	framesBuffer := bbpool.Get()
 	defer bbpool.Put(framesBuffer)
 
-	t.writeFrames(framesBuffer)
+	if err := t.writeFrames(framesBuffer); err != nil {
+		return nil, err
+	}
 
-	return framesBuffer.Bytes()
+	return framesBuffer.Bytes(), nil
 }
 
-func (t Tag) writeFrames(w io.Writer) {
+func (t Tag) writeFrames(w io.Writer) error {
 	for id, frames := range t.AllFrames() {
 		for _, f := range frames {
-			w.Write(formFrame(id, f))
+			formedFrame, err := formFrame(id, f)
+			if err != nil {
+				return err
+			}
+			if err := w.Write(formedFrame); err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }
 
-func formFrame(id string, frame Framer) []byte {
+func formFrame(id string, frame Framer) ([]byte, error) {
 	if id == "" {
-		return []byte{}
+		return []byte{}, nil
 	}
 
 	frameBuffer := bbpool.Get()
 	defer bbpool.Put(frameBuffer)
 
 	frameBody := frame.Body()
-	writeFrameHeader(frameBuffer, id, int64(len(frameBody)))
+	if err := writeFrameHeader(frameBuffer, id, int64(len(frameBody))); err != nil {
+		return nil, err
+	}
 	frameBuffer.Write(frameBody)
 
-	return frameBuffer.Bytes()
+	return frameBuffer.Bytes(), nil
 }
 
-func writeFrameHeader(buf *bytes.Buffer, id string, frameSize int64) {
+func writeFrameHeader(buf *bytes.Buffer, id string, frameSize int64) error {
+	size, err := util.FormSize(frameSize)
+	if err != nil {
+		return err
+	}
+
 	buf.WriteString(id)
-	buf.Write(util.FormSize(frameSize))
+	buf.Write(size)
 	buf.Write([]byte{0, 0})
+	return nil
 }

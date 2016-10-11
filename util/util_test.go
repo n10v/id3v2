@@ -15,14 +15,20 @@ var (
 )
 
 func TestParseSize(t *testing.T) {
-	size := ParseSize(sizeBytes)
+	size, err := ParseSize(sizeBytes)
+	if err != nil {
+		t.Error(err)
+	}
 	if size != sizeInt {
 		t.Errorf("Expected: %v, got: %v", sizeInt, size)
 	}
 }
 
 func TestFormSize(t *testing.T) {
-	size := FormSize(sizeInt)
+	size, err := FormSize(sizeInt)
+	if err != nil {
+		t.Error(err)
+	}
 	if !bytes.Equal(sizeBytes, size) {
 		t.Errorf("Expected: %v, got: %v", sizeBytes, size)
 	}

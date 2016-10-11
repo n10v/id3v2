@@ -4,6 +4,8 @@
 
 package util
 
+import "errors"
+
 const (
 	bytesPerInt = 4
 	sizeBase    = 7
@@ -11,16 +13,19 @@ const (
 
 var (
 	byteSize = make([]byte, bytesPerInt) // Made for reusing in FormSize
+
+	InvalidSizeFormat = errors.New("parsing size: invalid format of tag's/frame's size")
+	SizeOverflow      = errors.New("forming size: size of tag/frame is more than allowed in id3 tag")
 )
 
 // FormSize transforms uint32 integer to byte slice with
 // ID3v2 size (4 * 0b0xxxxxxx).
 //
-// If size more than allowed (256MB), then panic occurs.
-func FormSize(n int64) []byte {
+// If size more than allowed (256MB), then method returns SizeOverflow.
+func FormSize(n int64) ([]byte, error) {
 	allowedSize := int64(268435455) // 0b11111... (28 digits)
 	if n > allowedSize {
-		panic("size of tag/frame is more than allowed in id3 tag")
+		return nil, SizeOverflow
 	}
 
 	mask := int64(1<<sizeBase - 1)
@@ -30,28 +35,28 @@ func FormSize(n int64) []byte {
 		n >>= sizeBase
 	}
 
-	return byteSize
+	return byteSize, nil
 }
 
 // ParseSize parses byte slice with ID3v2 size (4 * 0b0xxxxxxx) and returns
-// uint32 integer.
+// int64.
 //
 // If length of slice is more than 4 or if there is invalid size format (e.g.
-// one byte in slice is like 0b1xxxxxxx), then panic occurs.
-func ParseSize(data []byte) int64 {
+// one byte in slice is like 0b1xxxxxxx), then method return InvalidSizeFormat.
+func ParseSize(data []byte) (int64, error) {
 	var size int64
 
 	if len(data) > bytesPerInt {
-		panic("invalid length of tag's/frame's size (it must be equal or less than 4)")
+		return 0, InvalidSizeFormat
 	}
 
 	for _, b := range data {
 		if b&0x80 > 0 { // 0x80 = 0b1000_0000
-			panic("invalid format of tag's/frame's size")
+			return 0, InvalidSizeFormat
 		}
 
 		size = (size << sizeBase) | int64(b)
 	}
 
-	return size
+	return size, nil
 }

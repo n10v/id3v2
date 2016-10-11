@@ -75,7 +75,7 @@ func (t *Tag) parseAllFrames() error {
 
 	for {
 		id, frame, err := t.parseFrame(fileReader)
-		if err == io.EOF || err == blankFrameError {
+		if err == io.EOF || err == blankFrameError || err == util.InvalidSizeFormat {
 			break
 		}
 		if err != nil {
@@ -93,7 +93,7 @@ var frameBody = new(io.LimitedReader)
 func (t Tag) parseFrame(rd io.Reader) (id string, frame Framer, err error) {
 	header, err := parseFrameHeader(rd)
 	if err != nil {
-		return
+		return "", nil, err
 	}
 	id = header.ID
 
@@ -103,7 +103,7 @@ func (t Tag) parseFrame(rd io.Reader) (id string, frame Framer, err error) {
 	frameBody.N = header.FrameSize
 
 	frame, err = parseFunc(frameBody)
-	return
+	return id, frame, err
 }
 
 var fhBuf = make([]byte, frameHeaderSize)
@@ -115,7 +115,10 @@ func parseFrameHeader(rd io.Reader) (*frameHeader, error) {
 	}
 
 	id := string(fhBuf[:4])
-	frameSize := util.ParseSize(fhBuf[4:8])
+	frameSize, err := util.ParseSize(fhBuf[4:8])
+	if err != nil {
+		return nil, err
+	}
 
 	if id == "" || frameSize == 0 {
 		return nil, blankFrameError
