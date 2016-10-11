@@ -18,17 +18,16 @@ var (
 	SizeOverflow      = errors.New("forming size: size of tag/frame is more than allowed in id3 tag")
 )
 
-// FormSize transforms uint32 integer to byte slice with
-// ID3v2 size (4 * 0b0xxxxxxx).
+// FormSize transforms int to byte slice with ID3v2 size (4 * 0b0xxxxxxx).
 //
 // If size more than allowed (256MB), then method returns SizeOverflow.
-func FormSize(n int64) ([]byte, error) {
-	allowedSize := int64(268435455) // 0b11111... (28 digits)
+func FormSize(n int) ([]byte, error) {
+	allowedSize := 268435455 // 0b11111... (28 digits)
 	if n > allowedSize {
 		return nil, SizeOverflow
 	}
 
-	mask := int64(1<<sizeBase - 1)
+	mask := 1<<sizeBase - 1
 
 	for i := range byteSize {
 		byteSize[len(byteSize)-i-1] = byte(n & mask)

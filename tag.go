@@ -227,7 +227,7 @@ func (t *Tag) Save() error {
 	}
 
 	// Form size of new frames
-	framesSize, err := util.FormSize(int64(len(frames)))
+	framesSize, err := util.FormSize(len(frames))
 	if err != nil {
 		return err
 	}
@@ -316,7 +316,7 @@ func formFrame(id string, frame Framer) ([]byte, error) {
 	defer bbpool.Put(frameBuffer)
 
 	frameBody := frame.Body()
-	if err := writeFrameHeader(frameBuffer, id, int64(len(frameBody))); err != nil {
+	if err := writeFrameHeader(frameBuffer, id, len(frameBody)); err != nil {
 		return nil, err
 	}
 	frameBuffer.Write(frameBody)
@@ -324,7 +324,7 @@ func formFrame(id string, frame Framer) ([]byte, error) {
 	return frameBuffer.Bytes(), nil
 }
 
-func writeFrameHeader(buf *bytes.Buffer, id string, frameSize int64) error {
+func writeFrameHeader(buf *bytes.Buffer, id string, frameSize int) error {
 	size, err := util.FormSize(frameSize)
 	if err != nil {
 		return err
