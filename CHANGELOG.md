@@ -1,5 +1,9 @@
 # ID3v2 Changelog
 
+## 0.8.4
+* Use errors instead of panics, if there is invalid size format in frame
+* Add error handling, if there is frame with blank ID or size equals to 0
+
 ## 0.8.3
 * Rename `tag.ID()` to `tag.CommonID()`, `V23IDs` and `V24IDs` to `V23CommonIDs` and `V24CommonIDs` respectively
 
