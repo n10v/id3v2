@@ -245,7 +245,6 @@ func (t *Tag) Save() error {
 
 	// Seek to a music part of original file
 	originalFile := t.file
-	defer originalFile.Close()
 	if _, err = originalFile.Seek(t.originalSize, os.SEEK_SET); err != nil {
 		return err
 	}
@@ -263,9 +262,13 @@ func (t *Tag) Save() error {
 	originalFileMode := originalFileStat.Mode()
 
 	// Set original file mode to new file
-	if err = newFile.Chmod(originalFileMode); err != nil {
+	if err = os.Chmod(newFile.Name(), originalFileMode); err != nil {
 		return err
 	}
+
+	// Close files to allow replacing
+	newFile.Close()
+	originalFile.Close()
 
 	// Replace original file with new file
 	if err = os.Rename(newFile.Name(), originalFile.Name()); err != nil {
