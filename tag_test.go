@@ -73,7 +73,7 @@ func TestBlankID(t *testing.T) {
 	// Delete all frames in tag and add one blank id
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {
-		t.Fatal("Error while opening mp3 file: ", err)
+		t.Fatal("Error while opening mp3 file:", err)
 	}
 
 	tag.DeleteAllFrames()
@@ -81,29 +81,29 @@ func TestBlankID(t *testing.T) {
 
 	// tag.Save should write no frames to file
 	if err = tag.Save(); err != nil {
-		t.Error("Error while saving a tag: ", err)
+		t.Error("Error while saving a tag:", err)
 	}
 
-	tag.Close()
+	if err = tag.Close(); err != nil {
+		t.Error("Error while closing a tag:", err)
+	}
 
 	// Parse tag. It should be no frames
 	parsedTag, err := Open(mp3Name)
 	if parsedTag == nil || err != nil {
-		t.Fatal("Error while opening mp3 file: ", err)
+		t.Fatal("Error while opening mp3 file:", err)
 	}
 
-	allFrames := parsedTag.AllFrames()
-	if len(allFrames) > 0 {
-		t.Error("There should be no frames in tag, but there are", len(allFrames))
+	if tag.Len() > 0 {
+		t.Error("There should be no frames in tag, but there are", tag.Len())
 	}
 }
 
 func TestSetTags(t *testing.T) {
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {
-		t.Fatal("Error while opening mp3 file: ", err)
+		t.Fatal("Error while opening mp3 file:", err)
 	}
-	defer tag.Close()
 
 	tag.SetTitle("Title")
 	tag.SetArtist("Artist")
@@ -130,16 +130,19 @@ func TestSetTags(t *testing.T) {
 	tag.AddFrame(unknownFrameID, unknownFrame)
 
 	if err = tag.Save(); err != nil {
-		t.Error("Error while saving a tag: ", err)
+		t.Error("Error while saving a tag:", err)
+	}
+
+	if err = tag.Close(); err != nil {
+		t.Error("Error while closing a tag:", err)
 	}
 }
 
 func TestCorrectnessOfSettingTag(t *testing.T) {
 	mp3, err := os.Open(mp3Name)
 	if err != nil {
-		t.Fatal("Error while opening mp3 file: ", err)
+		t.Fatal("Error while opening mp3 file:", err)
 	}
-	defer mp3.Close()
 
 	tagHeader := make([]byte, tagHeaderSize)
 	n, err := mp3.Read(tagHeader)
@@ -147,16 +150,20 @@ func TestCorrectnessOfSettingTag(t *testing.T) {
 		t.Errorf("Expected length of header %v, got %v", tagHeaderSize, n)
 	}
 	if err != nil {
-		t.Error("Error while reading a tag header: ", err)
+		t.Error("Error while reading a tag header:", err)
 	}
 
 	size, err := util.ParseSize(tagHeader[6:10])
 	if err != nil {
-		t.Error("Error while parsing a tag header size: ", err)
+		t.Error("Error while parsing a tag header size:", err)
 	}
 
 	if framesSize != size {
 		t.Errorf("Expected size of frames: %v, got: %v", framesSize, size)
+	}
+
+	if err = mp3.Close(); err != nil {
+		t.Error("Error while closing a tag:", err)
 	}
 }
 
@@ -180,9 +187,8 @@ func resetPictureReaders() error {
 func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 	mp3, err := os.Open(mp3Name)
 	if err != nil {
-		t.Fatal("Error while opening mp3 file: ", err)
+		t.Fatal("Error while opening mp3 file:", err)
 	}
-	defer mp3.Close()
 
 	rd := bufio.NewReader(mp3)
 	n, err := rd.Discard(tagSize)
@@ -190,7 +196,7 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 		t.Errorf("Expected length of discarded bytes %v, got %v", tagSize, n)
 	}
 	if err != nil {
-		t.Fatal("Error while reading mp3 file: ", err)
+		t.Fatal("Error while reading mp3 file:", err)
 	}
 
 	expected := []byte{255, 251, 144, 68, 0, 0, 0}
@@ -200,11 +206,15 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 		t.Errorf("Expected length of read bytes %v, got %v", len(expected), n)
 	}
 	if err != nil {
-		t.Fatal("Error while reading mp3 file: ", err)
+		t.Fatal("Error while reading mp3 file:", err)
 	}
 
 	if !bytes.Equal(expected, got) {
 		t.Fail()
+	}
+
+	if err = mp3.Close(); err != nil {
+		t.Error("Error while closing a tag:", err)
 	}
 }
 
@@ -212,9 +222,8 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 	mp3, err := os.Open(mp3Name)
 	if err != nil {
-		t.Fatal("Error while opening mp3 file: ", err)
+		t.Fatal("Error while opening mp3 file:", err)
 	}
-	defer mp3.Close()
 
 	rd := bufio.NewReader(mp3)
 	expected := []byte{0, 0, 0, 0, 0, 0, 255}
@@ -224,7 +233,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 		t.Errorf("Expected length of discarded bytes %v, got %v", toDiscard, n)
 	}
 	if err != nil {
-		t.Fatal("Error while discarding: ", err)
+		t.Fatal("Error while discarding:", err)
 	}
 
 	got := make([]byte, len(expected))
@@ -233,10 +242,14 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 		t.Errorf("Expected length of read bytes %v, got %v", len(expected), n)
 	}
 	if err != nil {
-		t.Fatal("Error while reading mp3 file: ", err)
+		t.Fatal("Error while reading mp3 file:", err)
 	}
 
 	if !bytes.Equal(expected, got) {
 		t.Fail()
+	}
+
+	if err = mp3.Close(); err != nil {
+		t.Error("Error while closing a tag:", err)
 	}
 }

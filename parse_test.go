@@ -8,18 +8,17 @@ import (
 	"testing"
 )
 
-const countOfFrames = 9
+const countOfFrames = 12
 
 func TestParse(t *testing.T) {
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {
-		t.Error("Error while opening mp3 file: ", err)
+		t.Error("Error while opening mp3 file:", err)
 	}
 	defer tag.Close()
 
-	allFrames := tag.AllFrames()
-	if len(allFrames) != countOfFrames {
-		t.Errorf("There are %v frames in tag, but should be %v", len(allFrames), countOfFrames)
+	if tag.Len() != countOfFrames {
+		t.Errorf("There are %v frames in tag, but should be %v", tag.Len(), countOfFrames)
 	}
 
 	if err := testTwoStrings(tag.Artist(), "Artist"); err != nil {
@@ -130,6 +129,10 @@ func TestParse(t *testing.T) {
 	parsedUnknownFrame := parsedUnknownFramer.(UnknownFrame)
 	if err := testUnknownFrames(parsedUnknownFrame, unknownFrame); err != nil {
 		t.Error(err)
+	}
+
+	if err = tag.Close(); err != nil {
+		t.Error("Error while closing a tag:", err)
 	}
 
 }

@@ -13,13 +13,13 @@ func BenchmarkParseAllFrames(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		tag, err := Open(mp3Name)
 		if tag == nil || err != nil {
-			b.Fatal("Error while opening mp3 file: ", err)
+			b.Fatal("Error while opening mp3 file:", err)
 		}
 
 		tag.AllFrames()
 
 		if err = tag.Close(); err != nil {
-			b.Error("Error while closing a tag: ", err)
+			b.Error("Error while closing a tag:", err)
 		}
 	}
 }
@@ -28,7 +28,7 @@ func BenchmarkSetCommonCase(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		tag, err := Open(mp3Name)
 		if tag == nil || err != nil {
-			b.Fatal("Error while opening mp3 file: ", err)
+			b.Fatal("Error while opening mp3 file:", err)
 		}
 
 		tag.DeleteAllFrames()
@@ -52,13 +52,13 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		tag.AddAttachedPicture(pic)
 
 		if err = tag.Save(); err != nil {
-			b.Error("Error while saving a tag: ", err)
+			b.Error("Error while saving a tag:", err)
 		}
 		if err = tag.Close(); err != nil {
-			b.Error("Error while closing a tag: ", err)
+			b.Error("Error while closing a tag:", err)
 		}
 		if err = frontCover.Close(); err != nil {
-			b.Error("Error while closing a front cover: ", err)
+			b.Error("Error while closing a front cover:", err)
 		}
 	}
 }
@@ -67,7 +67,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		tag, err := Open(mp3Name)
 		if tag == nil || err != nil {
-			b.Fatal("Error while opening mp3 file: ", err)
+			b.Fatal("Error while opening mp3 file:", err)
 		}
 
 		tag.DeleteAllFrames()
@@ -112,13 +112,13 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		tag.AddCommentFrame(comm)
 
 		if err = tag.Save(); err != nil {
-			b.Error("Error while saving a tag: ", err)
+			b.Error("Error while saving a tag:", err)
 		}
 		if err = tag.Close(); err != nil {
-			b.Error("Error while closing a tag: ", err)
+			b.Error("Error while closing a tag:", err)
 		}
 		if err = frontCover.Close(); err != nil {
-			b.Error("Error while closing a front cover: ", err)
+			b.Error("Error while closing a front cover:", err)
 		}
 	}
 }
