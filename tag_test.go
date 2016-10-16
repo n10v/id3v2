@@ -69,6 +69,35 @@ var (
 	}
 )
 
+func TestBlankID(t *testing.T) {
+	// Delete all frames in tag and add one blank id
+	tag, err := Open(mp3Name)
+	if tag == nil || err != nil {
+		t.Fatal("Error while opening mp3 file: ", err)
+	}
+
+	tag.DeleteAllFrames()
+	tag.AddFrame("", frontCover)
+
+	// tag.Save should write no frames to file
+	if err = tag.Save(); err != nil {
+		t.Error("Error while saving a tag: ", err)
+	}
+
+	tag.Close()
+
+	// Parse tag. It should be no frames
+	parsedTag, err := Open(mp3Name)
+	if parsedTag == nil || err != nil {
+		t.Fatal("Error while opening mp3 file: ", err)
+	}
+
+	allFrames := parsedTag.AllFrames()
+	if len(allFrames) > 0 {
+		t.Error("There should be no frames in tag, but there are", len(allFrames))
+	}
+}
+
 func TestSetTags(t *testing.T) {
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {

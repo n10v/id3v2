@@ -221,26 +221,29 @@ func (t *Tag) Save() error {
 	// Make sure we clean up the temp file if it's still around
 	defer os.Remove(newFile.Name())
 
-	// Form new frames
-	frames, err := t.formAllFrames()
-	if err != nil {
-		return err
-	}
+	// If there is at least one frame, write it
+	if len(t.frames) > 0 || len(t.sequences) > 0 {
+		// Form new frames
+		frames, err := t.formAllFrames()
+		if err != nil {
+			return err
+		}
 
-	// Form size of new frames
-	framesSize, err := util.FormSize(len(frames))
-	if err != nil {
-		return err
-	}
+		// Form size of new frames
+		framesSize, err := util.FormSize(len(frames))
+		if err != nil {
+			return err
+		}
 
-	// Write to new file new tag header
-	if _, err = newFile.Write(formTagHeader(framesSize, t.version)); err != nil {
-		return err
-	}
+		// Write to new file new tag header
+		if _, err = newFile.Write(formTagHeader(framesSize, t.version)); err != nil {
+			return err
+		}
 
-	// Write to new file new frames
-	if _, err = newFile.Write(frames); err != nil {
-		return err
+		// Write to new file new frames
+		if _, err = newFile.Write(frames); err != nil {
+			return err
+		}
 	}
 
 	// Seek to a music part of original file
@@ -309,7 +312,7 @@ func (t Tag) formAllFrames() ([]byte, error) {
 
 func formFrame(id string, frame Framer) ([]byte, error) {
 	if id == "" {
-		return []byte{}, blankID
+		return nil, blankID
 	}
 
 	frameBuffer := bbpool.Get()
