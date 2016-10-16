@@ -88,12 +88,12 @@ func (t Tag) CommonID(description string) string {
 func (t *Tag) AllFrames() map[string][]Framer {
 	frames := make(map[string][]Framer)
 
-	for id, frame := range t.frames {
-		frames[id] = append(frames[id], frame)
+	for id := range t.frames {
+		frames[id] = t.GetFrames(id)
 	}
 
-	for id, sequence := range t.sequences {
-		frames[id] = append(frames[id], sequence.Frames()...)
+	for id := range t.sequences {
+		frames[id] = t.GetFrames(id)
 	}
 
 	return frames
@@ -157,7 +157,6 @@ func (t *Tag) GetFrames(id string) []Framer {
 	} else if s, exists := t.sequences[id]; exists {
 		return s.Frames()
 	}
-
 	return nil
 }
 
@@ -234,9 +233,6 @@ func (t *Tag) Save() error {
 		return err
 	}
 
-	// Make sure we clean up the temp file if it's still around
-	defer os.Remove(newFile.Name())
-
 	// If there is at least one frame, write it
 	if len(t.frames) > 0 || len(t.sequences) > 0 {
 		// Form new frames
@@ -278,10 +274,9 @@ func (t *Tag) Save() error {
 	if err != nil {
 		return err
 	}
-	originalFileMode := originalFileStat.Mode()
 
 	// Set original file mode to new file
-	if err = os.Chmod(newFile.Name(), originalFileMode); err != nil {
+	if err = os.Chmod(newFile.Name(), originalFileStat.Mode()); err != nil {
 		return err
 	}
 
@@ -289,11 +284,19 @@ func (t *Tag) Save() error {
 	newFile.Close()
 	originalFile.Close()
 
+	// Make sure we clean up the temp file if it's still around
+	os.Remove(newFile.Name())
+
 	// Replace original file with new file
 	if err = os.Rename(newFile.Name(), originalFile.Name()); err != nil {
 		return err
 	}
-	t.file = newFile
+
+	// Set t.file to new file with original name
+	t.file, err = os.Open(originalFile.Name())
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
