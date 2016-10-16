@@ -284,13 +284,13 @@ func (t *Tag) Save() error {
 	newFile.Close()
 	originalFile.Close()
 
-	// Make sure we clean up the temp file if it's still around
-	os.Remove(newFile.Name())
-
 	// Replace original file with new file
 	if err = os.Rename(newFile.Name(), originalFile.Name()); err != nil {
 		return err
 	}
+
+	// Make sure we clean up the temp file if it's still around
+	os.Remove(newFile.Name())
 
 	// Set t.file to new file with original name
 	t.file, err = os.Open(originalFile.Name())
