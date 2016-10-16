@@ -10,7 +10,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"runtime"
 
 	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/util"
@@ -255,19 +254,16 @@ func (t *Tag) Save() error {
 		return err
 	}
 
-	// Doesn't work in windows
-	if runtime.GOOS != "windows" {
-		// Get original file mode
-		originalFileStat, err := originalFile.Stat()
-		if err != nil {
-			return err
-		}
-		originalFileMode := originalFileStat.Mode()
+	// Get original file mode
+	originalFileStat, err := originalFile.Stat()
+	if err != nil {
+		return err
+	}
+	originalFileMode := originalFileStat.Mode()
 
-		// Set original file mode to new file
-		if err = newFile.Chmod(originalFileMode); err != nil {
-			return err
-		}
+	// Set original file mode to new file
+	if err = os.Chmod(newFile.Name(), originalFileMode); err != nil {
+		return err
 	}
 
 	// Close files to allow replacing
