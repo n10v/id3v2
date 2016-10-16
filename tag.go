@@ -26,38 +26,29 @@ type Tag struct {
 	version      byte
 }
 
+// AddFrame adds f to tag with appropriate id. If id is "" or f is nil,
+// AddFrame will not add f to tag.
 func (t *Tag) AddFrame(id string, f Framer) {
+	if id == "" || f == nil {
+		return
+	}
+
 	switch id {
 	case t.CommonID("Attached picture"):
 		pf := f.(PictureFrame)
-		t.AddAttachedPicture(pf)
+		t.checkExistenceOfSequence(id, newPictureSequence)
+		t.addFrameToSequence(id, pf)
 	case t.CommonID("Comments"):
 		cf := f.(CommentFrame)
-		t.AddCommentFrame(cf)
+		t.checkExistenceOfSequence(id, newCommentSequence)
+		t.addFrameToSequence(id, cf)
 	case t.CommonID("Unsynchronised lyrics/text transcription"):
 		uslf := f.(UnsynchronisedLyricsFrame)
-		t.AddUnsynchronisedLyricsFrame(uslf)
+		t.checkExistenceOfSequence(id, newUSLFSequence)
+		t.addFrameToSequence(id, uslf)
 	default:
 		t.frames[id] = f
 	}
-}
-
-func (t *Tag) AddAttachedPicture(pf PictureFrame) {
-	id := t.CommonID("Attached picture")
-	t.checkExistenceOfSequence(id, newPictureSequence)
-	t.addFrameToSequence(id, pf)
-}
-
-func (t *Tag) AddCommentFrame(cf CommentFrame) {
-	id := t.CommonID("Comments")
-	t.checkExistenceOfSequence(id, newCommentSequence)
-	t.addFrameToSequence(id, cf)
-}
-
-func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
-	id := t.CommonID("Unsynchronised lyrics/text transcription")
-	t.checkExistenceOfSequence(id, newUSLFSequence)
-	t.addFrameToSequence(id, uslf)
 }
 
 func (t *Tag) checkExistenceOfSequence(id string, newSequence func() sequencer) {
@@ -68,6 +59,21 @@ func (t *Tag) checkExistenceOfSequence(id string, newSequence func() sequencer) 
 
 func (t *Tag) addFrameToSequence(id string, f Framer) {
 	t.sequences[id].AddFrame(f)
+}
+
+func (t *Tag) AddAttachedPicture(pf PictureFrame) {
+	id := t.CommonID("Attached picture")
+	t.AddFrame(id, pf)
+}
+
+func (t *Tag) AddCommentFrame(cf CommentFrame) {
+	id := t.CommonID("Comments")
+	t.AddFrame(id, cf)
+}
+
+func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
+	id := t.CommonID("Unsynchronised lyrics/text transcription")
+	t.AddFrame(id, uslf)
 }
 
 // ID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
@@ -210,7 +216,8 @@ func (t *Tag) SetGenre(genre string) {
 	t.AddFrame(t.CommonID("Content type"), TextFrame{Encoding: ENUTF8, Text: genre})
 }
 
-// Save writes tag to the file.
+// Save writes tag to the file. If there are no frames in tag, Save will write
+// only music part without any ID3v2 information.
 func (t *Tag) Save() error {
 	// Create a temp file for mp3 file, which will contain new tag
 	newFile, err := ioutil.TempFile("", "")
