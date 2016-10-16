@@ -28,32 +28,34 @@ type Tag struct {
 
 // AddFrame adds f to tag with appropriate id. If id is "" or f is nil,
 // AddFrame will not add f to tag.
+//
+// If you want to add attached picture, comment or unsynchronised lyrics/text
+// transcription frames, better use AddAttachedPicture, AddCommentFrame
+// or AddUnsynchronisedLyricsFrame methods respectively.
 func (t *Tag) AddFrame(id string, f Framer) {
 	if id == "" || f == nil {
 		return
 	}
 
-	switch id {
-	case t.CommonID("Attached picture"):
-		pf := f.(PictureFrame)
-		t.checkExistenceOfSequence(id, newPictureSequence)
-		t.addFrameToSequence(id, pf)
-	case t.CommonID("Comments"):
-		cf := f.(CommentFrame)
-		t.checkExistenceOfSequence(id, newCommentSequence)
-		t.addFrameToSequence(id, cf)
-	case t.CommonID("Unsynchronised lyrics/text transcription"):
-		uslf := f.(UnsynchronisedLyricsFrame)
-		t.checkExistenceOfSequence(id, newUSLFSequence)
-		t.addFrameToSequence(id, uslf)
-	default:
+	if id == t.CommonID("Attached picture") || id == t.CommonID("Comments") ||
+		id == t.CommonID("Unsynchronised lyrics/text transcription") {
+		t.checkSequence(id)
+		t.addFrameToSequence(id, f)
+	} else {
 		t.frames[id] = f
 	}
 }
 
-func (t *Tag) checkExistenceOfSequence(id string, newSequence func() sequencer) {
+func (t *Tag) checkSequence(id string) {
 	if t.sequences[id] == nil {
-		t.sequences[id] = newSequence()
+		switch id {
+		case t.CommonID("Attached picture"):
+			t.sequences[id] = newPictureSequence()
+		case t.CommonID("Comments"):
+			t.sequences[id] = newCommentSequence()
+		case t.CommonID("Unsynchronised lyrics/text transcription"):
+			t.sequences[id] = newUSLFSequence()
+		}
 	}
 }
 
