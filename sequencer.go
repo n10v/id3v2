@@ -14,4 +14,5 @@ package id3v2
 type sequencer interface {
 	AddFrame(Framer)
 	Frames() []Framer
+	Len() int
 }

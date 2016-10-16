@@ -22,6 +22,12 @@ func newUSLFSequence() sequencer {
 	}
 }
 
+func (us *uslfSequence) AddFrame(f Framer) {
+	uslf := f.(UnsynchronisedLyricsFrame)
+	id := uslf.Language + uslf.ContentDescriptor
+	us.sequence[id] = uslf
+}
+
 func (us uslfSequence) Frames() []Framer {
 	frames := make([]Framer, 0, len(us.sequence))
 	for _, f := range us.sequence {
@@ -30,8 +36,6 @@ func (us uslfSequence) Frames() []Framer {
 	return frames
 }
 
-func (us *uslfSequence) AddFrame(f Framer) {
-	uslf := f.(UnsynchronisedLyricsFrame)
-	id := uslf.Language + uslf.ContentDescriptor
-	us.sequence[id] = uslf
+func (us uslfSequence) Len() int {
+	return len(us.sequence)
 }

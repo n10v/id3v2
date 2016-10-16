@@ -22,6 +22,11 @@ func newPictureSequence() sequencer {
 	}
 }
 
+func (ps *pictureSequence) AddFrame(f Framer) {
+	pf := f.(PictureFrame)
+	ps.sequence[pf.Description] = pf
+}
+
 func (ps pictureSequence) Frames() []Framer {
 	frames := make([]Framer, 0, len(ps.sequence))
 	for _, f := range ps.sequence {
@@ -30,7 +35,6 @@ func (ps pictureSequence) Frames() []Framer {
 	return frames
 }
 
-func (ps *pictureSequence) AddFrame(f Framer) {
-	pf := f.(PictureFrame)
-	ps.sequence[pf.Description] = pf
+func (ps pictureSequence) Len() int {
+	return len(ps.sequence)
 }

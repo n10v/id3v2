@@ -171,6 +171,15 @@ func (t Tag) GetTextFrame(id string) TextFrame {
 	return tf
 }
 
+// Len returns the number of frames in tag.
+func (t Tag) Len() int {
+	n := len(t.frames)
+	for _, s := range t.sequences {
+		n += s.Len()
+	}
+	return n
+}
+
 func (t Tag) Title() string {
 	f := t.GetTextFrame(t.CommonID("Title/Songname/Content description"))
 	return f.Text
