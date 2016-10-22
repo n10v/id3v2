@@ -78,7 +78,7 @@ func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 	t.AddFrame(id, uslf)
 }
 
-// ID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
+// CommonID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
 // from given description.
 // For example, CommonID("Language") will return "TLAN".
 func (t Tag) CommonID(description string) string {
@@ -309,7 +309,7 @@ func (t *Tag) Close() error {
 	return t.file.Close()
 }
 
-var blankID = errors.New("blank ID")
+var errBlankID = errors.New("blank ID")
 
 func (t Tag) formAllFrames() ([]byte, error) {
 	framesBuffer := bbpool.Get()
@@ -318,7 +318,7 @@ func (t Tag) formAllFrames() ([]byte, error) {
 	for id, frames := range t.AllFrames() {
 		for _, f := range frames {
 			formedFrame, err := formFrame(id, f)
-			if err == blankID {
+			if err == errBlankID {
 				continue
 			}
 			if err != nil {
@@ -333,7 +333,7 @@ func (t Tag) formAllFrames() ([]byte, error) {
 
 func formFrame(id string, frame Framer) ([]byte, error) {
 	if id == "" {
-		return nil, blankID
+		return nil, errBlankID
 	}
 
 	frameBuffer := bbpool.Get()

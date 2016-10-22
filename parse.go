@@ -14,7 +14,7 @@ import (
 
 const frameHeaderSize = 10
 
-var blankFrameError = errors.New("id or size of frame are blank")
+var errBlankFrame = errors.New("id or size of frame are blank")
 
 type frameHeader struct {
 	ID        string
@@ -75,7 +75,7 @@ func (t *Tag) parseAllFrames() error {
 
 	for {
 		id, frame, err := t.parseFrame(fileReader)
-		if err == io.EOF || err == blankFrameError || err == util.InvalidSizeFormat {
+		if err == io.EOF || err == errBlankFrame || err == util.ErrInvalidSizeFormat {
 			break
 		}
 		if err != nil {
@@ -121,7 +121,7 @@ func parseFrameHeader(rd io.Reader) (*frameHeader, error) {
 	}
 
 	if id == "" || frameSize == 0 {
-		return nil, blankFrameError
+		return nil, errBlankFrame
 	}
 
 	header := &frameHeader{

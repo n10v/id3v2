@@ -14,8 +14,8 @@ const (
 var (
 	byteSize = make([]byte, bytesPerInt) // Made for reusing in FormSize
 
-	InvalidSizeFormat = errors.New("parsing size: invalid format of tag's/frame's size")
-	SizeOverflow      = errors.New("forming size: size of tag/frame is more than allowed in id3 tag")
+	ErrInvalidSizeFormat = errors.New("parsing size: invalid format of tag's/frame's size")
+	ErrSizeOverflow      = errors.New("forming size: size of tag/frame is more than allowed in id3 tag")
 )
 
 // FormSize transforms int to byte slice with ID3v2 size (4 * 0b0xxxxxxx).
@@ -24,7 +24,7 @@ var (
 func FormSize(n int) ([]byte, error) {
 	allowedSize := 268435455 // 0b11111... (28 digits)
 	if n > allowedSize {
-		return nil, SizeOverflow
+		return nil, ErrSizeOverflow
 	}
 
 	mask := 1<<sizeBase - 1
@@ -46,12 +46,12 @@ func ParseSize(data []byte) (int64, error) {
 	var size int64
 
 	if len(data) > bytesPerInt {
-		return 0, InvalidSizeFormat
+		return 0, ErrInvalidSizeFormat
 	}
 
 	for _, b := range data {
 		if b&0x80 > 0 { // 0x80 = 0b1000_0000
-			return 0, InvalidSizeFormat
+			return 0, ErrInvalidSizeFormat
 		}
 
 		size = (size << sizeBase) | int64(b)
