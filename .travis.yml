@@ -12,7 +12,7 @@ env:
     - GOOS=windows
 
 script:
-  - go build && go test
+  - go build && go test ./...
 
 notifications:
   email: false
