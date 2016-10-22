@@ -1,5 +1,11 @@
 # ID3v2 Changelog
 
+## 0.8.5
+* Add `Len` method
+* [More windows compatibility](https://github.com/bogem/id3v2/pull/12) (thanks to [forgiv](https://github.com/forgiv) for PR)
+* More documentation
+* Minor stablitily improvements
+
 ## 0.8.4
 * Use errors instead of panics, if there is invalid size format in frame
 * Add error handling, if there is frame with blank ID or size equals to 0
