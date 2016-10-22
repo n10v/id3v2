@@ -10,8 +10,8 @@ import (
 )
 
 var (
-	sizeInt   int64 = 15351
-	sizeBytes       = []byte{0, 0, 0x77, 0x77}
+	sizeInt   int = 15351
+	sizeBytes     = []byte{0, 0, 0x77, 0x77}
 )
 
 func TestParseSize(t *testing.T) {
@@ -19,7 +19,7 @@ func TestParseSize(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if size != sizeInt {
+	if size != int64(sizeInt) {
 		t.Errorf("Expected: %v, got: %v", sizeInt, size)
 	}
 }
