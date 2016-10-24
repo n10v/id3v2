@@ -6,12 +6,11 @@ import (
 )
 
 var (
-	bs   = []byte{0, 11, 22, 33, 44, 55, 77, 88, 55, 55, 66, 77, 88}
-	bsRd = bytes.NewReader(bs)
+	bs = []byte{0, 11, 22, 33, 44, 55, 77, 88, 55, 55, 66, 77, 88}
 )
 
 func TestReadSeveralBytes(t *testing.T) {
-	bsRd.Reset(bs)
+	bsRd := bytes.NewReader(bs)
 	bsReader := NewReader(bsRd)
 	n := 5 // Read 5 elements
 
@@ -32,7 +31,7 @@ func TestReadSeveralBytes(t *testing.T) {
 }
 
 func TestReadTillDelims(t *testing.T) {
-	bsRd.Reset(bs)
+	bsRd := bytes.NewReader(bs)
 	bsReader := NewReader(bsRd)
 	delims := []byte{55, 66}
 	expectedLen := 9
