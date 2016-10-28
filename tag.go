@@ -135,6 +135,7 @@ func (t *Tag) GetLastFrame(id string) Framer {
 }
 
 // GetFrames returns frames with corresponding id.
+// It returns nil if there is no frames with given id.
 //
 // Example of usage:
 //	pictures := tag.GetFrames(tag.CommonID("Attached picture"))
