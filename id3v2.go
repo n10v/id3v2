@@ -106,7 +106,7 @@ var (
 	Encodings = []util.Encoding{ENISO, ENUTF16, ENUTF16BE, ENUTF8}
 )
 
-// Open opens file with string name and finds tag in it.
+// Open opens file with name and finds tag in it.
 func Open(name string) (*Tag, error) {
 	file, err := os.Open(name)
 	if err != nil {
