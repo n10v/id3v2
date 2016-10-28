@@ -94,8 +94,8 @@ func TestBlankID(t *testing.T) {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
 
-	if tag.Len() > 0 {
-		t.Error("There should be no frames in tag, but there are", tag.Len())
+	if tag.Count() > 0 {
+		t.Error("There should be no frames in tag, but there are", tag.Count())
 	}
 }
 

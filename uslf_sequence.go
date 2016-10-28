@@ -28,14 +28,14 @@ func (us *uslfSequence) AddFrame(f Framer) {
 	us.sequence[id] = uslf
 }
 
+func (us uslfSequence) Count() int {
+	return len(us.sequence)
+}
+
 func (us uslfSequence) Frames() []Framer {
 	frames := make([]Framer, 0, len(us.sequence))
 	for _, f := range us.sequence {
 		frames = append(frames, f)
 	}
 	return frames
-}
-
-func (us uslfSequence) Len() int {
-	return len(us.sequence)
 }

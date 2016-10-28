@@ -173,11 +173,11 @@ func (t Tag) GetTextFrame(id string) TextFrame {
 	return tf
 }
 
-// Len returns the number of frames in tag.
-func (t Tag) Len() int {
+// Count returns the number of frames in tag.
+func (t Tag) Count() int {
 	n := len(t.frames)
 	for _, s := range t.sequences {
-		n += s.Len()
+		n += s.Count()
 	}
 	return n
 }

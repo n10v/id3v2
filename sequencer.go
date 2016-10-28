@@ -13,6 +13,6 @@ package id3v2
 // content descriptor.", so commentSequence must ensure that condition.
 type sequencer interface {
 	AddFrame(Framer)
+	Count() int
 	Frames() []Framer
-	Len() int
 }

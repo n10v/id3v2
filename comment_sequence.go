@@ -27,14 +27,14 @@ func (cs *commentSequence) AddFrame(f Framer) {
 	cs.sequence[id] = cf
 }
 
+func (cs commentSequence) Count() int {
+	return len(cs.sequence)
+}
+
 func (cs commentSequence) Frames() []Framer {
 	frames := make([]Framer, 0, len(cs.sequence))
 	for _, f := range cs.sequence {
 		frames = append(frames, f)
 	}
 	return frames
-}
-
-func (cs commentSequence) Len() int {
-	return len(cs.sequence)
 }

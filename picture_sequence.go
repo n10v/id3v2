@@ -27,14 +27,14 @@ func (ps *pictureSequence) AddFrame(f Framer) {
 	ps.sequence[pf.Description] = pf
 }
 
+func (ps pictureSequence) Count() int {
+	return len(ps.sequence)
+}
+
 func (ps pictureSequence) Frames() []Framer {
 	frames := make([]Framer, 0, len(ps.sequence))
 	for _, f := range ps.sequence {
 		frames = append(frames, f)
 	}
 	return frames
-}
-
-func (ps pictureSequence) Len() int {
-	return len(ps.sequence)
 }

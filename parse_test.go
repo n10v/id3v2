@@ -17,8 +17,8 @@ func TestParse(t *testing.T) {
 	}
 	defer tag.Close()
 
-	if tag.Len() != countOfFrames {
-		t.Errorf("There are %v frames in tag, but should be %v", tag.Len(), countOfFrames)
+	if tag.Count() != countOfFrames {
+		t.Errorf("There are %v frames in tag, but should be %v", tag.Count(), countOfFrames)
 	}
 
 	if err := testTwoStrings(tag.Artist(), "Artist"); err != nil {
