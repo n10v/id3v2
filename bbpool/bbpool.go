@@ -17,10 +17,10 @@ var bytesBufferPool = sync.Pool{
 
 func Get() *bytes.Buffer {
 	b := bytesBufferPool.Get().(*bytes.Buffer)
-	b.Reset()
 	return b
 }
 
 func Put(b *bytes.Buffer) {
+	b.Reset()
 	bytesBufferPool.Put(b)
 }
