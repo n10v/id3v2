@@ -182,6 +182,12 @@ func (t Tag) Count() int {
 	return n
 }
 
+// HasAnyFrames checks if there is at least one frame in tag.
+// It's much faster than tag.Count() > 0.
+func (t Tag) HasAnyFrames() bool {
+	return len(t.frames) > 0 || len(t.sequences) > 0
+}
+
 func (t Tag) Title() string {
 	f := t.GetTextFrame(t.CommonID("Title/Songname/Content description"))
 	return f.Text
@@ -237,7 +243,7 @@ func (t *Tag) Save() error {
 	}
 
 	// If there is at least one frame, write it
-	if len(t.frames) > 0 || len(t.sequences) > 0 {
+	if t.HasAnyFrames() {
 		// Form new frames
 		frames, err := t.formAllFrames()
 		if err != nil {
