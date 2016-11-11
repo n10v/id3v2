@@ -21,7 +21,7 @@ import (
 //		Encoding: id3v2.ENUTF8,
 //		Text:     "Happy",
 //	}
-//	tag.AddFrame(tag.ID("Mood"), textFrame)
+//	tag.AddFrame(tag.CommonID("Mood"), textFrame)
 type TextFrame struct {
 	Encoding util.Encoding
 	Text     string
