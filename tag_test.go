@@ -8,6 +8,7 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"io/ioutil"
 	"os"
 	"testing"
 
@@ -172,13 +173,21 @@ func resetPictureReaders() error {
 	if err != nil {
 		return errors.New("Error while opening front cover file: " + err.Error())
 	}
-	frontCover.Picture = frontCoverFile
+	fcBytes, err := ioutil.ReadAll(frontCoverFile)
+	if err != nil {
+		return errors.New("Error while reading front cover file: " + err.Error())
+	}
+	frontCover.Picture = fcBytes
 
 	backCoverFile, err := os.Open(backCoverName)
 	if err != nil {
 		return errors.New("Error while opening back cover file: " + err.Error())
 	}
-	backCover.Picture = backCoverFile
+	bcBytes, err := ioutil.ReadAll(backCoverFile)
+	if err != nil {
+		return errors.New("Error while reading back cover file: " + err.Error())
+	}
+	backCover.Picture = bcBytes
 
 	return nil
 }

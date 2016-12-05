@@ -18,6 +18,14 @@ func (uk UnknownFrame) Body() []byte {
 	return uk.body
 }
 
+func (uk UnknownFrame) Size() int {
+	return len(uk.body)
+}
+
+func (uk UnknownFrame) WriteTo(w io.Writer) (n int, err error) {
+	return w.Write(uk.body)
+}
+
 func parseUnknownFrame(rd io.Reader) (Framer, error) {
 	bufRd := rdpool.Get(rd)
 	defer rdpool.Put(bufRd)

@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bufio"
 	"bytes"
 	"io"
 
@@ -16,18 +17,22 @@ import (
 //
 // Example of setting a new picture frame to existing tag:
 //
-//	frontCover, err := os.Open("artwork.jpg")
+//	artwork, err := os.Open("artwork.jpg")
 //	if err != nil {
-//		log.Fatal("Error while opening front cover file")
+//		log.Fatal("Error while opening artwork file", err)
 //	}
-//	defer frontCover.Close()
+//	defer artwork.Close()
+//  artworkBytes, err := ioutil.ReadAll(artwork)
+//  if err != nil {
+//    log.Fatal("Error while reading artwork file", err)
+//  }
 //
 //	pic := id3v2.PictureFrame{
 //		Encoding:    id3v2.ENUTF8,
 //		MimeType:    "image/jpeg",
 //		PictureType: id3v2.PTFrontCover,
 //		Description: "Front cover",
-//		Picture:     frontCover,
+//		Picture:     artworkBytes,
 //	}
 //	tag.AddAttachedPicture(pic)
 //
@@ -37,7 +42,7 @@ type PictureFrame struct {
 	MimeType    string
 	PictureType byte
 	Description string
-	Picture     io.Reader
+	Picture     []byte
 }
 
 func (pf PictureFrame) Body() []byte {
@@ -49,12 +54,64 @@ func (pf PictureFrame) Body() []byte {
 	b.WriteByte(pf.PictureType)
 	b.WriteString(pf.Description)
 	b.Write(pf.Encoding.TerminationBytes)
-
-	if _, err := b.ReadFrom(pf.Picture); err != nil {
-		panic("can't read a picture: " + err.Error())
-	}
+	b.Write(pf.Picture)
 
 	return b.Bytes()
+}
+
+func (pf PictureFrame) Size() int {
+	return 1 + len(pf.MimeType) + 1 + 1 + len(pf.Description) +
+		len(pf.Encoding.TerminationBytes) + len(pf.Picture)
+}
+
+func (pf PictureFrame) WriteTo(w io.Writer) (n int, err error) {
+	var i int
+	bw := bufio.NewWriter(w)
+
+	err = bw.WriteByte(pf.Encoding.Key)
+	if err != nil {
+		return
+	}
+	n += 1
+
+	i, err = bw.WriteString(pf.MimeType)
+	if err != nil {
+		return
+	}
+	n += i
+
+	err = bw.WriteByte(0)
+	if err != nil {
+		return
+	}
+	n += 1
+
+	err = bw.WriteByte(pf.PictureType)
+	if err != nil {
+		return
+	}
+	n += 1
+
+	i, err = bw.WriteString(pf.Description)
+	if err != nil {
+		return
+	}
+	n += i
+
+	i, err = bw.Write(pf.Encoding.TerminationBytes)
+	if err != nil {
+		return
+	}
+	n += i
+
+	i, err = bw.Write(pf.Picture)
+	if err != nil {
+		return
+	}
+	n += i
+
+	err = bw.Flush()
+	return
 }
 
 func parsePictureFrame(rd io.Reader) (Framer, error) {
@@ -92,7 +149,7 @@ func parsePictureFrame(rd io.Reader) (Framer, error) {
 		MimeType:    string(mimeType),
 		PictureType: pictureType,
 		Description: string(description),
-		Picture:     bytes.NewReader(picture),
+		Picture:     picture,
 	}
 
 	return pf, nil

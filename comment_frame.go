@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bufio"
 	"bytes"
 	"io"
 
@@ -43,6 +44,49 @@ func (cf CommentFrame) Body() []byte {
 	b.WriteString(cf.Text)
 
 	return b.Bytes()
+}
+
+func (cf CommentFrame) Size() int {
+	return 1 + len(cf.Language) + len(cf.Description) +
+		+len(cf.Encoding.TerminationBytes) + len(cf.Text)
+}
+
+func (cf CommentFrame) WriteTo(w io.Writer) (n int, err error) {
+	var i int
+	bw := bufio.NewWriter(w)
+
+	err = bw.WriteByte(cf.Encoding.Key)
+	if err != nil {
+		return
+	}
+	n += 1
+
+	i, err = bw.WriteString(cf.Language)
+	if err != nil {
+		return
+	}
+	n += i
+
+	i, err = bw.WriteString(cf.Description)
+	if err != nil {
+		return
+	}
+	n += i
+
+	i, err = bw.Write(cf.Encoding.TerminationBytes)
+	if err != nil {
+		return
+	}
+	n += i
+
+	i, err = bw.WriteString(cf.Text)
+	if err != nil {
+		return
+	}
+	n += i
+
+	err = bw.Flush()
+	return
 }
 
 func parseCommentFrame(rd io.Reader) (Framer, error) {

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"testing"
 )
 
@@ -151,15 +150,7 @@ func testPictureFrames(actual, expected PictureFrame) error {
 		return err
 	}
 
-	actualBytes, err := ioutil.ReadAll(actual.Picture)
-	if err != nil {
-		return errors.New("Error while reading picture of actual picture frame: " + err.Error())
-	}
-	expectedBytes, err := ioutil.ReadAll(expected.Picture)
-	if err != nil {
-		return errors.New("Error while reading picture of expected picture frame: " + err.Error())
-	}
-	if !bytes.Equal(actualBytes, expectedBytes) {
+	if !bytes.Equal(actual.Picture, expected.Picture) {
 		return errors.New("Pictures of picture frames' are different")
 	}
 

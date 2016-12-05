@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"io/ioutil"
 	"os"
 	"testing"
 )
@@ -42,12 +43,17 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		if err != nil {
 			b.Fatal("Error while opening front cover file")
 		}
+		fcBytes, err := ioutil.ReadAll(frontCover)
+		if err != nil {
+			b.Error("Error while reading front cover file")
+		}
+
 		pic := PictureFrame{
 			Encoding:    ENUTF8,
 			MimeType:    "image/jpeg",
 			PictureType: PTFrontCover,
 			Description: "Front cover",
-			Picture:     frontCover,
+			Picture:     fcBytes,
 		}
 		tag.AddAttachedPicture(pic)
 
@@ -83,13 +89,17 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		if err != nil {
 			b.Error("Error while opening front cover file")
 		}
+		fcBytes, err := ioutil.ReadAll(frontCover)
+		if err != nil {
+			b.Error("Error while reading front cover file")
+		}
 
 		pic := PictureFrame{
 			Encoding:    ENUTF8,
 			MimeType:    "image/jpeg",
 			PictureType: PTFrontCover,
 			Description: "Front cover",
-			Picture:     frontCover,
+			Picture:     fcBytes,
 		}
 		tag.AddAttachedPicture(pic)
 

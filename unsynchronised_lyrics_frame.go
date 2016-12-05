@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bufio"
 	"bytes"
 	"io"
 
@@ -40,6 +41,49 @@ func (uslf UnsynchronisedLyricsFrame) Body() []byte {
 	b.WriteString(uslf.Lyrics)
 
 	return b.Bytes()
+}
+
+func (uslf UnsynchronisedLyricsFrame) Size() int {
+	return 1 + len(uslf.Language) + len(uslf.ContentDescriptor) +
+		+len(uslf.Encoding.TerminationBytes) + len(uslf.Lyrics)
+}
+
+func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int, err error) {
+	var i int
+	bw := bufio.NewWriter(w)
+
+	err = bw.WriteByte(uslf.Encoding.Key)
+	if err != nil {
+		return
+	}
+	n += 1
+
+	i, err = bw.WriteString(uslf.Language)
+	if err != nil {
+		return
+	}
+	n += i
+
+	i, err = bw.WriteString(uslf.ContentDescriptor)
+	if err != nil {
+		return
+	}
+	n += i
+
+	i, err = bw.Write(uslf.Encoding.TerminationBytes)
+	if err != nil {
+		return
+	}
+	n += i
+
+	i, err = bw.WriteString(uslf.Lyrics)
+	if err != nil {
+		return
+	}
+	n += i
+
+	err = bw.Flush()
+	return
 }
 
 func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {

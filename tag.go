@@ -5,13 +5,12 @@
 package id3v2
 
 import (
-	"bytes"
+	"bufio"
 	"errors"
 	"io"
 	"io/ioutil"
 	"os"
 
-	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -244,14 +243,8 @@ func (t *Tag) Save() error {
 
 	// If there is at least one frame, write it
 	if t.HasAnyFrames() {
-		// Form new frames
-		frames, err := t.formAllFrames()
-		if err != nil {
-			return err
-		}
-
 		// Form size of new frames
-		framesSize, err := util.FormSize(len(frames))
+		framesSize, err := util.FormSize(t.allFramesSize())
 		if err != nil {
 			return err
 		}
@@ -262,7 +255,7 @@ func (t *Tag) Save() error {
 		}
 
 		// Write to new file new frames
-		if _, err = newFile.Write(frames); err != nil {
+		if err = t.writeAllFrames(newFile); err != nil {
 			return err
 		}
 	}
@@ -318,51 +311,61 @@ func (t *Tag) Close() error {
 
 var errBlankID = errors.New("blank ID")
 
-func (t Tag) formAllFrames() ([]byte, error) {
-	framesBuffer := bbpool.Get()
-	defer bbpool.Put(framesBuffer)
+func (t Tag) allFramesSize() int {
+	var n int
+
+	n += t.Count() * frameHeaderSize
+
+	for _, frames := range t.AllFrames() {
+		for _, f := range frames {
+			n += f.Size()
+		}
+	}
+
+	return n
+}
+
+func (t Tag) writeAllFrames(w io.Writer) error {
+	bw := bufio.NewWriter(w)
 
 	for id, frames := range t.AllFrames() {
 		for _, f := range frames {
-			formedFrame, err := formFrame(id, f)
+			err := writeFrame(bw, id, f)
 			if err == errBlankID {
 				continue
 			}
 			if err != nil {
-				return nil, err
+				return err
 			}
-			framesBuffer.Write(formedFrame)
 		}
 	}
 
-	return framesBuffer.Bytes(), nil
+	return bw.Flush()
 }
 
-func formFrame(id string, frame Framer) ([]byte, error) {
+func writeFrame(bw *bufio.Writer, id string, frame Framer) error {
 	if id == "" {
-		return nil, errBlankID
+		return errBlankID
 	}
 
-	frameBuffer := bbpool.Get()
-	defer bbpool.Put(frameBuffer)
-
-	frameBody := frame.Body()
-	if err := writeFrameHeader(frameBuffer, id, len(frameBody)); err != nil {
-		return nil, err
+	if err := writeFrameHeader(bw, id, frame.Size()); err != nil {
+		return err
 	}
-	frameBuffer.Write(frameBody)
+	if _, err := frame.WriteTo(bw); err != nil {
+		return err
+	}
 
-	return frameBuffer.Bytes(), nil
+	return nil
 }
 
-func writeFrameHeader(buf *bytes.Buffer, id string, frameSize int) error {
+func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
 	size, err := util.FormSize(frameSize)
 	if err != nil {
 		return err
 	}
 
-	buf.WriteString(id)
-	buf.Write(size)
-	buf.Write([]byte{0, 0})
+	bw.WriteString(id)
+	bw.Write(size)
+	bw.Write([]byte{0, 0})
 	return nil
 }

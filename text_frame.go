@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bufio"
 	"bytes"
 	"io"
 
@@ -34,6 +35,30 @@ func (tf TextFrame) Body() []byte {
 	b.WriteString(tf.Text)
 
 	return b.Bytes()
+}
+
+func (tf TextFrame) Size() int {
+	return 1 + len(tf.Text)
+}
+
+func (tf TextFrame) WriteTo(w io.Writer) (n int, err error) {
+	var i int
+	bw := bufio.NewWriter(w)
+
+	err = bw.WriteByte(tf.Encoding.Key)
+	if err != nil {
+		return
+	}
+	n += 1
+
+	i, err = bw.WriteString(tf.Text)
+	if err != nil {
+		return
+	}
+	n += i
+
+	err = bw.Flush()
+	return
 }
 
 func parseTextFrame(rd io.Reader) (Framer, error) {
