@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/bogem/id3v2/bwpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -326,7 +327,8 @@ func (t Tag) allFramesSize() int {
 }
 
 func (t Tag) writeAllFrames(w io.Writer) error {
-	bw := bufio.NewWriter(w)
+	bw := bwpool.Get(w)
+	defer bwpool.Put(bw)
 
 	for id, frames := range t.AllFrames() {
 		for _, f := range frames {

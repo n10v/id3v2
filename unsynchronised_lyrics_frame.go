@@ -5,10 +5,10 @@
 package id3v2
 
 import (
-	"bufio"
 	"bytes"
 	"io"
 
+	"github.com/bogem/id3v2/bwpool"
 	"github.com/bogem/id3v2/rdpool"
 	"github.com/bogem/id3v2/util"
 )
@@ -50,7 +50,8 @@ func (uslf UnsynchronisedLyricsFrame) Size() int {
 
 func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int, err error) {
 	var i int
-	bw := bufio.NewWriter(w)
+	bw := bwpool.Get(w)
+	defer bwpool.Put(bw)
 
 	err = bw.WriteByte(uslf.Encoding.Key)
 	if err != nil {
