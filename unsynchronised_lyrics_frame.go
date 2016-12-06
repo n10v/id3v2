@@ -48,7 +48,7 @@ func (uslf UnsynchronisedLyricsFrame) Size() int {
 		+len(uslf.Encoding.TerminationBytes) + len(uslf.Lyrics)
 }
 
-func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int, err error) {
+func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) {
 	var i int
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
@@ -63,25 +63,25 @@ func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int, err error) {
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	i, err = bw.WriteString(uslf.ContentDescriptor)
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	i, err = bw.Write(uslf.Encoding.TerminationBytes)
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	i, err = bw.WriteString(uslf.Lyrics)
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	err = bw.Flush()
 	return

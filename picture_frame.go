@@ -64,7 +64,7 @@ func (pf PictureFrame) Size() int {
 		len(pf.Encoding.TerminationBytes) + len(pf.Picture)
 }
 
-func (pf PictureFrame) WriteTo(w io.Writer) (n int, err error) {
+func (pf PictureFrame) WriteTo(w io.Writer) (n int64, err error) {
 	var i int
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
@@ -79,7 +79,7 @@ func (pf PictureFrame) WriteTo(w io.Writer) (n int, err error) {
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	err = bw.WriteByte(0)
 	if err != nil {
@@ -97,19 +97,19 @@ func (pf PictureFrame) WriteTo(w io.Writer) (n int, err error) {
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	i, err = bw.Write(pf.Encoding.TerminationBytes)
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	i, err = bw.Write(pf.Picture)
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	err = bw.Flush()
 	return

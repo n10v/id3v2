@@ -51,7 +51,7 @@ func (cf CommentFrame) Size() int {
 		+len(cf.Encoding.TerminationBytes) + len(cf.Text)
 }
 
-func (cf CommentFrame) WriteTo(w io.Writer) (n int, err error) {
+func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 	var i int
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
@@ -66,25 +66,25 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int, err error) {
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	i, err = bw.WriteString(cf.Description)
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	i, err = bw.Write(cf.Encoding.TerminationBytes)
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	i, err = bw.WriteString(cf.Text)
 	if err != nil {
 		return
 	}
-	n += i
+	n += int64(i)
 
 	err = bw.Flush()
 	return

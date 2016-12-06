@@ -22,8 +22,10 @@ func (uk UnknownFrame) Size() int {
 	return len(uk.body)
 }
 
-func (uk UnknownFrame) WriteTo(w io.Writer) (n int, err error) {
-	return w.Write(uk.body)
+func (uk UnknownFrame) WriteTo(w io.Writer) (n int64, err error) {
+	var i int
+	i, err = w.Write(uk.body)
+	return int64(i), err
 }
 
 func parseUnknownFrame(rd io.Reader) (Framer, error) {
