@@ -14,20 +14,12 @@ import (
 )
 
 var readerPool = sync.Pool{
-	New: func() interface{} { return nil },
+	New: func() interface{} { return util.NewReader(nil) },
 }
 
 func Get(rd io.Reader) *util.Reader {
-	var reader *util.Reader
-
-	ireader := readerPool.Get()
-	if ireader == nil {
-		reader = util.NewReader(rd)
-	} else {
-		reader = ireader.(*util.Reader)
-		reader.Reset(rd)
-	}
-
+	reader := readerPool.Get().(*util.Reader)
+	reader.Reset(rd)
 	return reader
 }
 
