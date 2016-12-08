@@ -22,10 +22,11 @@ import (
 //		log.Fatal("Error while opening artwork file", err)
 //	}
 //	defer artwork.Close()
-//  artworkBytes, err := ioutil.ReadAll(artwork)
-//  if err != nil {
-//    log.Fatal("Error while reading artwork file", err)
-//  }
+//
+//	artworkBytes, err := ioutil.ReadAll(artwork)
+//	if err != nil {
+//		log.Fatal("Error while reading artwork file", err)
+//	}
 //
 //	pic := id3v2.PictureFrame{
 //		Encoding:    id3v2.ENUTF8,
