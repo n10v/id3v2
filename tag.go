@@ -148,10 +148,6 @@ func (t *Tag) GetLastFrame(id string) Framer {
 //
 //			// Do some operations with picture frame:
 //			fmt.Println(pic.Description) // For example, print description of picture frame
-//			image, err := ioutil.ReadAll(pic.Picture) // Or read a picture from picture frame
-//			if err != nil {
-//				log.Fatal("Error while reading a picture from picture frame: ", err)
-//			}
 //		}
 //	}
 func (t *Tag) GetFrames(id string) []Framer {
