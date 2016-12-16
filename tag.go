@@ -238,6 +238,9 @@ func (t *Tag) Save() error {
 		return err
 	}
 
+	// Make sure we clean up the temp file if it's still around
+	defer os.Remove(newFile.Name())
+
 	// If there is at least one frame, write it
 	if t.HasAnyFrames() {
 		// Form size of new frames
@@ -287,9 +290,6 @@ func (t *Tag) Save() error {
 	if err = os.Rename(newFile.Name(), originalFile.Name()); err != nil {
 		return err
 	}
-
-	// Make sure we clean up the temp file if it's still around
-	os.Remove(newFile.Name())
 
 	// Set t.file to new file with original name
 	t.file, err = os.Open(originalFile.Name())
