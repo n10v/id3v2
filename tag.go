@@ -297,6 +297,9 @@ func (t *Tag) Save() error {
 		return err
 	}
 
+	// Set t.originalSize to new size
+	t.originalSize = int64(t.allFramesSize())
+
 	return nil
 }
 
