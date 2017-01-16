@@ -34,7 +34,7 @@
 //		comment := id3v2.CommentFrame{
 //			Encoding:   id3v2.ENUTF8,
 //			Language:   "eng",
-//			Desciption: "My opinion",
+//			Description: "My opinion",
 //			Text:       "Very good song",
 //		}
 //		tag.AddCommentFrame(comment)
