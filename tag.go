@@ -81,6 +81,7 @@ func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 // CommonID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
 // from given description.
 // For example, CommonID("Language") will return "TLAN".
+// All descriptions you can find in file common_ids.go or in id3 documentation (for fourth version: http://id3.org/id3v2.4.0-frames; for third version: http://id3.org/id3v2.3.0#Declared_ID3v2_frames).
 func (t Tag) CommonID(description string) string {
 	return t.commonIDs[description]
 }
