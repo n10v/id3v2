@@ -230,6 +230,22 @@ func (t *Tag) SetGenre(genre string) {
 	t.AddFrame(t.CommonID("Content type"), TextFrame{Encoding: ENUTF8, Text: genre})
 }
 
+// Version returns current ID3v2 version of tag.
+func (t Tag) Version() byte {
+	return t.version
+}
+
+// SetVersion sets given ID3v2 version to tag.
+// If version is less than 3 or more than 4, then this method will do nothing.
+// If tag has some frames, which are deprecated or changed in given version,
+// then to your notice you can delete, change or just stay them.
+func (t *Tag) SetVersion(version byte) {
+	if version < 3 || version > 4 {
+		return
+	}
+	t.version = version
+}
+
 // Save writes tag to the file. If there are no frames in tag, Save will write
 // only music part without any ID3v2 information.
 func (t *Tag) Save() error {
