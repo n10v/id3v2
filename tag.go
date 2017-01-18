@@ -10,6 +10,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 
 	"github.com/bogem/id3v2/bwpool"
 	"github.com/bogem/id3v2/util"
@@ -250,7 +251,7 @@ func (t *Tag) SetVersion(version byte) {
 // only music part without any ID3v2 information.
 func (t *Tag) Save() error {
 	// Create a temp file for mp3 file, which will contain new tag
-	newFile, err := ioutil.TempFile("", "")
+	newFile, err := ioutil.TempFile(filepath.Dir(t.file.Name()), "id3v2-")
 	if err != nil {
 		return err
 	}
