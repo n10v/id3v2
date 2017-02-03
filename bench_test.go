@@ -6,7 +6,6 @@ package id3v2
 
 import (
 	"io/ioutil"
-	"os"
 	"testing"
 )
 
@@ -39,11 +38,7 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		tag.SetYear("2016")
 
 		// Set front cover
-		frontCover, err := os.Open(frontCoverName)
-		if err != nil {
-			b.Fatal("Error while opening front cover file")
-		}
-		fcBytes, err := ioutil.ReadAll(frontCover)
+		frontCover, err := ioutil.ReadFile(frontCoverName)
 		if err != nil {
 			b.Error("Error while reading front cover file")
 		}
@@ -53,7 +48,7 @@ func BenchmarkSetCommonCase(b *testing.B) {
 			MimeType:    "image/jpeg",
 			PictureType: PTFrontCover,
 			Description: "Front cover",
-			Picture:     fcBytes,
+			Picture:     frontCover,
 		}
 		tag.AddAttachedPicture(pic)
 
@@ -62,9 +57,6 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		}
 		if err = tag.Close(); err != nil {
 			b.Error("Error while closing a tag:", err)
-		}
-		if err = frontCover.Close(); err != nil {
-			b.Error("Error while closing a front cover:", err)
 		}
 	}
 }
@@ -85,11 +77,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		tag.SetGenre("Genre")
 
 		// Set front cover
-		frontCover, err := os.Open(frontCoverName)
-		if err != nil {
-			b.Error("Error while opening front cover file")
-		}
-		fcBytes, err := ioutil.ReadAll(frontCover)
+		frontCover, err := ioutil.ReadFile(frontCoverName)
 		if err != nil {
 			b.Error("Error while reading front cover file")
 		}
@@ -99,7 +87,7 @@ func BenchmarkSetManyFrames(b *testing.B) {
 			MimeType:    "image/jpeg",
 			PictureType: PTFrontCover,
 			Description: "Front cover",
-			Picture:     fcBytes,
+			Picture:     frontCover,
 		}
 		tag.AddAttachedPicture(pic)
 
@@ -126,9 +114,6 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		}
 		if err = tag.Close(); err != nil {
 			b.Error("Error while closing a tag:", err)
-		}
-		if err = frontCover.Close(); err != nil {
-			b.Error("Error while closing a front cover:", err)
 		}
 	}
 }

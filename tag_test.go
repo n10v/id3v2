@@ -169,25 +169,17 @@ func TestCorrectnessOfSettingTag(t *testing.T) {
 }
 
 func resetPictureReaders() error {
-	frontCoverFile, err := os.Open(frontCoverName)
-	if err != nil {
-		return errors.New("Error while opening front cover file: " + err.Error())
-	}
-	fcBytes, err := ioutil.ReadAll(frontCoverFile)
+	fc, err := ioutil.ReadFile(frontCoverName)
 	if err != nil {
 		return errors.New("Error while reading front cover file: " + err.Error())
 	}
-	frontCover.Picture = fcBytes
+	frontCover.Picture = fc
 
-	backCoverFile, err := os.Open(backCoverName)
-	if err != nil {
-		return errors.New("Error while opening back cover file: " + err.Error())
-	}
-	bcBytes, err := ioutil.ReadAll(backCoverFile)
+	bc, err := ioutil.ReadFile(backCoverName)
 	if err != nil {
 		return errors.New("Error while reading back cover file: " + err.Error())
 	}
-	backCover.Picture = bcBytes
+	backCover.Picture = bc
 
 	return nil
 }
