@@ -17,13 +17,7 @@ import (
 //
 // Example of setting a new picture frame to existing tag:
 //
-//	artwork, err := os.Open("artwork.jpg")
-//	if err != nil {
-//		log.Fatal("Error while opening artwork file", err)
-//	}
-//	defer artwork.Close()
-//
-//	artworkBytes, err := ioutil.ReadAll(artwork)
+//	artwork, err := ioutil.ReadFile("artwork.jpg")
 //	if err != nil {
 //		log.Fatal("Error while reading artwork file", err)
 //	}
@@ -33,7 +27,7 @@ import (
 //		MimeType:    "image/jpeg",
 //		PictureType: id3v2.PTFrontCover,
 //		Description: "Front cover",
-//		Picture:     artworkBytes,
+//		Picture:     artwork,
 //	}
 //	tag.AddAttachedPicture(pic)
 //
