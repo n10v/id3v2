@@ -37,9 +37,6 @@ func TestParse(t *testing.T) {
 	}
 
 	// Check picture frames
-	if err := resetPictureReaders(); err != nil {
-		t.Fatal(err)
-	}
 	picFrames := tag.GetFrames(tag.CommonID("Attached picture"))
 	if len(picFrames) != 2 {
 		t.Errorf("Expected picture frames: %v, got %v", 2, len(picFrames))

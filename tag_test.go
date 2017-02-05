@@ -7,7 +7,6 @@ package id3v2
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -70,6 +69,20 @@ var (
 	}
 )
 
+func init() {
+	var err error
+
+	frontCover.Picture, err = ioutil.ReadFile(frontCoverName)
+	if err != nil {
+		panic("Error while reading front cover file: " + err.Error())
+	}
+
+	backCover.Picture, err = ioutil.ReadFile(backCoverName)
+	if err != nil {
+		panic("Error while reading back cover file: " + err.Error())
+	}
+}
+
 func TestBlankID(t *testing.T) {
 	// Delete all frames in tag and add one blank id
 	tag, err := Open(mp3Name)
@@ -113,9 +126,6 @@ func TestSetTags(t *testing.T) {
 	tag.SetGenre("Genre")
 
 	// Set picture frames
-	if err := resetPictureReaders(); err != nil {
-		t.Fatal(err)
-	}
 	tag.AddAttachedPicture(frontCover)
 	tag.AddAttachedPicture(backCover)
 
@@ -166,22 +176,6 @@ func TestCorrectnessOfSettingTag(t *testing.T) {
 	if err = mp3.Close(); err != nil {
 		t.Error("Error while closing a tag:", err)
 	}
-}
-
-func resetPictureReaders() error {
-	fc, err := ioutil.ReadFile(frontCoverName)
-	if err != nil {
-		return errors.New("Error while reading front cover file: " + err.Error())
-	}
-	frontCover.Picture = fc
-
-	bc, err := ioutil.ReadFile(backCoverName)
-	if err != nil {
-		return errors.New("Error while reading back cover file: " + err.Error())
-	}
-	backCover.Picture = bc
-
-	return nil
 }
 
 // Check integrity at the beginning of mp3's music part
