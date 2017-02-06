@@ -46,7 +46,7 @@ func parseTag(file *os.File) (*Tag, error) {
 }
 
 func newTag(file *os.File, originalSize int64, version byte) *Tag {
-	t := &Tag{
+	return &Tag{
 		frames:    make(map[string]Framer),
 		sequences: make(map[string]sequencer),
 
@@ -54,14 +54,6 @@ func newTag(file *os.File, originalSize int64, version byte) *Tag {
 		originalSize: originalSize,
 		version:      version,
 	}
-
-	if version == 3 {
-		t.commonIDs = V23CommonIDs
-	} else {
-		t.commonIDs = V24CommonIDs
-	}
-
-	return t
 }
 
 func (t *Tag) parseAllFrames() error {

@@ -20,7 +20,6 @@ import (
 type Tag struct {
 	frames    map[string]Framer
 	sequences map[string]sequencer
-	commonIDs map[string]string
 
 	file         *os.File
 	originalSize int64
@@ -84,7 +83,13 @@ func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 // For example, CommonID("Language") will return "TLAN".
 // All descriptions you can find in file common_ids.go or in id3 documentation (for fourth version: http://id3.org/id3v2.4.0-frames; for third version: http://id3.org/id3v2.3.0#Declared_ID3v2_frames).
 func (t Tag) CommonID(description string) string {
-	return t.commonIDs[description]
+	if t.version == 3 {
+		return V23CommonIDs[description]
+	} else {
+		return V24CommonIDs[description]
+	}
+
+	return ""
 }
 
 // AllFrames returns map, that contains all frames in tag, that could be parsed.
