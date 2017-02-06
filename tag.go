@@ -134,6 +134,12 @@ func (t *Tag) DeleteFrames(id string) {
 //		fmt.Println(bpm.Text)
 //	}
 func (t *Tag) GetLastFrame(id string) Framer {
+	// Avoid an allocation of slice in GetFrames,
+	// if there is anyway one frame.
+	if f, exists := t.frames[id]; exists {
+		return f
+	}
+
 	fs := t.GetFrames(id)
 	if len(fs) == 0 || fs == nil {
 		return nil
