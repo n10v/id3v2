@@ -287,23 +287,9 @@ func (t *Tag) Save() error {
 	// Make sure we clean up the temp file if it's still around
 	defer os.Remove(newFile.Name())
 
-	framesSize := t.Size() - tagHeaderSize
-
-	// If there is at least one frame, write it
-	if framesSize > 0 {
-		// Form size of new frames
-		framesSize, err := util.FormSize(framesSize)
-		if err != nil {
-			return err
-		}
-
-		// Write to new file new tag header
-		if _, err = newFile.Write(formTagHeader(framesSize, t.version)); err != nil {
-			return err
-		}
-
-		// Write to new file new frames
-		if err = t.writeAllFrames(newFile); err != nil {
+	// If there is at least one frame, write whole tag in new file
+	if t.HasAnyFrames() {
+		if err = t.Write(newFile); err != nil {
 			return err
 		}
 	}
@@ -345,19 +331,36 @@ func (t *Tag) Save() error {
 		return err
 	}
 
-	// Set t.originalSize to new size
+	// Set t.originalSize to new frames size
+	framesSize := t.Size() - tagHeaderSize
 	t.originalSize = int64(framesSize)
 
 	return nil
 }
 
-// Close closes the tag's file, rendering it unusable for I/O.
-// It returns an error, if any.
-func (t *Tag) Close() error {
-	return t.file.Close()
-}
-
 var errBlankID = errors.New("blank ID")
+
+// Write writes whole tag in w.
+func (t Tag) Write(w io.Writer) error {
+	// Form size of frames
+	framesSize := t.Size() - tagHeaderSize
+	byteFramesSize, err := util.FormSize(framesSize)
+	if err != nil {
+		return err
+	}
+
+	// Write tag header
+	if _, err = w.Write(formTagHeader(byteFramesSize, t.version)); err != nil {
+		return err
+	}
+
+	// Write frames
+	if err = t.writeAllFrames(w); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (t Tag) writeAllFrames(w io.Writer) error {
 	bw := bwpool.Get(w)
@@ -403,4 +406,10 @@ func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
 	bw.Write(size)
 	bw.Write([]byte{0, 0})
 	return nil
+}
+
+// Close closes the tag's file, rendering it unusable for I/O.
+// It returns an error, if any.
+func (t *Tag) Close() error {
+	return t.file.Close()
 }
