@@ -82,12 +82,11 @@ func (t Tag) CommonID(description string) string {
 func (t *Tag) AllFrames() map[string][]Framer {
 	frames := make(map[string][]Framer)
 
-	for id := range t.frames {
-		frames[id] = t.GetFrames(id)
+	for id, f := range t.frames {
+		frames[id] = []Framer{f}
 	}
-
-	for id := range t.sequences {
-		frames[id] = t.GetFrames(id)
+	for id, sequence := range t.sequences {
+		frames[id] = sequence.Frames()
 	}
 
 	return frames
