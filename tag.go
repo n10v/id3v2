@@ -37,30 +37,15 @@ func (t *Tag) AddFrame(id string, f Framer) {
 		return
 	}
 
-	if id == t.CommonID("Attached picture") || id == t.CommonID("Comments") ||
-		id == t.CommonID("Unsynchronised lyrics/text transcription") {
-		t.checkSequence(id)
-		t.addFrameToSequence(id, f)
+	if _, exists := sequenceConstructors[id]; exists { // check if for id should be made sequence
+		if t.sequences[id] == nil {
+			constructor := sequenceConstructors[id]
+			t.sequences[id] = constructor()
+		}
+		t.sequences[id].AddFrame(f)
 	} else {
 		t.frames[id] = f
 	}
-}
-
-func (t *Tag) checkSequence(id string) {
-	if t.sequences[id] == nil {
-		switch id {
-		case t.CommonID("Attached picture"):
-			t.sequences[id] = newPictureSequence()
-		case t.CommonID("Comments"):
-			t.sequences[id] = newCommentSequence()
-		case t.CommonID("Unsynchronised lyrics/text transcription"):
-			t.sequences[id] = newUSLFSequence()
-		}
-	}
-}
-
-func (t *Tag) addFrameToSequence(id string, f Framer) {
-	t.sequences[id].AddFrame(f)
 }
 
 func (t *Tag) AddAttachedPicture(pf PictureFrame) {

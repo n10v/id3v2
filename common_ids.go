@@ -4,6 +4,8 @@
 
 package id3v2
 
+import "io"
+
 // Common IDs for ID3v2.3 and ID3v2.4
 var (
 	V23CommonIDs = map[string]string{
@@ -111,3 +113,24 @@ var (
 		"Year":                  "TDRC",
 	}
 )
+
+// parsers is map, where key is ID of frame and value is function for
+// parsing corresponding frame.
+// You should consider, what there is no text frames. That's why you should
+// check at first, if it's a text frame:
+//	if id[0] == 'T' {
+//		// use parseTextFrame
+//	}
+var parsers = map[string]func(io.Reader) (Framer, error){
+	"APIC": parsePictureFrame,
+	"COMM": parseCommentFrame,
+	"USLT": parseUnsynchronisedLyricsFrame,
+}
+
+// sequenceConstructors is map, where key is ID of frame and value is function
+// for constructing a sequence for corresponding frames.
+var sequenceConstructors = map[string]func() sequencer{
+	"APIC": newPictureSequence,
+	"COMM": newCommentSequence,
+	"USLT": newUSLFSequence,
+}

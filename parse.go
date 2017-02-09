@@ -130,13 +130,9 @@ func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
 		return parseTextFrame
 	}
 
-	switch id {
-	case t.CommonID("Attached picture"):
-		return parsePictureFrame
-	case t.CommonID("Comments"):
-		return parseCommentFrame
-	case t.CommonID("Unsynchronised lyrics/text transcription"):
-		return parseUnsynchronisedLyricsFrame
+	if parseFunc, exists := parsers[id]; exists {
+		return parseFunc
 	}
+
 	return parseUnknownFrame
 }
