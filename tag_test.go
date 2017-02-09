@@ -93,6 +93,18 @@ func TestBlankID(t *testing.T) {
 	tag.DeleteAllFrames()
 	tag.AddFrame("", frontCover)
 
+	if tag.Count() > 0 {
+		t.Error("There should be no frames in tag, but there are", tag.Count())
+	}
+
+	if tag.HasAnyFrames() {
+		t.Error("tag.HasAnyFrames should return false, but it returns true")
+	}
+
+	if tag.Size() != 0 {
+		t.Error("Size of tag should be 0. Actual tag size:", tag.Size())
+	}
+
 	// tag.Save should write no frames to file
 	if err = tag.Save(); err != nil {
 		t.Error("Error while saving a tag:", err)
@@ -109,8 +121,17 @@ func TestBlankID(t *testing.T) {
 	}
 
 	if tag.Count() > 0 {
-		t.Error("There should be no frames in tag, but there are", tag.Count())
+		t.Error("There should be no frames in parsed tag, but there are", tag.Count())
 	}
+
+	if tag.HasAnyFrames() {
+		t.Error("Parsed tag.HasAnyFrames should return false, but it returns true")
+	}
+
+	if tag.Size() != 0 {
+		t.Error("Size of parsed tag should be 0. Actual tag size:", tag.Size())
+	}
+
 }
 
 func TestSetTags(t *testing.T) {
