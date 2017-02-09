@@ -249,11 +249,10 @@ func (t Tag) Size() int {
 	}
 
 	var n int
-	n += tagHeaderSize                     // Add the size of tag header
-	n += t.Count() * frameHeaderSize       // Add the size of all frame headers
-	for _, frames := range t.AllFrames() { // Add the size of all frame bodies
+	n += tagHeaderSize // Add the size of tag header
+	for _, frames := range t.AllFrames() {
 		for _, f := range frames {
-			n += f.Size()
+			n += frameHeaderSize + f.Size() // Add the size of the whole frame
 		}
 	}
 
