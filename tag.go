@@ -242,6 +242,24 @@ func (t *Tag) SetGenre(genre string) {
 	t.AddFrame(t.CommonID("Content type"), TextFrame{Encoding: ENUTF8, Text: genre})
 }
 
+// Size returns the size of all ID3 tag in bytes.
+func (t Tag) Size() int {
+	if !t.HasAnyFrames() {
+		return 0
+	}
+
+	var n int
+	n += tagHeaderSize                     // Add the size of tag header
+	n += t.Count() * frameHeaderSize       // Add the size of all frame headers
+	for _, frames := range t.AllFrames() { // Add the size of all frame bodies
+		for _, f := range frames {
+			n += f.Size()
+		}
+	}
+
+	return n
+}
+
 // Version returns current ID3v2 version of tag.
 func (t Tag) Version() byte {
 	return t.version
@@ -270,10 +288,12 @@ func (t *Tag) Save() error {
 	// Make sure we clean up the temp file if it's still around
 	defer os.Remove(newFile.Name())
 
+	framesSize := t.Size() - tagHeaderSize
+
 	// If there is at least one frame, write it
-	if t.HasAnyFrames() {
+	if framesSize > 0 {
 		// Form size of new frames
-		framesSize, err := util.FormSize(t.allFramesSize())
+		framesSize, err := util.FormSize(framesSize)
 		if err != nil {
 			return err
 		}
@@ -327,7 +347,7 @@ func (t *Tag) Save() error {
 	}
 
 	// Set t.originalSize to new size
-	t.originalSize = int64(t.allFramesSize())
+	t.originalSize = int64(framesSize)
 
 	return nil
 }
@@ -339,20 +359,6 @@ func (t *Tag) Close() error {
 }
 
 var errBlankID = errors.New("blank ID")
-
-func (t Tag) allFramesSize() int {
-	var n int
-
-	n += t.Count() * frameHeaderSize
-
-	for _, frames := range t.AllFrames() {
-		for _, f := range frames {
-			n += f.Size()
-		}
-	}
-
-	return n
-}
 
 func (t Tag) writeAllFrames(w io.Writer) error {
 	bw := bwpool.Get(w)
