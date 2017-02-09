@@ -129,6 +129,7 @@ var parsers = map[string]func(io.Reader) (Framer, error){
 
 // sequenceConstructors is map, where key is ID of frame and value is function
 // for constructing a sequence for corresponding frames.
+// The frames with these IDs must be added to sequences.
 var sequenceConstructors = map[string]func() sequencer{
 	"APIC": newPictureSequence,
 	"COMM": newCommentSequence,

@@ -37,7 +37,7 @@ func (t *Tag) AddFrame(id string, f Framer) {
 		return
 	}
 
-	if _, exists := sequenceConstructors[id]; exists { // check if for id should be made sequence
+	if _, exists := sequenceConstructors[id]; exists { // check if frame should be added in sequence
 		if t.sequences[id] == nil {
 			constructor := sequenceConstructors[id]
 			t.sequences[id] = constructor()
