@@ -15,9 +15,6 @@ func BenchmarkParseAllFrames(b *testing.B) {
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
 		}
-
-		tag.AllFrames()
-
 		if err = tag.Close(); err != nil {
 			b.Error("Error while closing a tag:", err)
 		}
