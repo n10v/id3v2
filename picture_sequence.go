@@ -13,7 +13,8 @@ package id3v2
 // descriptor.(TODO:) There may only be one picture with the picture type
 // declared as picture type $01 and $02 respectively."
 type pictureSequence struct {
-	sequence map[string]PictureFrame
+	sequence    map[string]PictureFrame
+	framesCache []Framer
 }
 
 func newPictureSequence() sequencer {
@@ -23,6 +24,8 @@ func newPictureSequence() sequencer {
 }
 
 func (ps *pictureSequence) AddFrame(f Framer) {
+	ps.framesCache = nil
+
 	pf := f.(PictureFrame)
 	ps.sequence[pf.Description] = pf
 }
@@ -31,10 +34,14 @@ func (ps pictureSequence) Count() int {
 	return len(ps.sequence)
 }
 
-func (ps pictureSequence) Frames() []Framer {
-	frames := make([]Framer, 0, len(ps.sequence))
-	for _, f := range ps.sequence {
-		frames = append(frames, f)
+func (ps *pictureSequence) Frames() []Framer {
+	cache := ps.framesCache
+	if cache == nil || len(cache) == 0 {
+		cache = make([]Framer, 0, len(ps.sequence))
+		for _, f := range ps.sequence {
+			cache = append(cache, f)
+		}
+		ps.framesCache = cache
 	}
-	return frames
+	return cache
 }

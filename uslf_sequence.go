@@ -13,7 +13,8 @@ package id3v2
 // lyrics/text transcription' frame in each tag, but only one with the
 // same language and content descriptor."
 type uslfSequence struct {
-	sequence map[string]UnsynchronisedLyricsFrame
+	sequence    map[string]UnsynchronisedLyricsFrame
+	framesCache []Framer
 }
 
 func newUSLFSequence() sequencer {
@@ -32,10 +33,14 @@ func (us uslfSequence) Count() int {
 	return len(us.sequence)
 }
 
-func (us uslfSequence) Frames() []Framer {
-	frames := make([]Framer, 0, len(us.sequence))
-	for _, f := range us.sequence {
-		frames = append(frames, f)
+func (us *uslfSequence) Frames() []Framer {
+	cache := us.framesCache
+	if cache == nil || len(cache) == 0 {
+		cache = make([]Framer, 0, len(us.sequence))
+		for _, f := range us.sequence {
+			cache = append(cache, f)
+		}
+		us.framesCache = cache
 	}
-	return frames
+	return cache
 }

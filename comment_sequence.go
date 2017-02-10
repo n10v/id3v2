@@ -12,7 +12,8 @@ package id3v2
 // ID3v2 Documentation: "There may be more than one comment frame in each tag,
 // but only one with the same language and content descriptor."
 type commentSequence struct {
-	sequence map[string]CommentFrame
+	sequence    map[string]CommentFrame
+	framesCache []Framer
 }
 
 func newCommentSequence() sequencer {
@@ -22,6 +23,8 @@ func newCommentSequence() sequencer {
 }
 
 func (cs *commentSequence) AddFrame(f Framer) {
+	cs.framesCache = nil
+
 	cf := f.(CommentFrame)
 	id := cf.Language + cf.Description
 	cs.sequence[id] = cf
@@ -31,10 +34,14 @@ func (cs commentSequence) Count() int {
 	return len(cs.sequence)
 }
 
-func (cs commentSequence) Frames() []Framer {
-	frames := make([]Framer, 0, len(cs.sequence))
-	for _, f := range cs.sequence {
-		frames = append(frames, f)
+func (cs *commentSequence) Frames() []Framer {
+	cache := cs.framesCache
+	if cache == nil || len(cache) == 0 {
+		cache = make([]Framer, 0, len(cs.sequence))
+		for _, f := range cs.sequence {
+			cache = append(cache, f)
+		}
+		cs.framesCache = cache
 	}
-	return frames
+	return cache
 }
