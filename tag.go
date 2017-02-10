@@ -339,6 +339,8 @@ func (t *Tag) Save() error {
 }
 
 // Write writes whole tag in w.
+// It returns the number of bytes written and error. It returns nil as error
+// if writing was successful.
 func (t Tag) Write(w io.Writer) (n int, err error) {
 	// Form size of frames
 	framesSize := t.Size() - tagHeaderSize
@@ -364,7 +366,8 @@ func (t Tag) Write(w io.Writer) (n int, err error) {
 }
 
 // writeAllFrames writes all frames to w and returns
-// the number of bytes written and error.
+// the number of bytes written and error. It returns nil as error
+// if writing was successful.
 func (t Tag) writeAllFrames(w io.Writer) (int, error) {
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
