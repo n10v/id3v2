@@ -286,9 +286,9 @@ func (t *Tag) Save() error {
 	defer os.Remove(newFile.Name())
 
 	// If there is at least one frame, write whole tag in new file
-	var framesSize int
+	var framesSize int64
 	if t.HasAnyFrames() {
-		tagSize, err := t.Write(newFile)
+		tagSize, err := t.WriteTo(newFile)
 		if err != nil {
 			return err
 		}
@@ -307,7 +307,7 @@ func (t *Tag) Save() error {
 	}
 
 	// Set t.originalSize to new frames size
-	t.originalSize = int64(framesSize)
+	t.originalSize = framesSize
 
 	// Get original file mode
 	originalFileStat, err := originalFile.Stat()
@@ -338,10 +338,10 @@ func (t *Tag) Save() error {
 	return nil
 }
 
-// Write writes whole tag in w.
-// It returns the number of bytes written and error. It returns nil as error
-// if writing was successful.
-func (t Tag) Write(w io.Writer) (n int, err error) {
+// WriteTo writes whole tag in w.
+// It returns the number of bytes written and error during the write.
+// It returns nil as error if the write was successful.
+func (t Tag) WriteTo(w io.Writer) (n int64, err error) {
 	// Form size of frames
 	framesSize := t.Size() - tagHeaderSize
 	byteFramesSize, err := util.FormSize(framesSize)
@@ -351,24 +351,24 @@ func (t Tag) Write(w io.Writer) (n int, err error) {
 
 	// Write tag header
 	if _, err = w.Write(formTagHeader(byteFramesSize, t.version)); err != nil {
-		return n, err
+		return 0, err
 	}
 	n += tagHeaderSize
 
 	// Write frames
 	nn, err := t.writeAllFrames(w)
 	if err != nil {
-		return n, err
+		return 0, err
 	}
 	n += nn
 
-	return
+	return n, err
 }
 
 // writeAllFrames writes all frames to w and returns
-// the number of bytes written and error. It returns nil as error
-// if writing was successful.
-func (t Tag) writeAllFrames(w io.Writer) (int, error) {
+// the number of bytes written and error during the write.
+// It returns nil as error if the write was successful.
+func (t Tag) writeAllFrames(w io.Writer) (int64, error) {
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
 
@@ -379,7 +379,7 @@ func (t Tag) writeAllFrames(w io.Writer) (int, error) {
 		return 0, err
 	}
 
-	return bw.Buffered(), bw.Flush()
+	return int64(bw.Buffered()), bw.Flush()
 }
 
 func writeFrame(bw *bufio.Writer, id string, frame Framer) error {
