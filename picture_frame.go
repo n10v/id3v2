@@ -14,24 +14,8 @@ import (
 )
 
 // PictureFrame structure is used for picture frames (APIC).
-//
-// Example of setting a new picture frame to existing tag:
-//
-//	artwork, err := ioutil.ReadFile("artwork.jpg")
-//	if err != nil {
-//		log.Fatal("Error while reading artwork file", err)
-//	}
-//
-//	pic := id3v2.PictureFrame{
-//		Encoding:    id3v2.ENUTF8,
-//		MimeType:    "image/jpeg",
-//		PictureType: id3v2.PTFrontCover,
-//		Description: "Front cover",
-//		Picture:     artwork,
-//	}
-//	tag.AddAttachedPicture(pic)
-//
-// Available picture types you can see in constants.
+// The information about how to add picture frame to tag you can
+// see in the docs to tag.AddAttachedPicture function.
 type PictureFrame struct {
 	Encoding    util.Encoding
 	MimeType    string

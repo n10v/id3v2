@@ -47,16 +47,61 @@ func (t *Tag) AddFrame(id string, f Framer) {
 	}
 }
 
+// AddAttachedPicture adds a picture frame to tag.
+//
+// Example:
+//
+//	artwork, err := ioutil.ReadFile("artwork.jpg")
+//	if err != nil {
+//		log.Fatal("Error while reading artwork file", err)
+//	}
+//
+//	pic := id3v2.PictureFrame{
+//		Encoding:    id3v2.ENUTF8,
+//		MimeType:    "image/jpeg",
+//		PictureType: id3v2.PTFrontCover,
+//		Description: "Front cover",
+//		Picture:     artwork,
+//	}
+//	tag.AddAttachedPicture(pic)
+//
+// Available picture types you can see in constants.
 func (t *Tag) AddAttachedPicture(pf PictureFrame) {
 	id := t.CommonID("Attached picture")
 	t.AddFrame(id, pf)
 }
 
+// AddCommentFrame adds a comment frame to tag.
+//
+// Example:
+//
+//	comment := id3v2.CommentFrame{
+//		Encoding:   id3v2.ENUTF8,
+//		Language:   "eng",
+//		Desciption: "My opinion",
+//		Text:       "Very good song",
+//	}
+//	tag.AddCommentFrame(comment)
+//
+// You should choose a language code from
+// ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
 func (t *Tag) AddCommentFrame(cf CommentFrame) {
 	id := t.CommonID("Comments")
 	t.AddFrame(id, cf)
 }
 
+// AddUnsynchronisedLyricsFrame adds an unsynchronised lyrics/text frame
+// to tag.
+//
+// Example:
+//
+//	uslt := id3v2.UnsynchronisedLyricsFrame{
+//		Encoding:          id3v2.ENUTF8,
+//		Language:          "ger",
+//		ContentDescriptor: "Deutsche Nationalhymne",
+//		Lyrics:            "Einigkeit und Recht und Freiheit...",
+//	}
+//	tag.AddUnsynchronisedLyricsFrame(uslt)
 func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 	id := t.CommonID("Unsynchronised lyrics/text transcription")
 	t.AddFrame(id, uslf)

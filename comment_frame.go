@@ -14,19 +14,8 @@ import (
 )
 
 // CommentFrame is used to work with COMM frames.
-//
-// Example of setting a new comment frame to existing tag:
-//
-//	comment := id3v2.CommentFrame{
-//		Encoding:   id3v2.ENUTF8,
-//		Language:   "eng",
-//		Desciption: "My opinion",
-//		Text:       "Very good song",
-//	}
-//	tag.AddCommentFrame(comment)
-//
-// You should choose a language code from
-// ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
+// The information about how to add comment frame to tag you can
+// see in the docs to tag.AddCommentFrame function.
 type CommentFrame struct {
 	Encoding    util.Encoding
 	Language    string
