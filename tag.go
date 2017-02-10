@@ -286,10 +286,13 @@ func (t *Tag) Save() error {
 	defer os.Remove(newFile.Name())
 
 	// If there is at least one frame, write whole tag in new file
+	var framesSize int
 	if t.HasAnyFrames() {
-		if err = t.Write(newFile); err != nil {
+		tagSize, err := t.Write(newFile)
+		if err != nil {
 			return err
 		}
+		framesSize = tagSize - tagHeaderSize
 	}
 
 	// Seek to a music part of original file
@@ -302,6 +305,9 @@ func (t *Tag) Save() error {
 	if _, err = io.Copy(newFile, originalFile); err != nil {
 		return err
 	}
+
+	// Set t.originalSize to new frames size
+	t.originalSize = int64(framesSize)
 
 	// Get original file mode
 	originalFileStat, err := originalFile.Stat()
@@ -329,36 +335,37 @@ func (t *Tag) Save() error {
 		return err
 	}
 
-	// Set t.originalSize to new frames size
-	framesSize := t.Size() - tagHeaderSize
-	t.originalSize = int64(framesSize)
-
 	return nil
 }
 
 // Write writes whole tag in w.
-func (t Tag) Write(w io.Writer) error {
+func (t Tag) Write(w io.Writer) (n int, err error) {
 	// Form size of frames
 	framesSize := t.Size() - tagHeaderSize
 	byteFramesSize, err := util.FormSize(framesSize)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// Write tag header
 	if _, err = w.Write(formTagHeader(byteFramesSize, t.version)); err != nil {
-		return err
+		return n, err
 	}
+	n += tagHeaderSize
 
 	// Write frames
-	if err = t.writeAllFrames(w); err != nil {
-		return err
+	nn, err := t.writeAllFrames(w)
+	if err != nil {
+		return n, err
 	}
+	n += nn
 
-	return nil
+	return
 }
 
-func (t Tag) writeAllFrames(w io.Writer) error {
+// writeAllFrames writes all frames to w and returns
+// the number of bytes written and error.
+func (t Tag) writeAllFrames(w io.Writer) (int, error) {
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
 
@@ -366,16 +373,17 @@ func (t Tag) writeAllFrames(w io.Writer) error {
 		return writeFrame(bw, id, f)
 	})
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return bw.Flush()
+	return bw.Buffered(), bw.Flush()
 }
 
 func writeFrame(bw *bufio.Writer, id string, frame Framer) error {
 	if err := writeFrameHeader(bw, id, frame.Size()); err != nil {
 		return err
 	}
+
 	if _, err := frame.WriteTo(bw); err != nil {
 		return err
 	}
