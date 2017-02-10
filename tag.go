@@ -6,7 +6,6 @@ package id3v2
 
 import (
 	"bufio"
-	"errors"
 	"io"
 	"io/ioutil"
 	"os"
@@ -226,6 +225,25 @@ func (t *Tag) SetGenre(genre string) {
 	t.AddFrame(t.CommonID("Content type"), TextFrame{Encoding: ENUTF8, Text: genre})
 }
 
+// iterateOverAllFrames iterates over every single frame in tag and call
+// f for them. It consumps no memory at all, unlike the tag.AllFrames().
+// It returns error only if f returns error.
+func (t Tag) iterateOverAllFrames(f func(id string, frame Framer) error) error {
+	for id, frame := range t.frames {
+		if err := f(id, frame); err != nil {
+			return err
+		}
+	}
+	for id, sequence := range t.sequences {
+		for _, frame := range sequence.Frames() {
+			if err := f(id, frame); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 // Size returns the size of all ID3 tag in bytes.
 func (t Tag) Size() int {
 	if !t.HasAnyFrames() {
@@ -234,11 +252,10 @@ func (t Tag) Size() int {
 
 	var n int
 	n += tagHeaderSize // Add the size of tag header
-	for _, frames := range t.AllFrames() {
-		for _, f := range frames {
-			n += frameHeaderSize + f.Size() // Add the size of the whole frame
-		}
-	}
+	t.iterateOverAllFrames(func(id string, f Framer) error {
+		n += frameHeaderSize + f.Size()
+		return nil
+	})
 
 	return n
 }
@@ -322,8 +339,6 @@ func (t *Tag) Save() error {
 	return nil
 }
 
-var errBlankID = errors.New("blank ID")
-
 // Write writes whole tag in w.
 func (t Tag) Write(w io.Writer) error {
 	// Form size of frames
@@ -350,26 +365,17 @@ func (t Tag) writeAllFrames(w io.Writer) error {
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
 
-	for id, frames := range t.AllFrames() {
-		for _, f := range frames {
-			err := writeFrame(bw, id, f)
-			if err == errBlankID {
-				continue
-			}
-			if err != nil {
-				return err
-			}
-		}
+	err := t.iterateOverAllFrames(func(id string, f Framer) error {
+		return writeFrame(bw, id, f)
+	})
+	if err != nil {
+		return err
 	}
 
 	return bw.Flush()
 }
 
 func writeFrame(bw *bufio.Writer, id string, frame Framer) error {
-	if id == "" {
-		return errBlankID
-	}
-
 	if err := writeFrameHeader(bw, id, frame.Size()); err != nil {
 		return err
 	}
