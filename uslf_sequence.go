@@ -24,6 +24,8 @@ func newUSLFSequence() sequencer {
 }
 
 func (us *uslfSequence) AddFrame(f Framer) {
+	us.framesCache = nil
+
 	uslf := f.(UnsynchronisedLyricsFrame)
 	id := uslf.Language + uslf.ContentDescriptor
 	us.sequence[id] = uslf
