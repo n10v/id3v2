@@ -69,11 +69,8 @@ func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 func (t Tag) CommonID(description string) string {
 	if t.version == 3 {
 		return V23CommonIDs[description]
-	} else {
-		return V24CommonIDs[description]
 	}
-
-	return ""
+	return V24CommonIDs[description]
 }
 
 // AllFrames returns map, that contains all frames in tag, that could be parsed.
