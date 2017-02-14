@@ -161,6 +161,10 @@ func TestSetTags(t *testing.T) {
 	// Set unknown frame
 	tag.AddFrame(unknownFrameID, unknownFrame)
 
+	if len(tag.AllFrames()) != 9 {
+		t.Errorf("Expected: %v, got: %v", 9, len(tag.AllFrames()))
+	}
+
 	if err = tag.Save(); err != nil {
 		t.Error("Error while saving a tag:", err)
 	}
