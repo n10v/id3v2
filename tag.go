@@ -295,7 +295,7 @@ func (t Tag) Size() int {
 	var n int
 	n += tagHeaderSize // Add the size of tag header
 	t.iterateOverAllFrames(func(id string, f Framer) error {
-		n += frameHeaderSize + f.Size()
+		n += frameHeaderSize + f.Size() // Add the whole frame sie
 		return nil
 	})
 
