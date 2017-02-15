@@ -9,9 +9,6 @@ import "io"
 // Framer provides a generic interface for frames.
 // You can create your own frames. They must implement only this interface.
 type Framer interface {
-	// Body returns byte slice, that contains only frame body.
-	Body() []byte
-
 	// Size returns the size of frame body.
 	Size() int
 

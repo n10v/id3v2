@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"bytes"
 	"io"
 
 	"github.com/bogem/id3v2/bwpool"
@@ -22,20 +21,6 @@ type PictureFrame struct {
 	PictureType byte
 	Description string
 	Picture     []byte
-}
-
-func (pf PictureFrame) Body() []byte {
-	b := new(bytes.Buffer)
-
-	b.WriteByte(pf.Encoding.Key)
-	b.WriteString(pf.MimeType)
-	b.WriteByte(0)
-	b.WriteByte(pf.PictureType)
-	b.WriteString(pf.Description)
-	b.Write(pf.Encoding.TerminationBytes)
-	b.Write(pf.Picture)
-
-	return b.Bytes()
 }
 
 func (pf PictureFrame) Size() int {

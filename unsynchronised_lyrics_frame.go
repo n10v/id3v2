@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"bytes"
 	"io"
 
 	"github.com/bogem/id3v2/bwpool"
@@ -21,18 +20,6 @@ type UnsynchronisedLyricsFrame struct {
 	Language          string
 	ContentDescriptor string
 	Lyrics            string
-}
-
-func (uslf UnsynchronisedLyricsFrame) Body() []byte {
-	b := new(bytes.Buffer)
-
-	b.WriteByte(uslf.Encoding.Key)
-	b.WriteString(uslf.Language)
-	b.WriteString(uslf.ContentDescriptor)
-	b.Write(uslf.Encoding.TerminationBytes)
-	b.WriteString(uslf.Lyrics)
-
-	return b.Bytes()
 }
 
 func (uslf UnsynchronisedLyricsFrame) Size() int {

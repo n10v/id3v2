@@ -191,7 +191,15 @@ func testCommentFrames(actual, expected CommentFrame) error {
 }
 
 func testUnknownFrames(actual, expected UnknownFrame) error {
-	if !bytes.Equal(actual.Body(), expected.Body()) {
+	actualBody := new(bytes.Buffer)
+	expectedBody := new(bytes.Buffer)
+	if _, err := actual.WriteTo(actualBody); err != nil {
+		return err
+	}
+	if _, err := expected.WriteTo(expectedBody); err != nil {
+		return err
+	}
+	if !bytes.Equal(actualBody.Bytes(), expectedBody.Bytes()) {
 		return errors.New("Body of unknown frame isn't the same as expected")
 	}
 	return nil

@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"bytes"
 	"io"
 
 	"github.com/bogem/id3v2/bwpool"
@@ -21,18 +20,6 @@ type CommentFrame struct {
 	Language    string
 	Description string
 	Text        string
-}
-
-func (cf CommentFrame) Body() []byte {
-	b := new(bytes.Buffer)
-
-	b.WriteByte(cf.Encoding.Key)
-	b.WriteString(cf.Language)
-	b.WriteString(cf.Description)
-	b.Write(cf.Encoding.TerminationBytes)
-	b.WriteString(cf.Text)
-
-	return b.Bytes()
 }
 
 func (cf CommentFrame) Size() int {

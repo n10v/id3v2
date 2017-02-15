@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"bytes"
 	"io"
 
 	"github.com/bogem/id3v2/bwpool"
@@ -26,15 +25,6 @@ import (
 type TextFrame struct {
 	Encoding util.Encoding
 	Text     string
-}
-
-func (tf TextFrame) Body() []byte {
-	b := new(bytes.Buffer)
-
-	b.WriteByte(tf.Encoding.Key)
-	b.WriteString(tf.Text)
-
-	return b.Bytes()
 }
 
 func (tf TextFrame) Size() int {

@@ -14,10 +14,6 @@ type UnknownFrame struct {
 	body []byte
 }
 
-func (uk UnknownFrame) Body() []byte {
-	return uk.body
-}
-
 func (uk UnknownFrame) Size() int {
 	return len(uk.body)
 }
