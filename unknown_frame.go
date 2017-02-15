@@ -6,10 +6,11 @@ package id3v2
 
 import (
 	"io"
-
-	"github.com/bogem/id3v2/rdpool"
+	"io/ioutil"
 )
 
+// UnknownFrame is used for frames, which id3v2 so far doesn't know how to
+// parse and write it. It just contains an unparsed byte body of the frame.
 type UnknownFrame struct {
 	body []byte
 }
@@ -25,10 +26,6 @@ func (uk UnknownFrame) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func parseUnknownFrame(rd io.Reader) (Framer, error) {
-	bufRd := rdpool.Get(rd)
-	defer rdpool.Put(bufRd)
-
-	body, err := bufRd.ReadAll()
-
+	body, err := ioutil.ReadAll(rd)
 	return UnknownFrame{body: body}, err
 }
