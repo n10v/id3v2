@@ -5,8 +5,8 @@
 package id3v2
 
 import (
+	"bytes"
 	"io"
-	"io/ioutil"
 
 	"github.com/bogem/id3v2/bwpool"
 	"github.com/bogem/id3v2/util"
@@ -52,12 +52,18 @@ func (tf TextFrame) WriteTo(w io.Writer) (n int64, err error) {
 	return
 }
 
+// tfBuf is used for reusing memory while parsing TextFrame.
+// It is used only in parseTextFrame.
+var tfBuf = new(bytes.Buffer)
+
 func parseTextFrame(rd io.Reader) (Framer, error) {
-	body, err := ioutil.ReadAll(rd)
+	tfBuf.Reset()
+	_, err := tfBuf.ReadFrom(rd)
 	if err != nil {
 		return nil, err
 	}
 
+	body := tfBuf.Bytes()
 	tf := TextFrame{
 		Encoding: Encodings[body[0]],
 		Text:     string(body[1:]),
