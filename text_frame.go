@@ -6,9 +6,9 @@ package id3v2
 
 import (
 	"io"
+	"io/ioutil"
 
 	"github.com/bogem/id3v2/bwpool"
-	"github.com/bogem/id3v2/rdpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -53,22 +53,14 @@ func (tf TextFrame) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func parseTextFrame(rd io.Reader) (Framer, error) {
-	bufRd := rdpool.Get(rd)
-	defer rdpool.Put(bufRd)
-
-	encoding, err := bufRd.ReadByte()
-	if err != nil {
-		return nil, err
-	}
-
-	text, err := bufRd.ReadAll()
+	body, err := ioutil.ReadAll(rd)
 	if err != nil {
 		return nil, err
 	}
 
 	tf := TextFrame{
-		Encoding: Encodings[encoding],
-		Text:     string(text),
+		Encoding: Encodings[body[0]],
+		Text:     string(body[1:]),
 	}
 
 	return tf, nil
