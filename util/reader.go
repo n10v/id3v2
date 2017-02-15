@@ -19,6 +19,8 @@ func NewReader(rd io.Reader) *Reader {
 	return &Reader{buf: bufio.NewReader(rd)}
 }
 
+// Discard skips the next n bytes, returning the number of bytes discarded.
+// If Discard skips fewer than n bytes, it also returns an error.
 func (r *Reader) Discard(n int) (discarded int, err error) {
 	return r.buf.Discard(n)
 }
