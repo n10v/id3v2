@@ -7,8 +7,6 @@ import (
 	"testing"
 )
 
-const countOfFrames = 12
-
 func TestParse(t *testing.T) {
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {

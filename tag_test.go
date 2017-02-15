@@ -21,6 +21,7 @@ const (
 	framesSize     = 222524
 	tagSize        = tagHeaderSize + framesSize
 	musicSize      = 4557971
+	countOfFrames  = 12
 )
 
 var (
@@ -163,6 +164,15 @@ func TestSetTags(t *testing.T) {
 
 	if len(tag.AllFrames()) != 9 {
 		t.Errorf("Expected: %v, got: %v", 9, len(tag.AllFrames()))
+	}
+
+	if tag.Count() != countOfFrames {
+		t.Errorf("Expected frames: %v, got: %v", countOfFrames, tag.Count())
+	}
+
+	tagSize := tagHeaderSize + framesSize
+	if tag.Size() != tagSize {
+		t.Errorf("Expected tag.Size(): %v, got: %v", tagSize, tag.Size())
 	}
 
 	if err = tag.Save(); err != nil {
