@@ -13,7 +13,7 @@ for providing information for digital music tracks, just write me an e-mail.
 I think, it's a good time to write an appropriate standard for it 😉
 
 ## Description
-**Fast and stable ID3 parsing and writing library for Go**
+**Fast and stable ID3 parsing and writing library for Go, based only on standard library and without any third-party dependency.**
 
 It can:
 * Support ID3v2.3 and ID3v2.4 tags
