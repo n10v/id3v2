@@ -98,6 +98,9 @@ func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
 	if err != nil {
 		return nil, err
 	}
+	if _, err = bufRd.Discard(len(encoding.TerminationBytes)); err != nil {
+		return nil, err
+	}
 
 	lyrics, err := bufRd.ReadAll()
 	if err != nil {

@@ -108,6 +108,9 @@ func parsePictureFrame(rd io.Reader) (Framer, error) {
 	if err != nil {
 		return nil, err
 	}
+	if _, err = bufRd.Discard(1); err != nil {
+		return nil, err
+	}
 
 	pictureType, err := bufRd.ReadByte()
 	if err != nil {
@@ -116,6 +119,9 @@ func parsePictureFrame(rd io.Reader) (Framer, error) {
 
 	description, err := bufRd.ReadTillDelims(encoding.TerminationBytes)
 	if err != nil {
+		return nil, err
+	}
+	if _, err = bufRd.Discard(len(encoding.TerminationBytes)); err != nil {
 		return nil, err
 	}
 

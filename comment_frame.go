@@ -98,6 +98,9 @@ func parseCommentFrame(rd io.Reader) (Framer, error) {
 	if err != nil {
 		return nil, err
 	}
+	if _, err = bufRd.Discard(len(encoding.TerminationBytes)); err != nil {
+		return nil, err
+	}
 
 	text, err := bufRd.ReadAll()
 	if err != nil {

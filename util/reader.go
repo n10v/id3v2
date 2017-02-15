@@ -19,6 +19,10 @@ func NewReader(rd io.Reader) *Reader {
 	return &Reader{buf: bufio.NewReader(rd)}
 }
 
+func (r *Reader) Discard(n int) (discarded int, err error) {
+	return r.buf.Discard(n)
+}
+
 // Read reads data into p.
 // It returns the number of bytes read into p.
 // The bytes are taken from at most one Read on the underlying Reader,
@@ -61,25 +65,22 @@ func (r *Reader) ReadSeveralBytes(n int) ([]byte, error) {
 }
 
 // ReadTillDelim reads until the first occurrence of delim in the input,
-// returning a slice containing the data up to the delimiter.
-// ReadTillDelim advances buffer up to and including delimiter
-// but returns only a slice containing the data without the delimiter though.
+// returning a slice containing the data up to and NOT including the delimiter.
 // If ReadTillDelim encounters an error before finding a delimiter,
 // it returns the data read before the error and the error itself (often io.EOF).
 // ReadTillDelim returns err != nil if and only if the returned data does not end in
 // delim.
 func (r *Reader) ReadTillDelim(delim byte) ([]byte, error) {
 	read, err := r.buf.ReadBytes(delim)
-	if read == nil || len(read) == 0 {
+	if err != nil || read == nil || len(read) == 0 {
 		return read, err
 	}
+	err = r.buf.UnreadByte()
 	return read[:len(read)-1], err
 }
 
 // ReadTillDelims reads until the first occurrence of delims in the input,
-// returning a slice containing the data up to the delimiters.
-// ReadTillDelims advances buffer up to and including delimiters
-// but returns only a slice containing the data without the delimiters though.
+// returning a slice containing the data up to and NOT including the delimiters.
 // If ReadTillDelims encounters an error before finding a delimiters,
 // it returns the data read before the error and the error itself (often io.EOF).
 // ReadTillAndWithDelims returns err != nil if and only if the returned data does not end in
@@ -93,32 +94,25 @@ func (r *Reader) ReadTillDelims(delims []byte) ([]byte, error) {
 	}
 
 	buf := make([]byte, 0)
-
 	for {
 		read, err := r.ReadTillDelim(delims[0])
 		if err != nil {
 			return buf, err
 		}
 		buf = append(buf, read...)
-		err = r.buf.UnreadByte()
+
+		peeked, err := r.buf.Peek(len(delims))
 		if err != nil {
 			return buf, err
 		}
 
-		b, err := r.buf.ReadByte()
-		if err != nil {
-			return buf, err
+		if bytes.Equal(peeked, delims) {
+			break
 		}
 
-		if b == delims[0] {
-			peeked, err := r.buf.Peek(len(delims) - 1)
-			if err != nil {
-				return buf, err
-			}
-			if bytes.Equal(peeked, delims[1:]) {
-				r.buf.Discard(len(peeked) - 1)
-				break
-			}
+		b, err := r.ReadByte()
+		if err != nil {
+			return buf, err
 		}
 		buf = append(buf, b)
 	}
