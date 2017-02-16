@@ -6,6 +6,7 @@ package util
 
 import (
 	"bytes"
+	"io"
 	"testing"
 )
 
@@ -49,11 +50,11 @@ func TestReadTillZero(t *testing.T) {
 	}
 }
 
-func TestReadSeveralBytes(t *testing.T) {
+func TestNext(t *testing.T) {
 	bsReader := NewReader(bytes.NewReader(bs))
 	n := 5 // Read 5 elements
 
-	read, err := bsReader.ReadSeveralBytes(n)
+	read, err := bsReader.Next(n)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -65,6 +66,14 @@ func TestReadSeveralBytes(t *testing.T) {
 	}
 	if len(bs)-n != bsReader.buf.Buffered() {
 		t.Errorf("Expected buffered: %v, got: %v", len(bs)-n, bsReader.buf.Buffered())
+	}
+}
+
+func TestReadTillDelimEOF(t *testing.T) {
+	bsReader := NewReader(bytes.NewReader(bs))
+	_, err := bsReader.ReadTillDelim(234)
+	if err != io.EOF {
+		t.Errorf("Expected io.EOF, got %v", err)
 	}
 }
 

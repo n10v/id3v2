@@ -76,7 +76,7 @@ func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
 	}
 	encoding := Encodings[encodingByte]
 
-	language, err := bufRd.ReadSeveralBytes(3)
+	language, err := bufRd.Next(3)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
 		return nil, err
 	}
 
-	lyrics, err := bufRd.ReadAll()
+	lyrics, err := bufRd.String()
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
 		Encoding:          encoding,
 		Language:          string(language),
 		ContentDescriptor: string(contentDescriptor),
-		Lyrics:            string(lyrics),
+		Lyrics:            lyrics,
 	}
 
 	return uslf, nil

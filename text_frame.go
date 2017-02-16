@@ -58,6 +58,7 @@ var tfBuf = new(bytes.Buffer)
 
 func parseTextFrame(rd io.Reader) (Framer, error) {
 	tfBuf.Reset()
+
 	_, err := tfBuf.ReadFrom(rd)
 	if err != nil {
 		return nil, err

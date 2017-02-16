@@ -12,11 +12,19 @@ import (
 )
 
 type Reader struct {
-	buf *bufio.Reader
+	buf      *bufio.Reader
+	bytesBuf *bytes.Buffer // Need for intermediate calculations
 }
 
 func NewReader(rd io.Reader) *Reader {
 	return &Reader{buf: bufio.NewReader(rd)}
+}
+
+func (r *Reader) initBytesBuf() {
+	if r.bytesBuf == nil {
+		r.bytesBuf = new(bytes.Buffer)
+	}
+	r.bytesBuf.Reset()
 }
 
 // Discard skips the next n bytes, returning the number of bytes discarded.
@@ -34,24 +42,19 @@ func (r *Reader) Read(p []byte) (n int, err error) {
 	return r.buf.Read(p)
 }
 
-// ReadAll reads from Reader until an error or EOF and returns the data it read.
-// A successful call returns err == nil, not err == EOF. Because ReadAll is
-// defined to read from Reader until EOF, it does not treat an EOF from Read
-// as an error to be reported.
-func (r *Reader) ReadAll() ([]byte, error) {
-	return ioutil.ReadAll(r.buf)
-}
-
 // ReadByte reads and returns a single byte.
 // If no byte is available, returns an error.
 func (r *Reader) ReadByte() (byte, error) {
 	return r.buf.ReadByte()
 }
 
-// ReadSeveralBytes reads n bytes.
-func (r *Reader) ReadSeveralBytes(n int) ([]byte, error) {
+// Next returns a slice containing the next n bytes from the buffer,
+// advancing the buffer as if the bytes had been returned by Read.
+// If there are fewer than n bytes in the buffer, Next returns the entire buffer.
+// The slice is only valid until the next call to a read or write method.
+func (r *Reader) Next(n int) ([]byte, error) {
 	if n == 0 {
-		return nil, nil
+		return []byte{}, nil
 	}
 
 	peeked, err := r.buf.Peek(n)
@@ -70,7 +73,7 @@ func (r *Reader) ReadSeveralBytes(n int) ([]byte, error) {
 // returning a slice containing the data up to and NOT including the delimiter.
 // If ReadTillDelim encounters an error before finding a delimiter,
 // it returns the data read before the error and the error itself (often io.EOF).
-// ReadTillDelim returns err != nil if and only if the returned data does not end in
+// ReadTillDelim returns err != nil if and only if ReadTillDelim didn't find
 // delim.
 func (r *Reader) ReadTillDelim(delim byte) ([]byte, error) {
 	read, err := r.buf.ReadBytes(delim)
@@ -85,27 +88,28 @@ func (r *Reader) ReadTillDelim(delim byte) ([]byte, error) {
 // returning a slice containing the data up to and NOT including the delimiters.
 // If ReadTillDelims encounters an error before finding a delimiters,
 // it returns the data read before the error and the error itself (often io.EOF).
-// ReadTillAndWithDelims returns err != nil if and only if the returned data does not end in
-// delim.
+// ReadTillDelims returns err != nil if and only if ReadTillDelims didn't find
+// delims.
 func (r *Reader) ReadTillDelims(delims []byte) ([]byte, error) {
 	if len(delims) == 0 {
-		return r.ReadAll()
+		return ioutil.ReadAll(r)
 	}
 	if len(delims) == 1 {
 		return r.ReadTillDelim(delims[0])
 	}
 
-	buf := make([]byte, 0)
+	r.initBytesBuf()
+
 	for {
 		read, err := r.ReadTillDelim(delims[0])
 		if err != nil {
-			return buf, err
+			return r.bytesBuf.Bytes(), err
 		}
-		buf = append(buf, read...)
+		r.bytesBuf.Write(read)
 
 		peeked, err := r.buf.Peek(len(delims))
 		if err != nil {
-			return buf, err
+			return r.bytesBuf.Bytes(), err
 		}
 
 		if bytes.Equal(peeked, delims) {
@@ -114,12 +118,20 @@ func (r *Reader) ReadTillDelims(delims []byte) ([]byte, error) {
 
 		b, err := r.ReadByte()
 		if err != nil {
-			return buf, err
+			return r.bytesBuf.Bytes(), err
 		}
-		buf = append(buf, b)
+		r.bytesBuf.WriteByte(b)
 	}
 
-	return buf, nil
+	return r.bytesBuf.Bytes(), nil
+}
+
+// String returns the contents of the unread portion of the buffered data
+// as a string. It returns error if there was an error during read.
+func (r *Reader) String() (string, error) {
+	r.initBytesBuf()
+	_, err := r.bytesBuf.ReadFrom(r)
+	return r.bytesBuf.String(), err
 }
 
 // Reset discards any buffered data, resets all state,

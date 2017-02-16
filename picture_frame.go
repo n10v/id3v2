@@ -6,6 +6,7 @@ package id3v2
 
 import (
 	"io"
+	"io/ioutil"
 
 	"github.com/bogem/id3v2/bwpool"
 	"github.com/bogem/id3v2/rdpool"
@@ -110,7 +111,7 @@ func parsePictureFrame(rd io.Reader) (Framer, error) {
 		return nil, err
 	}
 
-	picture, err := bufRd.ReadAll()
+	picture, err := ioutil.ReadAll(bufRd)
 	if err != nil {
 		return nil, err
 	}
