@@ -88,7 +88,7 @@ func init() {
 func resetMP3Tag() error {
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {
-		errors.New("Error while opening mp3 file: " + err.Error())
+		return errors.New("Error while opening mp3 file: " + err.Error())
 	}
 
 	tag.SetTitle("Title")
@@ -113,11 +113,11 @@ func resetMP3Tag() error {
 	tag.AddFrame(unknownFrameID, unknownFrame)
 
 	if err = tag.Save(); err != nil {
-		errors.New("Error while saving a tag: " + err.Error())
+		return errors.New("Error while saving a tag: " + err.Error())
 	}
 
 	if err = tag.Close(); err != nil {
-		errors.New("Error while closing a tag: " + err.Error())
+		return errors.New("Error while closing a tag: " + err.Error())
 	}
 
 	return nil
