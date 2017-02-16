@@ -36,15 +36,20 @@ func (t *Tag) AddFrame(id string, f Framer) {
 		return
 	}
 
-	if _, exists := sequenceConstructors[id]; exists { // check if frame should be added in sequence
-		if t.sequences[id] == nil {
-			constructor := sequenceConstructors[id]
-			t.sequences[id] = constructor()
+	if isFrameShouldBeInSequence(id) {
+		if t.sequences[id] == nil { // if there is no sequence for id, ...
+			constructor := sequenceConstructors[id] // ... find the constructor ...
+			t.sequences[id] = constructor()         // ... and make the sequence.
 		}
 		t.sequences[id].AddFrame(f)
 	} else {
 		t.frames[id] = f
 	}
+}
+
+func isFrameShouldBeInSequence(id string) bool {
+	_, exists := sequenceConstructors[id]
+	return exists
 }
 
 // AddAttachedPicture adds a picture frame to tag.
