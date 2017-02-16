@@ -135,3 +135,10 @@ var sequenceConstructors = map[string]func() sequencer{
 	"COMM": newCommentSequence,
 	"USLT": newUSLFSequence,
 }
+
+// isFrameShouldBeInSequence checks if frame with corresponding ID should
+// be added to sequence.
+func isFrameShouldBeInSequence(id string) bool {
+	_, exists := sequenceConstructors[id]
+	return exists
+}

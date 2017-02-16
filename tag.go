@@ -47,11 +47,6 @@ func (t *Tag) AddFrame(id string, f Framer) {
 	}
 }
 
-func isFrameShouldBeInSequence(id string) bool {
-	_, exists := sequenceConstructors[id]
-	return exists
-}
-
 // AddAttachedPicture adds a picture frame to tag.
 //
 // Example:
