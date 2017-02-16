@@ -7,6 +7,7 @@ package id3v2
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -84,6 +85,44 @@ func init() {
 	}
 }
 
+func resetMP3Tag() error {
+	tag, err := Open(mp3Name)
+	if tag == nil || err != nil {
+		errors.New("Error while opening mp3 file: " + err.Error())
+	}
+
+	tag.SetTitle("Title")
+	tag.SetArtist("Artist")
+	tag.SetAlbum("Album")
+	tag.SetYear("2016")
+	tag.SetGenre("Genre")
+
+	// Set picture frames
+	tag.AddAttachedPicture(frontCover)
+	tag.AddAttachedPicture(backCover)
+
+	// Set USLTs
+	tag.AddUnsynchronisedLyricsFrame(engUSLF)
+	tag.AddUnsynchronisedLyricsFrame(gerUSLF)
+
+	// Set comments
+	tag.AddCommentFrame(engComm)
+	tag.AddCommentFrame(gerComm)
+
+	// Set unknown frame
+	tag.AddFrame(unknownFrameID, unknownFrame)
+
+	if err = tag.Save(); err != nil {
+		errors.New("Error while saving a tag: " + err.Error())
+	}
+
+	if err = tag.Close(); err != nil {
+		errors.New("Error while closing a tag: " + err.Error())
+	}
+
+	return nil
+}
+
 func TestBlankID(t *testing.T) {
 	// Delete all frames in tag and add one blank id
 	tag, err := Open(mp3Name)
@@ -136,31 +175,14 @@ func TestBlankID(t *testing.T) {
 }
 
 func TestSetTags(t *testing.T) {
+	if err := resetMP3Tag(); err != nil {
+		t.Fatal("Error while reseting mp3 file:", err)
+	}
+
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
-
-	tag.SetTitle("Title")
-	tag.SetArtist("Artist")
-	tag.SetAlbum("Album")
-	tag.SetYear("2016")
-	tag.SetGenre("Genre")
-
-	// Set picture frames
-	tag.AddAttachedPicture(frontCover)
-	tag.AddAttachedPicture(backCover)
-
-	// Set USLTs
-	tag.AddUnsynchronisedLyricsFrame(engUSLF)
-	tag.AddUnsynchronisedLyricsFrame(gerUSLF)
-
-	// Set comments
-	tag.AddCommentFrame(engComm)
-	tag.AddCommentFrame(gerComm)
-
-	// Set unknown frame
-	tag.AddFrame(unknownFrameID, unknownFrame)
 
 	if len(tag.AllFrames()) != 9 {
 		t.Errorf("Expected: %v, got: %v", 9, len(tag.AllFrames()))
@@ -173,10 +195,6 @@ func TestSetTags(t *testing.T) {
 	tagSize := tagHeaderSize + framesSize
 	if tag.Size() != tagSize {
 		t.Errorf("Expected tag.Size(): %v, got: %v", tagSize, tag.Size())
-	}
-
-	if err = tag.Save(); err != nil {
-		t.Error("Error while saving a tag:", err)
 	}
 
 	if err = tag.Close(); err != nil {

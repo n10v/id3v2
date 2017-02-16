@@ -10,6 +10,11 @@ import (
 )
 
 func BenchmarkParseAllFrames(b *testing.B) {
+	if err := resetMP3Tag(); err != nil {
+		b.Fatal("Error while reseting mp3 file:", err)
+	}
+	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		tag, err := Open(mp3Name)
 		if tag == nil || err != nil {
@@ -21,8 +26,10 @@ func BenchmarkParseAllFrames(b *testing.B) {
 	}
 }
 
-func BenchmarkSetCommonCase(b *testing.B) {
-	for n := 0; n < b.N; n++ {
+func BenchmarkParseAndWriteCommonCase(b *testing.B) {
+	// We use b.N+1, because in first iteration we just resetting tag
+	// and setting common frames. Also timer will be resetted.
+	for n := 0; n < b.N+1; n++ {
 		tag, err := Open(mp3Name)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
@@ -55,11 +62,18 @@ func BenchmarkSetCommonCase(b *testing.B) {
 		if err = tag.Close(); err != nil {
 			b.Error("Error while closing a tag:", err)
 		}
+
+		// Reset timer because we just resetting tag in first iteration
+		if n == 0 {
+			b.ResetTimer()
+		}
 	}
 }
 
-func BenchmarkSetManyFrames(b *testing.B) {
-	for n := 0; n < b.N; n++ {
+func BenchmarkParseAndWriteManyFrames(b *testing.B) {
+	// We use b.N+1, because in first iteration we just resetting tag
+	// and setting many frames. Also timer will be resetted.
+	for n := 0; n < b.N+1; n++ {
 		tag, err := Open(mp3Name)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
@@ -111,6 +125,11 @@ func BenchmarkSetManyFrames(b *testing.B) {
 		}
 		if err = tag.Close(); err != nil {
 			b.Error("Error while closing a tag:", err)
+		}
+
+		// Reset timer because we just resetting tag in first iteration
+		if n == 0 {
+			b.ResetTimer()
 		}
 	}
 }

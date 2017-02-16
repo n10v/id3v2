@@ -12,11 +12,14 @@ import (
 )
 
 func TestParse(t *testing.T) {
+	if err := resetMP3Tag(); err != nil {
+		t.Fatal("Error while reseting mp3 file:", err)
+	}
+
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {
 		t.Error("Error while opening mp3 file:", err)
 	}
-	defer tag.Close()
 
 	if tag.Count() != countOfFrames {
 		t.Errorf("There are %v frames in tag, but should be %v", tag.Count(), countOfFrames)
