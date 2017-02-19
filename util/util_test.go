@@ -33,3 +33,19 @@ func TestFormSize(t *testing.T) {
 		t.Errorf("Expected: %v, got: %v", sizeBytes, size)
 	}
 }
+
+func BenchmarkFormSize(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		if _, err := FormSize(268435454); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkParseSize(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		if _, err := ParseSize([]byte{127, 127, 127, 127}); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
