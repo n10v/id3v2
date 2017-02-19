@@ -12,7 +12,7 @@ const (
 )
 
 var (
-	byteSize = make([]byte, bytesPerInt) // Made for reusing in FormSize
+	bSize = make([]byte, bytesPerInt) // Made for reusing in FormSize
 
 	ErrInvalidSizeFormat = errors.New("parsing size: invalid format of tag's/frame's size")
 	ErrSizeOverflow      = errors.New("forming size: size of tag/frame is more than allowed in id3 tag")
@@ -20,37 +20,36 @@ var (
 
 // FormSize transforms int to byte slice with ID3v2 size (4 * 0b0xxxxxxx).
 //
-// If size more than allowed (256MB), then method returns SizeOverflow.
+// If size more than allowed (256MB), then method returns ErrSizeOverflow.
 func FormSize(n int) ([]byte, error) {
-	allowedSize := 268435455 // 0b11111... (28 digits)
-	if n > allowedSize {
+	maxN := 268435455 // 0b11111... (28 digits)
+	if n > maxN {
 		return nil, ErrSizeOverflow
 	}
 
 	mask := 1<<sizeBase - 1
 
-	for i := range byteSize {
-		byteSize[len(byteSize)-i-1] = byte(n & mask)
+	for i := range bSize {
+		bSize[len(bSize)-1-i] = byte(n & mask)
 		n >>= sizeBase
 	}
 
-	return byteSize, nil
+	return bSize, nil
 }
 
 // ParseSize parses byte slice with ID3v2 size (4 * 0b0xxxxxxx) and returns
 // int64.
 //
 // If length of slice is more than 4 or if there is invalid size format (e.g.
-// one byte in slice is like 0b1xxxxxxx), then method return InvalidSizeFormat.
+// one byte in slice is like 0b1xxxxxxx), then method returns ErrInvalidSizeFormat.
 func ParseSize(data []byte) (int64, error) {
-	var size int64
-
 	if len(data) > bytesPerInt {
 		return 0, ErrInvalidSizeFormat
 	}
 
+	var size int64
 	for _, b := range data {
-		if b&0x80 > 0 { // 0x80 = 0b1000_0000
+		if b&128 > 0 { // 128 = 0b1000_0000
 			return 0, ErrInvalidSizeFormat
 		}
 
