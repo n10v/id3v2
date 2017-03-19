@@ -54,7 +54,7 @@ func (r *Reader) ReadByte() (byte, error) {
 // The slice is only valid until the next call to a read or write method.
 func (r *Reader) Next(n int) ([]byte, error) {
 	if n == 0 {
-		return []byte{}, nil
+		return nil, nil
 	}
 
 	peeked, err := r.buf.Peek(n)
