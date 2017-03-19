@@ -100,27 +100,26 @@ func (t Tag) parseFrame(rd io.Reader) (id string, frame Framer, err error) {
 
 var fhBuf = make([]byte, frameHeaderSize)
 
-func parseFrameHeader(rd io.Reader) (*frameHeader, error) {
+func parseFrameHeader(rd io.Reader) (frameHeader, error) {
+	var header frameHeader
+
 	_, err := rd.Read(fhBuf)
 	if err != nil {
-		return nil, err
+		return header, err
 	}
 
 	id := string(fhBuf[:4])
 	frameSize, err := util.ParseSize(fhBuf[4:8])
 	if err != nil {
-		return nil, err
+		return header, err
 	}
 
 	if id == "" || frameSize == 0 {
-		return nil, errBlankFrame
+		return header, errBlankFrame
 	}
 
-	header := &frameHeader{
-		ID:        id,
-		FrameSize: frameSize,
-	}
-
+	header.ID = id
+	header.FrameSize = frameSize
 	return header, nil
 
 }
