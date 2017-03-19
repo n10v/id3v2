@@ -27,12 +27,12 @@ func parseTag(file *os.File) (*Tag, error) {
 		return nil, err
 	}
 	header, err := parseHeader(file)
+	if err == errNoTag {
+		return newTag(file, 0, 4), nil
+	}
 	if err != nil {
 		err = errors.New("trying to parse tag header: " + err.Error())
 		return nil, err
-	}
-	if header == nil {
-		return newTag(file, 0, 4), nil
 	}
 	if header.Version < 3 {
 		err = errors.New("unsupported version of ID3 tag")

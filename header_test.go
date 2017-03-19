@@ -22,7 +22,7 @@ func TestParseHeader(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if *parsed != th {
+	if parsed != th {
 		t.Fail()
 	}
 }

@@ -17,36 +17,37 @@ const (
 	tagHeaderSize = 10
 )
 
+var errNoTag = errors.New("there is no tag in file")
+
 type tagHeader struct {
 	FramesSize int64
 	Version    byte
 }
 
-func parseHeader(rd io.Reader) (*tagHeader, error) {
+func parseHeader(rd io.Reader) (tagHeader, error) {
+	var header tagHeader
+
 	data := make([]byte, tagHeaderSize)
 	n, err := rd.Read(data)
 	if n < tagHeaderSize {
 		err = errors.New("Size of tag header is less than expected")
-		return nil, err
+		return header, err
 	}
 	if err != nil {
-		return nil, err
+		return header, err
 	}
 
 	if !isID3Tag(data[0:3]) {
-		return nil, nil
+		return header, errNoTag
 	}
 
 	size, err := util.ParseSize(data[6:])
 	if err != nil {
-		return nil, err
+		return header, err
 	}
 
-	header := &tagHeader{
-		Version:    data[3],
-		FramesSize: size,
-	}
-
+	header.Version = data[3]
+	header.FramesSize = size
 	return header, nil
 }
 
