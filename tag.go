@@ -166,7 +166,7 @@ func (t *Tag) GetLastFrame(id string) Framer {
 	}
 
 	fs := t.GetFrames(id)
-	if len(fs) == 0 || fs == nil {
+	if len(fs) == 0 {
 		return nil
 	}
 	return fs[len(fs)-1]

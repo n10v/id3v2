@@ -37,7 +37,7 @@ func (us uslfSequence) Count() int {
 
 func (us *uslfSequence) Frames() []Framer {
 	cache := us.framesCache
-	if cache == nil || len(cache) == 0 {
+	if len(cache) == 0 {
 		cache = make([]Framer, 0, len(us.sequence))
 		for _, f := range us.sequence {
 			cache = append(cache, f)

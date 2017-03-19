@@ -36,7 +36,7 @@ func (cs commentSequence) Count() int {
 
 func (cs *commentSequence) Frames() []Framer {
 	cache := cs.framesCache
-	if cache == nil || len(cache) == 0 {
+	if len(cache) == 0 {
 		cache = make([]Framer, 0, len(cs.sequence))
 		for _, f := range cs.sequence {
 			cache = append(cache, f)

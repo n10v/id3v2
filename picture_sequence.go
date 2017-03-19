@@ -36,7 +36,7 @@ func (ps pictureSequence) Count() int {
 
 func (ps *pictureSequence) Frames() []Framer {
 	cache := ps.framesCache
-	if cache == nil || len(cache) == 0 {
+	if len(cache) == 0 {
 		cache = make([]Framer, 0, len(ps.sequence))
 		for _, f := range ps.sequence {
 			cache = append(cache, f)

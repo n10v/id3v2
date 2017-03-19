@@ -77,7 +77,7 @@ func (r *Reader) Next(n int) ([]byte, error) {
 // delim.
 func (r *Reader) ReadTillDelim(delim byte) ([]byte, error) {
 	read, err := r.buf.ReadBytes(delim)
-	if err != nil || read == nil || len(read) == 0 {
+	if err != nil || len(read) == 0 {
 		return read, err
 	}
 	err = r.buf.UnreadByte()
