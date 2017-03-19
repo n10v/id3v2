@@ -66,7 +66,7 @@ func (t *Tag) parseAllFrames() error {
 	fileReader := io.LimitReader(t.file, size)
 
 	for {
-		id, frame, err := t.parseFrame(fileReader)
+		id, frame, err := parseFrame(fileReader)
 		if err == io.EOF || err == errBlankFrame || err == util.ErrInvalidSizeFormat {
 			break
 		}
@@ -82,23 +82,19 @@ func (t *Tag) parseAllFrames() error {
 
 var frameBody = new(io.LimitedReader)
 
-func (t Tag) parseFrame(rd io.Reader) (id string, frame Framer, err error) {
+func parseFrame(rd io.Reader) (id string, frame Framer, err error) {
 	header, err := parseFrameHeader(rd)
 	if err != nil {
 		return "", nil, err
 	}
 	id = header.ID
 
-	parseFunc := t.findParseFunc(id)
-
 	frameBody.R = rd
 	frameBody.N = header.FrameSize
 
-	frame, err = parseFunc(frameBody)
+	frame, err = parseFrameBody(id, frameBody)
 	return id, frame, err
 }
-
-var fhBuf = make([]byte, frameHeaderSize)
 
 func parseFrameHeader(rd io.Reader) (frameHeader, error) {
 	var header frameHeader
@@ -124,14 +120,16 @@ func parseFrameHeader(rd io.Reader) (frameHeader, error) {
 
 }
 
-func (t Tag) findParseFunc(id string) func(io.Reader) (Framer, error) {
+func parseFrameBody(id string, rd io.Reader) (Framer, error) {
 	if id[0] == 'T' {
-		return parseTextFrame
+		return parseTextFrame(rd)
 	}
 
 	if parseFunc, exists := parsers[id]; exists {
-		return parseFunc
+		return parseFunc(rd)
 	}
 
-	return parseUnknownFrame
+	return parseUnknownFrame(rd)
 }
+
+var fhBuf = make([]byte, frameHeaderSize)
