@@ -145,6 +145,31 @@ func (t *Tag) DeleteFrames(id string) {
 	delete(t.sequences, id)
 }
 
+// GetFrames returns frames with corresponding id.
+// It returns nil if there is no frames with given id.
+//
+// Example of usage:
+//	pictures := tag.GetFrames(tag.CommonID("Attached picture"))
+//	if pictures != nil {
+//		for _, f := range pictures {
+//			pic, ok := f.(id3v2.PictureFrame)
+//			if !ok {
+//				log.Fatal("Couldn't assert picture frame")
+//			}
+//
+//			// Do some operations with picture frame:
+//			fmt.Println(pic.Description) // For example, print description of picture frame
+//		}
+//	}
+func (t *Tag) GetFrames(id string) []Framer {
+	if f, exists := t.frames[id]; exists {
+		return []Framer{f}
+	} else if s, exists := t.sequences[id]; exists {
+		return s.Frames()
+	}
+	return nil
+}
+
 // GetLastFrame returns last frame from slice, that is returned from GetFrames function.
 // GetLastFrame is suitable for frames, that can be only one in whole tag.
 // For example, for text frames.
@@ -170,31 +195,6 @@ func (t *Tag) GetLastFrame(id string) Framer {
 		return nil
 	}
 	return fs[len(fs)-1]
-}
-
-// GetFrames returns frames with corresponding id.
-// It returns nil if there is no frames with given id.
-//
-// Example of usage:
-//	pictures := tag.GetFrames(tag.CommonID("Attached picture"))
-//	if pictures != nil {
-//		for _, f := range pictures {
-//			pic, ok := f.(id3v2.PictureFrame)
-//			if !ok {
-//				log.Fatal("Couldn't assert picture frame")
-//			}
-//
-//			// Do some operations with picture frame:
-//			fmt.Println(pic.Description) // For example, print description of picture frame
-//		}
-//	}
-func (t *Tag) GetFrames(id string) []Framer {
-	if f, exists := t.frames[id]; exists {
-		return []Framer{f}
-	} else if s, exists := t.sequences[id]; exists {
-		return s.Frames()
-	}
-	return nil
 }
 
 // GetTextFrame returns text frame with corresponding id.
