@@ -96,6 +96,8 @@ func parseFrame(rd io.Reader) (id string, frame Framer, err error) {
 	return id, frame, err
 }
 
+var fhBuf = make([]byte, frameHeaderSize)
+
 func parseFrameHeader(rd io.Reader) (frameHeader, error) {
 	var header frameHeader
 
@@ -131,5 +133,3 @@ func parseFrameBody(id string, rd io.Reader) (Framer, error) {
 
 	return parseUnknownFrame(rd)
 }
-
-var fhBuf = make([]byte, frameHeaderSize)
