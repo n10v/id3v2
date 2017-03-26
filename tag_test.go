@@ -7,7 +7,6 @@ package id3v2
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -88,7 +87,7 @@ func init() {
 func resetMP3Tag() error {
 	tag, err := Open(mp3Name)
 	if tag == nil || err != nil {
-		return errors.New("Error while opening mp3 file: " + err.Error())
+		return err
 	}
 
 	tag.SetTitle("Title")
@@ -113,11 +112,11 @@ func resetMP3Tag() error {
 	tag.AddFrame(unknownFrameID, unknownFrame)
 
 	if err = tag.Save(); err != nil {
-		return errors.New("Error while saving a tag: " + err.Error())
+		return err
 	}
 
 	if err = tag.Close(); err != nil {
-		return errors.New("Error while closing a tag: " + err.Error())
+		return err
 	}
 
 	return nil
@@ -299,5 +298,44 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 
 	if err = mp3.Close(); err != nil {
 		t.Error("Error while closing a tag:", err)
+	}
+}
+
+func TestCheckPermissions(t *testing.T) {
+	originalFile, err := os.Open(mp3Name)
+	if err != nil {
+		t.Fatal("Error while opening mp3 file:", err)
+	}
+
+	originalStat, err := originalFile.Stat()
+	if err != nil {
+		t.Fatal("Error while getting mp3 file stat:", err)
+	}
+	originalMode := originalStat.Mode()
+	originalFile.Close()
+
+	tag, err := Open(mp3Name)
+	if err != nil {
+		t.Fatal("Error while parsing a tag:", err)
+	}
+	if err = tag.Save(); err != nil {
+		t.Error("Error while saving a tag:", err)
+	}
+	if err = tag.Close(); err != nil {
+		t.Error("Error while closing a tag:", err)
+	}
+
+	newFile, err := os.Open(mp3Name)
+	if err != nil {
+		t.Fatal("Error while opening mp3 file:", err)
+	}
+	newStat, err := newFile.Stat()
+	if err != nil {
+		t.Fatal("Error while getting mp3 file stats:", err)
+	}
+	newMode := newStat.Mode()
+
+	if originalMode != newMode {
+		t.Errorf("Expected permissions: %v, got %v", originalMode, newMode)
 	}
 }
