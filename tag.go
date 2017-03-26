@@ -321,14 +321,14 @@ func (t *Tag) SetVersion(version byte) {
 func (t *Tag) Save() error {
 	// Get original file mode
 	originalFile := t.file
-	originalFileStat, err := originalFile.Stat()
+	originalStat, err := originalFile.Stat()
 	if err != nil {
 		return err
 	}
 
 	// Create a temp file for mp3 file, which will contain new tag
 	name := t.file.Name() + "-id3v2"
-	newFile, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE, originalFileStat.Mode())
+	newFile, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE, originalStat.Mode())
 	if err != nil {
 		return err
 	}
@@ -355,6 +355,7 @@ func (t *Tag) Save() error {
 	if _, err = io.Copy(newFile, originalFile); err != nil {
 		return err
 	}
+
 	// Set t.originalSize to new frames size
 	t.originalSize = framesSize
 
