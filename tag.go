@@ -7,9 +7,7 @@ package id3v2
 import (
 	"bufio"
 	"io"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 
 	"github.com/bogem/id3v2/bwpool"
 	"github.com/bogem/id3v2/util"
@@ -321,8 +319,16 @@ func (t *Tag) SetVersion(version byte) {
 // Save writes tag to the file. If there are no frames in tag, Save will write
 // only music part without any ID3v2 information.
 func (t *Tag) Save() error {
+	// Get original file mode
+	originalFile := t.file
+	originalFileStat, err := originalFile.Stat()
+	if err != nil {
+		return err
+	}
+
 	// Create a temp file for mp3 file, which will contain new tag
-	newFile, err := ioutil.TempFile(filepath.Dir(t.file.Name()), "id3v2-")
+	name := t.file.Name() + "-id3v2"
+	newFile, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE, originalFileStat.Mode())
 	if err != nil {
 		return err
 	}
@@ -341,7 +347,6 @@ func (t *Tag) Save() error {
 	}
 
 	// Seek to a music part of original file
-	originalFile := t.file
 	if _, err = originalFile.Seek(t.originalSize, os.SEEK_SET); err != nil {
 		return err
 	}
@@ -350,20 +355,8 @@ func (t *Tag) Save() error {
 	if _, err = io.Copy(newFile, originalFile); err != nil {
 		return err
 	}
-
 	// Set t.originalSize to new frames size
 	t.originalSize = framesSize
-
-	// Get original file mode
-	originalFileStat, err := originalFile.Stat()
-	if err != nil {
-		return err
-	}
-
-	// Set original file mode to new file
-	if err = os.Chmod(newFile.Name(), originalFileStat.Mode()); err != nil {
-		return err
-	}
 
 	// Close files to allow replacing
 	newFile.Close()
