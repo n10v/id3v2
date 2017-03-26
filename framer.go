@@ -12,6 +12,6 @@ type Framer interface {
 	// Size returns the size of frame body.
 	Size() int
 
-	// WriteTo writes body slice into io.Writer.
+	// WriteTo writes body slice into w.
 	WriteTo(w io.Writer) (n int64, err error)
 }
