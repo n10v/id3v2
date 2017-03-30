@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bufio"
 	"bytes"
 	"testing"
 )
@@ -28,8 +29,15 @@ func TestParseHeader(t *testing.T) {
 }
 
 func TestFormTagHeader(t *testing.T) {
-	formed := formTagHeader([]byte{0, 0, 0, 0}, 4)
-	if !bytes.Equal(formed, thb) {
-		t.Fail()
+	buf := new(bytes.Buffer)
+	bw := bufio.NewWriter(buf)
+	if err := writeTagHeader(bw, []byte{0, 0, 0, 0}, 4); err != nil {
+		t.Fatal(err)
+	}
+	if err := bw.Flush(); err != nil {
+		t.Fatal(err)
+	}
+	if !bytes.Equal(thb, buf.Bytes()) {
+		t.Fatalf("Expected %v, got %v", thb, buf.Bytes())
 	}
 }

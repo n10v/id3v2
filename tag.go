@@ -392,14 +392,17 @@ func (t Tag) WriteTo(w io.Writer) (n int64, err error) {
 		return 0, err
 	}
 
+	bw := bwpool.Get(w)
+	defer bwpool.Put(bw)
+
 	// Write tag header
-	if _, err = w.Write(formTagHeader(byteFramesSize, t.version)); err != nil {
+	if err := writeTagHeader(bw, byteFramesSize, t.version); err != nil {
 		return 0, err
 	}
 	n += tagHeaderSize
 
 	// Write frames
-	nn, err := t.writeAllFrames(w)
+	nn, err := t.writeAllFrames(bw)
 	if err != nil {
 		return 0, err
 	}
@@ -411,10 +414,7 @@ func (t Tag) WriteTo(w io.Writer) (n int64, err error) {
 // writeAllFrames writes all frames to w and returns
 // the number of bytes written and error during the write.
 // It returns nil as error if the write was successful.
-func (t Tag) writeAllFrames(w io.Writer) (int64, error) {
-	bw := bwpool.Get(w)
-	defer bwpool.Put(bw)
-
+func (t Tag) writeAllFrames(bw *bufio.Writer) (int64, error) {
 	err := t.iterateOverAllFrames(func(id string, f Framer) error {
 		return writeFrame(bw, id, f)
 	})
@@ -443,9 +443,20 @@ func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
 		return err
 	}
 
-	bw.WriteString(id)
-	bw.Write(size)
-	bw.Write([]byte{0, 0})
+	// ID
+	if _, err := bw.WriteString(id); err != nil {
+		return err
+	}
+
+	// Size
+	if _, err := bw.Write(size); err != nil {
+		return err
+	}
+
+	// Flags
+	if _, err := bw.Write([]byte{0, 0}); err != nil {
+		return err
+	}
 	return nil
 }
 

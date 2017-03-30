@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -26,9 +27,20 @@ func TestParseInvalidFrameSize(t *testing.T) {
 	defer os.Remove(file.Name())
 
 	size, _ := util.FormSize(16 + 10)
-	file.Write(formTagHeader(size, 4))
+
+	// Write tag header
+	bw := bufio.NewWriter(file)
+	if err := writeTagHeader(bw, size, 4); err != nil {
+		t.Fatal(err)
+	}
+	if err := bw.Flush(); err != nil {
+		t.Fatal(err)
+	}
+	// Write valid TIT2 frame
 	file.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03, 0x54, 0x69, 0x74, 0x6C, 0x65})
-	file.Write([]byte{0x54, 0x49, 0x54, 0x32, 128, 128, 128, 255, 00, 00})
+	// Write invalid frame (size byte can't be more than 127)
+	file.Write([]byte{0x54, 0x49, 0x54, 0x32, 255, 255, 255, 255, 00, 00})
+
 	file.Seek(0, os.SEEK_SET)
 
 	tag, err := ParseFile(file)
