@@ -8,8 +8,40 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"testing"
+
+	"github.com/bogem/id3v2/util"
 )
+
+// TestParseInvalidFrameSize creates new temp file, writes tag header,
+// valid TIT2 frame and frame with invalid size to it, then checks
+// if valid frame is parsed and there is only this frame in tag.
+func TestParseInvalidFrameSize(t *testing.T) {
+	file, err := ioutil.TempFile("", "")
+	if err != nil {
+		t.Fatal("Error while opening mp3 file:", err)
+	}
+	defer os.Remove(file.Name())
+
+	size, _ := util.FormSize(16 + 10)
+	file.Write(formTagHeader(size, 4))
+	file.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03, 0x54, 0x69, 0x74, 0x6C, 0x65})
+	file.Write([]byte{0x54, 0x49, 0x54, 0x32, 128, 128, 128, 255, 00, 00})
+	file.Seek(0, os.SEEK_SET)
+
+	tag, err := ParseFile(file)
+	if tag == nil || err != nil {
+		t.Fatal("Error while parsing mp3 file:", err)
+	}
+	if tag.Title() != "Title" {
+		t.Errorf("Expected title: %q, got: %q", "Title", tag.Title())
+	}
+	if tag.Count() != 1 {
+		t.Error("There should be only 1 frame in tag, but there are", tag.Count())
+	}
+}
 
 func TestParse(t *testing.T) {
 	var err error
@@ -231,7 +263,7 @@ func compareUnknownFrames(actual, expected UnknownFrame) error {
 
 func compareTwoStrings(actual, expected string) error {
 	if actual != expected {
-		return fmt.Errorf("Expected %v, got %v", expected, actual)
+		return fmt.Errorf("Expected %q, got %q", expected, actual)
 	}
 	return nil
 }
