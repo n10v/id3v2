@@ -383,6 +383,10 @@ func (t *Tag) Save() error {
 func (t Tag) WriteTo(w io.Writer) (n int64, err error) {
 	// Form size of frames
 	framesSize := t.Size() - tagHeaderSize
+	if framesSize == 0 {
+		return 0, nil
+	}
+
 	byteFramesSize, err := util.FormSize(framesSize)
 	if err != nil {
 		return 0, err
