@@ -43,6 +43,7 @@ func TestParseInvalidFrameSize(t *testing.T) {
 	}
 }
 
+// TestParse compares parsed frames with expected frames.
 func TestParse(t *testing.T) {
 	var err error
 
