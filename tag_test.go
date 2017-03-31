@@ -205,7 +205,7 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 	}
 
 	if !bytes.Equal(expected, got) {
-		t.Fail()
+		t.Fatalf("Expected %v, got %v", expected, got)
 	}
 
 	if err = mp3.Close(); err != nil {
@@ -243,7 +243,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 	}
 
 	if !bytes.Equal(expected, got) {
-		t.Fail()
+		t.Fatalf("Expected %v, got %v", expected, got)
 	}
 
 	if err = mp3.Close(); err != nil {
