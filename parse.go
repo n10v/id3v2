@@ -26,6 +26,7 @@ func parseTag(file *os.File) (*Tag, error) {
 		err := errors.New("Invalid file: file is nil")
 		return nil, err
 	}
+
 	header, err := parseHeader(file)
 	if err == errNoTag {
 		return newTag(file, 0, 4), nil
@@ -62,8 +63,8 @@ func (t *Tag) parseAllFrames() error {
 		return err
 	}
 
-	size := t.originalSize - tagHeaderSize // Size of all frames = Size of tag - tag header
-	fileReader := io.LimitReader(t.file, size)
+	framesSize := t.originalSize - tagHeaderSize
+	fileReader := io.LimitReader(t.file, framesSize)
 
 	for {
 		id, frame, err := parseFrame(fileReader)
