@@ -341,13 +341,6 @@ func (t *Tag) Save() error {
 	if err != nil {
 		return err
 	}
-	var framesSize int64
-	if tagSize > tagHeaderSize {
-		framesSize = tagSize - tagHeaderSize
-	}
-
-	// Set t.originalSize to new frames size
-	t.originalSize = framesSize
 
 	// Seek to a music part of original file
 	if _, err = originalFile.Seek(t.originalSize, os.SEEK_SET); err != nil {
@@ -372,6 +365,13 @@ func (t *Tag) Save() error {
 	t.file, err = os.Open(originalFile.Name())
 	if err != nil {
 		return err
+	}
+
+	// Set t.originalSize to new frames size
+	if tagSize > tagHeaderSize {
+		t.originalSize = tagSize - tagHeaderSize
+	} else {
+		t.originalSize = 0
 	}
 
 	return nil
