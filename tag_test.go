@@ -292,7 +292,7 @@ func TestCheckPermissions(t *testing.T) {
 }
 
 // TestBlankID deletes all frames in tag, adds frame with blank id and checks
-// if no tag is written by tag.Size (tag.Size must not write tag to file
+// if no tag is written by tag.Size (tag.WriteTo must not write tag to file
 // if there are 0 frames).
 func TestBlankID(t *testing.T) {
 	tag, err := Open(mp3Name)

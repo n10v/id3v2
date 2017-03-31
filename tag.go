@@ -336,15 +336,18 @@ func (t *Tag) Save() error {
 	// Make sure we clean up the temp file if it's still around
 	defer os.Remove(newFile.Name())
 
-	// If there is at least one frame, write whole tag in new file
+	// Write tag in new file
+	tagSize, err := t.WriteTo(newFile)
+	if err != nil {
+		return err
+	}
 	var framesSize int64
-	if t.HasAnyFrames() {
-		tagSize, err := t.WriteTo(newFile)
-		if err != nil {
-			return err
-		}
+	if tagSize > tagHeaderSize {
 		framesSize = tagSize - tagHeaderSize
 	}
+
+	// Set t.originalSize to new frames size
+	t.originalSize = framesSize
 
 	// Seek to a music part of original file
 	if _, err = originalFile.Seek(t.originalSize, os.SEEK_SET); err != nil {
@@ -355,9 +358,6 @@ func (t *Tag) Save() error {
 	if _, err = io.Copy(newFile, originalFile); err != nil {
 		return err
 	}
-
-	// Set t.originalSize to new frames size
-	t.originalSize = framesSize
 
 	// Close files to allow replacing
 	newFile.Close()
@@ -377,13 +377,13 @@ func (t *Tag) Save() error {
 	return nil
 }
 
-// WriteTo writes whole tag in w.
+// WriteTo writes whole tag in w if there is at least one frame.
 // It returns the number of bytes written and error during the write.
 // It returns nil as error if the write was successful.
 func (t Tag) WriteTo(w io.Writer) (n int64, err error) {
 	// Form size of frames
 	framesSize := t.Size() - tagHeaderSize
-	if framesSize == 0 {
+	if framesSize <= 0 {
 		return 0, nil
 	}
 
