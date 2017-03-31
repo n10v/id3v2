@@ -28,7 +28,7 @@ func TestParseHeader(t *testing.T) {
 	}
 }
 
-func TestFormTagHeader(t *testing.T) {
+func TestWriteTagHeader(t *testing.T) {
 	buf := new(bytes.Buffer)
 	bw := bufio.NewWriter(buf)
 	if err := writeTagHeader(bw, []byte{0, 0, 0, 0}, 4); err != nil {
