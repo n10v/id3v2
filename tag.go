@@ -16,7 +16,7 @@ import (
 // Tag stores all frames of opened file.
 type Tag struct {
 	frames    map[string]Framer
-	sequences map[string]sequencer
+	sequences map[string]*sequence
 
 	file         *os.File
 	originalSize int64
@@ -35,9 +35,8 @@ func (t *Tag) AddFrame(id string, f Framer) {
 	}
 
 	if isFrameShouldBeInSequence(id) {
-		if t.sequences[id] == nil { // if there is no sequence for id, ...
-			constructor := sequenceConstructors[id] // ... find the constructor ...
-			t.sequences[id] = constructor()         // ... and make the sequence.
+		if t.sequences[id] == nil {
+			t.sequences[id] = newSequence()
 		}
 		t.sequences[id].AddFrame(f)
 	} else {
@@ -134,7 +133,7 @@ func (t *Tag) AllFrames() map[string][]Framer {
 // DeleteAllFrames deletes all frames in tag.
 func (t *Tag) DeleteAllFrames() {
 	t.frames = make(map[string]Framer)
-	t.sequences = make(map[string]sequencer)
+	t.sequences = make(map[string]*sequence)
 }
 
 // DeleteFrames deletes frames in tag with given id.

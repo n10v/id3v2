@@ -127,18 +127,12 @@ var parsers = map[string]func(io.Reader) (Framer, error){
 	"USLT": parseUnsynchronisedLyricsFrame,
 }
 
-// sequenceConstructors is map, where key is ID of frame and value is function
-// for constructing a sequence for corresponding frames.
-// The frames with these IDs must be added to sequences.
-var sequenceConstructors = map[string]func() sequencer{
-	"APIC": newPictureSequence,
-	"COMM": newCommentSequence,
-	"USLT": newUSLFSequence,
-}
-
 // isFrameShouldBeInSequence checks if frame with corresponding ID should
 // be added to sequence.
 func isFrameShouldBeInSequence(id string) bool {
-	_, exists := sequenceConstructors[id]
-	return exists
+	switch id {
+	case "APIC", "COMM", "USLT":
+		return true
+	}
+	return false
 }

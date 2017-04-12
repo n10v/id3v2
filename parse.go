@@ -49,7 +49,7 @@ func parseTag(file *os.File) (*Tag, error) {
 func newTag(file *os.File, originalSize int64, version byte) *Tag {
 	return &Tag{
 		frames:    make(map[string]Framer),
-		sequences: make(map[string]sequencer),
+		sequences: make(map[string]*sequence),
 
 		file:         file,
 		originalSize: originalSize,
