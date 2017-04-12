@@ -27,6 +27,11 @@ func BenchmarkParseAllFrames(b *testing.B) {
 }
 
 func BenchmarkParseAndWriteCommonCase(b *testing.B) {
+	frontCover, err := ioutil.ReadFile(frontCoverName)
+	if err != nil {
+		b.Error("Error while reading front cover file")
+	}
+
 	// We use b.N+1, because in first iteration we just resetting tag
 	// and setting common frames. Also timer will be resetted.
 	for n := 0; n < b.N+1; n++ {
@@ -35,18 +40,16 @@ func BenchmarkParseAndWriteCommonCase(b *testing.B) {
 			b.Fatal("Error while opening mp3 file:", err)
 		}
 
-		tag.DeleteAllFrames()
+		// Delete all frames in first iteration
+		if n == 0 {
+			tag.DeleteAllFrames()
+		}
 
 		tag.SetTitle("Title")
 		tag.SetArtist("Artist")
 		tag.SetYear("2016")
 
 		// Set front cover
-		frontCover, err := ioutil.ReadFile(frontCoverName)
-		if err != nil {
-			b.Error("Error while reading front cover file")
-		}
-
 		pic := PictureFrame{
 			Encoding:    ENUTF8,
 			MimeType:    "image/jpeg",
@@ -71,6 +74,11 @@ func BenchmarkParseAndWriteCommonCase(b *testing.B) {
 }
 
 func BenchmarkParseAndWriteManyFrames(b *testing.B) {
+	frontCover, err := ioutil.ReadFile(frontCoverName)
+	if err != nil {
+		b.Error("Error while reading front cover file")
+	}
+
 	// We use b.N+1, because in first iteration we just resetting tag
 	// and setting many frames. Also timer will be resetted.
 	for n := 0; n < b.N+1; n++ {
@@ -79,7 +87,10 @@ func BenchmarkParseAndWriteManyFrames(b *testing.B) {
 			b.Fatal("Error while opening mp3 file:", err)
 		}
 
-		tag.DeleteAllFrames()
+		// Delete all frames in first iteration
+		if n == 0 {
+			tag.DeleteAllFrames()
+		}
 
 		tag.SetTitle("Title")
 		tag.SetArtist("Artist")
@@ -88,11 +99,6 @@ func BenchmarkParseAndWriteManyFrames(b *testing.B) {
 		tag.SetGenre("Genre")
 
 		// Set front cover
-		frontCover, err := ioutil.ReadFile(frontCoverName)
-		if err != nil {
-			b.Error("Error while reading front cover file")
-		}
-
 		pic := PictureFrame{
 			Encoding:    ENUTF8,
 			MimeType:    "image/jpeg",
