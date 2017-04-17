@@ -20,7 +20,7 @@ const (
 	backCoverName  = "testdata/back_cover.jpg"
 	framesSize     = 222524
 	tagSize        = tagHeaderSize + framesSize
-	musicSize      = 4557971
+	musicSize      = 4557843
 	countOfFrames  = 12
 )
 
@@ -223,7 +223,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 	}
 
 	rd := bufio.NewReader(mp3)
-	expected := []byte{0, 0, 0, 0, 0, 0, 255}
+	expected := []byte{85, 85, 85, 85, 85, 85, 85}
 	toDiscard := tagSize + musicSize - len(expected)
 	n, err := rd.Discard(toDiscard)
 	if n != toDiscard {
