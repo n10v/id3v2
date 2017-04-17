@@ -396,47 +396,30 @@ func (t Tag) WriteTo(w io.Writer) (n int64, err error) {
 
 	// Write tag header
 	if err := writeTagHeader(bw, byteFramesSize, t.version); err != nil {
-		return 0, err
+		return n, err
 	}
 	n += tagHeaderSize
 
 	// Write frames
-	nn, err := t.writeAllFrames(bw)
-	if err != nil {
-		return 0, err
-	}
-	n += nn
-
-	return n, err
-}
-
-// writeAllFrames writes all frames to w and returns
-// the number of bytes written and error during the write.
-// It returns nil as error if the write was successful.
-func (t Tag) writeAllFrames(bw *bufio.Writer) (int64, error) {
-	var n int64
-	err := t.iterateOverAllFrames(func(id string, f Framer) error {
+	err = t.iterateOverAllFrames(func(id string, f Framer) error {
 		nn, err := writeFrame(bw, id, f)
 		n += nn
 		return err
 	})
 	if err != nil {
-		return 0, err
+		return n, err
 	}
 
 	return n, bw.Flush()
 }
 
 func writeFrame(bw *bufio.Writer, id string, frame Framer) (int64, error) {
-	var n int64
-
 	if err := writeFrameHeader(bw, id, frame.Size()); err != nil {
 		return 0, err
 	}
-	n += frameHeaderSize
 
 	frameSize, err := frame.WriteTo(bw)
-	return n + frameSize, err
+	return frameHeaderSize + frameSize, err
 }
 
 func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
