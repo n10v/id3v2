@@ -29,8 +29,11 @@ It can't:
 
 *id3v2 is still in beta. Until version 1.0 the API may be changed.*
 
-**If you want some functionality, that library can't do,
-or you have some questions, just write an issue.**
+If you have **issues with encoding** or you don't know, how to **set
+encoding to frame**, please write new issue!
+
+If you want some **functionality, that library can't do**,
+or you have some **questions**, just write an issue.
 
 **And of course, pull requests are welcome!**
 
