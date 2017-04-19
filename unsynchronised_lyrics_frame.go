@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"errors"
 	"io"
 
 	"github.com/bogem/id3v2/bwpool"
@@ -15,6 +16,9 @@ import (
 // UnsynchronisedLyricsFrame is used to work with USLT frames.
 // The information about how to add unsynchronised lyrics/text frame to tag
 // you can see in the docs to tag.AddUnsynchronisedLyricsFrame function.
+//
+// You should choose a three-letter language code from
+// ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
 type UnsynchronisedLyricsFrame struct {
 	Encoding          util.Encoding
 	Language          string
@@ -38,6 +42,9 @@ func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) 
 	}
 	n += 1
 
+	if len(uslf.Language) != 3 {
+		return n, errors.New("language code must consist of three letters according to ISO 639-2")
+	}
 	i, err = bw.WriteString(uslf.Language)
 	if err != nil {
 		return

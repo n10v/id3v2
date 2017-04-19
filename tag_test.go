@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/bogem/id3v2/util"
@@ -341,4 +342,56 @@ func TestBlankID(t *testing.T) {
 	if tag.Size() != 0 {
 		t.Error("Size of parsed tag should be 0. Actual tag size:", tag.Size())
 	}
+}
+
+// TestInvalidLanguageCommentFrame checks,
+// if tag.Save returns the correct error by writing the comment frame with
+// incorrect length of language code.
+func TestInvalidLanguageCommentFrame(t *testing.T) {
+	tag, err := Open(mp3Name)
+	if tag == nil || err != nil {
+		t.Fatal("Error while opening mp3 file:", err)
+	}
+
+	tag.DeleteAllFrames()
+	tag.AddCommentFrame(CommentFrame{
+		Encoding: ENUTF8,
+		Language: "en", // should be "eng" according to ISO 639-2
+		Text:     "The actual text",
+	})
+
+	err = tag.Save()
+	if err == nil {
+		t.Fatal("tag.Save must return the error about invalid language code")
+	}
+	if !strings.Contains(err.Error(), "must consist") {
+		t.Fatalf("Incorrect error. Expected error contains %q, got %q", "must consist", err)
+	}
+
+}
+
+// TestInvalidLanguageUSLF checks,
+// if tag.Save returns the correct error by writing the comment frame with
+// incorrect length of language code.
+func TestInvalidLanguageUSLF(t *testing.T) {
+	tag, err := Open(mp3Name)
+	if tag == nil || err != nil {
+		t.Fatal("Error while opening mp3 file:", err)
+	}
+
+	tag.DeleteAllFrames()
+	tag.AddUnsynchronisedLyricsFrame(UnsynchronisedLyricsFrame{
+		Encoding: ENUTF8,
+		Language: "en", // should be "eng" according to ISO 639-2
+		Lyrics:   "Lyrics",
+	})
+
+	err = tag.Save()
+	if err == nil {
+		t.Fatal("tag.Save must return the error about invalid language code")
+	}
+	if !strings.Contains(err.Error(), "must consist") {
+		t.Fatalf("Incorrect error. Expected error contains %q, got %q", "must consist", err)
+	}
+
 }
