@@ -127,9 +127,9 @@ var parsers = map[string]func(io.Reader) (Framer, error){
 	"USLT": parseUnsynchronisedLyricsFrame,
 }
 
-// isFrameShouldBeInSequence checks if frame with corresponding ID should
+// mustFrameBeInSequence checks if frame with corresponding ID must
 // be added to sequence.
-func isFrameShouldBeInSequence(id string) bool {
+func mustFrameBeInSequence(id string) bool {
 	switch id {
 	case "APIC", "COMM", "USLT":
 		return true

@@ -34,7 +34,7 @@ func (t *Tag) AddFrame(id string, f Framer) {
 		return
 	}
 
-	if isFrameShouldBeInSequence(id) {
+	if mustFrameBeInSequence(id) {
 		if t.sequences[id] == nil {
 			t.sequences[id] = newSequence()
 		}
@@ -80,7 +80,7 @@ func (t *Tag) AddAttachedPicture(pf PictureFrame) {
 //	}
 //	tag.AddCommentFrame(comment)
 //
-// You should choose a three-letter language code from
+// You must choose a three-letter language code from
 // ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
 func (t *Tag) AddCommentFrame(cf CommentFrame) {
 	id := t.CommonID("Comments")
@@ -100,7 +100,7 @@ func (t *Tag) AddCommentFrame(cf CommentFrame) {
 //	}
 //	tag.AddUnsynchronisedLyricsFrame(uslt)
 //
-// You should choose a three-letter language code from
+// You must choose a three-letter language code from
 // ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
 func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 	id := t.CommonID("Unsynchronised lyrics/text transcription")

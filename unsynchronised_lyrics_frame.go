@@ -17,7 +17,7 @@ import (
 // The information about how to add unsynchronised lyrics/text frame to tag
 // you can see in the docs to tag.AddUnsynchronisedLyricsFrame function.
 //
-// You should choose a three-letter language code from
+// You must choose a three-letter language code from
 // ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
 type UnsynchronisedLyricsFrame struct {
 	Encoding          util.Encoding
