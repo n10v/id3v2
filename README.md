@@ -83,15 +83,3 @@ func main() {
 ## Documentation
 
 You can find it here: https://godoc.org/github.com/bogem/id3v2
-
-## TODO
-
-- [ ] Unsynchronization (?)
-- [ ] Work with extended header, flags, padding, footer ***(Does anyone really use it?)***
-- [x] ID3v2.3 Support
-- [x] Parse tags
-- [x] Documentation
-- [x] Work with other encodings
-
-## License
-MIT
