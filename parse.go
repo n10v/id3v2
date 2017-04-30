@@ -67,7 +67,10 @@ func (t *Tag) parseAllFrames() error {
 	}
 
 	framesSize := t.originalSize - tagHeaderSize
-	fileReader := io.LimitReader(t.file, framesSize)
+	fileReader := lrpool.Get()
+	defer lrpool.Put(fileReader)
+	fileReader.R = t.file
+	fileReader.N = framesSize
 
 	for {
 		id, frame, err := parseFrame(fileReader)
