@@ -6,9 +6,12 @@ package id3v2
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 
+	"github.com/bogem/id3v2/bbpool"
+	"github.com/bogem/id3v2/lrpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -36,7 +39,7 @@ func parseTag(file *os.File) (*Tag, error) {
 		return nil, err
 	}
 	if header.Version < 3 {
-		err = errors.New("unsupported version of ID3 tag")
+		err = errors.New(fmt.Sprint("unsupported version of ID3 tag: ", header.Version))
 		return nil, err
 	}
 
@@ -81,8 +84,6 @@ func (t *Tag) parseAllFrames() error {
 	return nil
 }
 
-var frameBody = new(io.LimitedReader)
-
 func parseFrame(rd io.Reader) (id string, frame Framer, err error) {
 	header, err := parseFrameHeader(rd)
 	if err != nil {
@@ -90,25 +91,34 @@ func parseFrame(rd io.Reader) (id string, frame Framer, err error) {
 	}
 	id = header.ID
 
-	frameBody.R = rd
-	frameBody.N = header.FrameSize
+	frameRd := lrpool.Get()
+	defer lrpool.Put(frameRd)
+	frameRd.R = rd
+	frameRd.N = header.FrameSize
 
-	frame, err = parseFrameBody(id, frameBody)
+	frame, err = parseFrameBody(id, frameRd)
 	return id, frame, err
 }
-
-var fhBuf = make([]byte, frameHeaderSize)
 
 func parseFrameHeader(rd io.Reader) (frameHeader, error) {
 	var header frameHeader
 
-	_, err := rd.Read(fhBuf)
+	headerRd := lrpool.Get()
+	defer lrpool.Put(headerRd)
+	headerRd.R = rd
+	headerRd.N = frameHeaderSize
+
+	fhBuf := bbpool.Get()
+	defer bbpool.Put(fhBuf)
+
+	_, err := fhBuf.ReadFrom(headerRd)
 	if err != nil {
 		return header, err
 	}
+	fhBytes := fhBuf.Bytes()
 
-	id := string(fhBuf[:4])
-	frameSize, err := util.ParseSize(fhBuf[4:8])
+	id := string(fhBytes[:4])
+	frameSize, err := util.ParseSize(fhBytes[4:8])
 	if err != nil {
 		return header, err
 	}

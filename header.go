@@ -29,11 +29,11 @@ func parseHeader(rd io.Reader) (tagHeader, error) {
 
 	data := make([]byte, tagHeaderSize)
 	n, err := rd.Read(data)
-	if n < tagHeaderSize {
-		err = errors.New("size of tag header is less than expected")
+	if err != nil {
 		return header, err
 	}
-	if err != nil {
+	if n < tagHeaderSize {
+		err = errors.New("size of tag header is less than expected")
 		return header, err
 	}
 
