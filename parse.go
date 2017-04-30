@@ -103,6 +103,8 @@ func parseFrame(rd io.Reader) (id string, frame Framer, err error) {
 func parseFrameHeader(rd io.Reader) (frameHeader, error) {
 	var header frameHeader
 
+	// Limit the rd by frameHeaderSize, so fhBuf can read only 'frameHeaderSize'
+	// bytes.
 	headerRd := lrpool.Get()
 	defer lrpool.Put(headerRd)
 	headerRd.R = rd
