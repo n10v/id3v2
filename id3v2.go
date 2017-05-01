@@ -40,7 +40,7 @@
 //		}
 //		tag.AddCommentFrame(comment)
 //
-//		// Write tag to "file.mp3".
+//		// Write tag to file.
 //		if err = tag.Save(); err != nil {
 //			log.Fatal("Error while saving a tag: ", err)
 //		}

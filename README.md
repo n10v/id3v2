@@ -78,7 +78,7 @@ func main() {
 	}
 	tag.AddCommentFrame(comment)
 
-	// Write it to "file.mp3".
+	// Write it to file.
 	if err = tag.Save(); err != nil {
 		log.Fatal("Error while saving a tag: ", err)
 	}
