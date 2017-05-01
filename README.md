@@ -64,12 +64,12 @@ func main() {
 	fmt.Println(tag.Artist())
 	fmt.Println(tag.Title())
 
-  // Set simple text frames.
+	// Set simple text frames.
 	tag.SetArtist("New artist")
 	tag.SetTitle("New title")
 
 
-  // Set comment frame.
+	// Set comment frame.
 	comment := id3v2.CommentFrame{
 		Encoding:    id3v2.ENUTF8,
 		Language:    "eng",
@@ -87,19 +87,19 @@ func main() {
 
 ## Read multiple frames:
 ```go
-  pictures := tag.GetFrames(tag.CommonID("Attached picture"))
-  if pictures != nil {
-    for _, f := range pictures {
-      pic, ok := f.(id3v2.PictureFrame)
-      if !ok {
-        log.Fatal("Couldn't assert picture frame")
-      }
-
-      // Do something with picture frame.
-      // For example, print the description:
-      fmt.Println(pic.Description)
+pictures := tag.GetFrames(tag.CommonID("Attached picture"))
+if pictures != nil {
+  for _, f := range pictures {
+    pic, ok := f.(id3v2.PictureFrame)
+    if !ok {
+      log.Fatal("Couldn't assert picture frame")
     }
+
+    // Do something with picture frame.
+    // For example, print the description:
+    fmt.Println(pic.Description)
   }
+}
 ```
 
 ## Options:
