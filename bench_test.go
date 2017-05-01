@@ -16,7 +16,7 @@ func BenchmarkParseAllFrames(b *testing.B) {
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
-		tag, err := Open(mp3Name)
+		tag, err := Open(mp3Name, defaultOpts)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
 		}
@@ -35,7 +35,7 @@ func BenchmarkParseAndWriteCommonCase(b *testing.B) {
 	// We use b.N+1, because in first iteration we just resetting tag
 	// and setting common frames. Also timer will be resetted.
 	for n := 0; n < b.N+1; n++ {
-		tag, err := Open(mp3Name)
+		tag, err := Open(mp3Name, defaultOpts)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
 		}
@@ -82,7 +82,7 @@ func BenchmarkParseAndWriteManyFrames(b *testing.B) {
 	// We use b.N+1, because in first iteration we just resetting tag
 	// and setting many frames. Also timer will be resetted.
 	for n := 0; n < b.N+1; n++ {
-		tag, err := Open(mp3Name)
+		tag, err := Open(mp3Name, defaultOpts)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
 		}

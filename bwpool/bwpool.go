@@ -17,12 +17,14 @@ var bwPool = sync.Pool{
 	New: func() interface{} { return bufio.NewWriter(nil) },
 }
 
+// Get returns *bufio.Writer with specified w.
 func Get(w io.Writer) *bufio.Writer {
 	bw := bwPool.Get().(*bufio.Writer)
 	bw.Reset(w)
 	return bw
 }
 
+// Put puts bw back to pool.
 func Put(bw *bufio.Writer) {
 	bwPool.Put(bw)
 }

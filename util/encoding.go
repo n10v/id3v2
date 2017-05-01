@@ -8,7 +8,8 @@ package util
 //
 // If you are user of id3v2 library, all list of allowed encodings you can find
 // in documentation in variables.
-// You can set by yourself encoding to frames:
+// You can set encoding by yourself like this:
+//
 //	comment := id3v2.CommentFrame{
 //		Encoding:    id3v2.ENISO,
 //		Language:    "eng",

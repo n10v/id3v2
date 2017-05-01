@@ -13,7 +13,7 @@ import (
 	"github.com/bogem/id3v2/util"
 )
 
-// Tag stores all frames of opened file.
+// Tag stores all information about opened tag.
 type Tag struct {
 	frames    map[string]Framer
 	sequences map[string]*sequence
@@ -23,8 +23,8 @@ type Tag struct {
 	version      byte
 }
 
-// AddFrame adds f to tag with appropriate id. If id is "" or f is nil,
-// AddFrame will not add f to tag.
+// AddFrame adds f to t with appropriate id. If id is "" or f is nil,
+// AddFrame will not add it to t.
 //
 // If you want to add attached picture, comment or unsynchronised lyrics/text
 // transcription frames, better use AddAttachedPicture, AddCommentFrame
@@ -110,12 +110,22 @@ func (t *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 // CommonID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
 // from given description.
 // For example, CommonID("Language") will return "TLAN".
-// All descriptions you can find in file common_ids.go or in id3 documentation (for fourth version: http://id3.org/id3v2.4.0-frames; for third version: http://id3.org/id3v2.3.0#Declared_ID3v2_frames).
-func (t Tag) CommonID(description string) string {
+// If it can't find the ID with given description, it returns the description.
+//
+// All descriptions you can find in file common_ids.go
+// or in id3 documentation (for fourth version: http://id3.org/id3v2.4.0-frames;
+// for third version: http://id3.org/id3v2.3.0#Declared_ID3v2_frames).
+func (t *Tag) CommonID(description string) string {
+	var ids map[string]string
 	if t.version == 3 {
-		return V23CommonIDs[description]
+		ids = V23CommonIDs
+	} else {
+		ids = V24CommonIDs
 	}
-	return V24CommonIDs[description]
+	if id, ok := ids[description]; ok {
+		return id
+	}
+	return description
 }
 
 // AllFrames returns map, that contains all frames in tag, that could be parsed.
@@ -133,13 +143,13 @@ func (t *Tag) AllFrames() map[string][]Framer {
 	return frames
 }
 
-// DeleteAllFrames deletes all frames in tag.
+// DeleteAllFrames deletes all frames in t.
 func (t *Tag) DeleteAllFrames() {
 	t.frames = make(map[string]Framer)
 	t.sequences = make(map[string]*sequence)
 }
 
-// DeleteFrames deletes frames in tag with given id.
+// DeleteFrames deletes frames in t with given id.
 func (t *Tag) DeleteFrames(id string) {
 	delete(t.frames, id)
 	delete(t.sequences, id)
@@ -149,6 +159,7 @@ func (t *Tag) DeleteFrames(id string) {
 // It returns nil if there is no frames with given id.
 //
 // Example of usage:
+//
 //	pictures := tag.GetFrames(tag.CommonID("Attached picture"))
 //	if pictures != nil {
 //		for _, f := range pictures {
@@ -157,8 +168,9 @@ func (t *Tag) DeleteFrames(id string) {
 //				log.Fatal("Couldn't assert picture frame")
 //			}
 //
-//			// Do some operations with picture frame:
-//			fmt.Println(pic.Description) // For example, print description of picture frame
+//			// Do something with picture frame.
+//			// For example, print description of picture frame:
+//			fmt.Println(pic.Description)
 //		}
 //	}
 func (t *Tag) GetFrames(id string) []Framer {
@@ -198,7 +210,7 @@ func (t *Tag) GetLastFrame(id string) Framer {
 }
 
 // GetTextFrame returns text frame with corresponding id.
-func (t Tag) GetTextFrame(id string) TextFrame {
+func (t *Tag) GetTextFrame(id string) TextFrame {
 	f := t.GetLastFrame(id)
 	if f == nil {
 		return TextFrame{}
@@ -207,8 +219,8 @@ func (t Tag) GetTextFrame(id string) TextFrame {
 	return tf
 }
 
-// Count returns the number of frames in tag.
-func (t Tag) Count() int {
+// Count returns the number of frames in t.
+func (t *Tag) Count() int {
 	n := len(t.frames)
 	for _, s := range t.sequences {
 		n += s.Count()
@@ -216,13 +228,13 @@ func (t Tag) Count() int {
 	return n
 }
 
-// HasAnyFrames checks if there is at least one frame in tag.
+// HasFrames checks if there is at least one frame in tag.
 // It's much faster than tag.Count() > 0.
-func (t Tag) HasAnyFrames() bool {
+func (t *Tag) HasFrames() bool {
 	return len(t.frames) > 0 || len(t.sequences) > 0
 }
 
-func (t Tag) Title() string {
+func (t *Tag) Title() string {
 	f := t.GetTextFrame(t.CommonID("Title/Songname/Content description"))
 	return f.Text
 }
@@ -231,7 +243,7 @@ func (t *Tag) SetTitle(title string) {
 	t.AddFrame(t.CommonID("Title/Songname/Content description"), TextFrame{Encoding: ENUTF8, Text: title})
 }
 
-func (t Tag) Artist() string {
+func (t *Tag) Artist() string {
 	f := t.GetTextFrame(t.CommonID("Lead artist/Lead performer/Soloist/Performing group"))
 	return f.Text
 }
@@ -240,7 +252,7 @@ func (t *Tag) SetArtist(artist string) {
 	t.AddFrame(t.CommonID("Lead artist/Lead performer/Soloist/Performing group"), TextFrame{Encoding: ENUTF8, Text: artist})
 }
 
-func (t Tag) Album() string {
+func (t *Tag) Album() string {
 	f := t.GetTextFrame(t.CommonID("Album/Movie/Show title"))
 	return f.Text
 }
@@ -249,7 +261,7 @@ func (t *Tag) SetAlbum(album string) {
 	t.AddFrame(t.CommonID("Album/Movie/Show title"), TextFrame{Encoding: ENUTF8, Text: album})
 }
 
-func (t Tag) Year() string {
+func (t *Tag) Year() string {
 	f := t.GetTextFrame(t.CommonID("Year"))
 	return f.Text
 }
@@ -258,7 +270,7 @@ func (t *Tag) SetYear(year string) {
 	t.AddFrame(t.CommonID("Year"), TextFrame{Encoding: ENUTF8, Text: year})
 }
 
-func (t Tag) Genre() string {
+func (t *Tag) Genre() string {
 	f := t.GetTextFrame(t.CommonID("Content type"))
 	return f.Text
 }
@@ -270,7 +282,7 @@ func (t *Tag) SetGenre(genre string) {
 // iterateOverAllFrames iterates over every single frame in tag and call
 // f for them. It consumps no memory at all, unlike the tag.AllFrames().
 // It returns error only if f returns error.
-func (t Tag) iterateOverAllFrames(f func(id string, frame Framer) error) error {
+func (t *Tag) iterateOverAllFrames(f func(id string, frame Framer) error) error {
 	for id, frame := range t.frames {
 		if err := f(id, frame); err != nil {
 			return err
@@ -286,9 +298,9 @@ func (t Tag) iterateOverAllFrames(f func(id string, frame Framer) error) error {
 	return nil
 }
 
-// Size returns the size of all ID3 tag in bytes.
-func (t Tag) Size() int {
-	if !t.HasAnyFrames() {
+// Size returns the size of all frames in bytes.
+func (t *Tag) Size() int {
+	if !t.HasFrames() {
 		return 0
 	}
 
@@ -303,11 +315,11 @@ func (t Tag) Size() int {
 }
 
 // Version returns current ID3v2 version of tag.
-func (t Tag) Version() byte {
+func (t *Tag) Version() byte {
 	return t.version
 }
 
-// SetVersion sets given ID3v2 version to tag.
+// SetVersion sets given ID3v2 version to t.
 // If version is less than 3 or more than 4, then this method will do nothing.
 // If tag has some frames, which are deprecated or changed in given version,
 // then to your notice you can delete, change or just stay them.
@@ -318,58 +330,58 @@ func (t *Tag) SetVersion(version byte) {
 	t.version = version
 }
 
-// Save writes tag to the file. If there are no frames in tag, Save will write
+// Save writes t to the file. If there are no frames in tag, Save will write
 // only music part without any ID3v2 information.
 func (t *Tag) Save() error {
-	// Get original file mode
+	// Get original file mode.
 	originalFile := t.file
 	originalStat, err := originalFile.Stat()
 	if err != nil {
 		return err
 	}
 
-	// Create a temp file for mp3 file, which will contain new tag
+	// Create a temp file for mp3 file, which will contain new tag.
 	name := t.file.Name() + "-id3v2"
 	newFile, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE, originalStat.Mode())
 	if err != nil {
 		return err
 	}
 
-	// Make sure we clean up the temp file if it's still around
+	// Make sure we clean up the temp file if it's still around.
 	defer os.Remove(newFile.Name())
 
-	// Write tag in new file
+	// Write tag in new file.
 	tagSize, err := t.WriteTo(newFile)
 	if err != nil {
 		return err
 	}
 
-	// Seek to a music part of original file
+	// Seek to a music part of original file.
 	if _, err = originalFile.Seek(t.originalSize, os.SEEK_SET); err != nil {
 		return err
 	}
 
-	// Write to new file the music part
+	// Write to new file the music part.
 	if _, err = io.Copy(newFile, originalFile); err != nil {
 		return err
 	}
 
-	// Close files to allow replacing
+	// Close files to allow replacing.
 	newFile.Close()
 	originalFile.Close()
 
-	// Replace original file with new file
+	// Replace original file with new file.
 	if err = os.Rename(newFile.Name(), originalFile.Name()); err != nil {
 		return err
 	}
 
-	// Set t.file to new file with original name
+	// Set t.file to new file with original name.
 	t.file, err = os.Open(originalFile.Name())
 	if err != nil {
 		return err
 	}
 
-	// Set t.originalSize to new frames size
+	// Set t.originalSize to new frames size.
 	if tagSize > tagHeaderSize {
 		t.originalSize = tagSize - tagHeaderSize
 	} else {
@@ -382,7 +394,7 @@ func (t *Tag) Save() error {
 // WriteTo writes whole tag in w if there is at least one frame.
 // It returns the number of bytes written and error during the write.
 // It returns nil as error if the write was successful.
-func (t Tag) WriteTo(w io.Writer) (n int64, err error) {
+func (t *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	// Form size of frames
 	framesSize := t.Size() - tagHeaderSize
 	if framesSize <= 0 {
@@ -397,13 +409,13 @@ func (t Tag) WriteTo(w io.Writer) (n int64, err error) {
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
 
-	// Write tag header
+	// Write tag header.
 	if err := writeTagHeader(bw, byteFramesSize, t.version); err != nil {
 		return n, err
 	}
 	n += tagHeaderSize
 
-	// Write frames
+	// Write frames.
 	err = t.iterateOverAllFrames(func(id string, f Framer) error {
 		nn, err := writeFrame(bw, id, f)
 		n += nn
@@ -448,7 +460,7 @@ func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
 	return nil
 }
 
-// Close closes the tag's file, rendering it unusable for I/O.
+// Close closes t's file, rendering it unusable for I/O.
 // It returns an error, if any.
 func (t *Tag) Close() error {
 	return t.file.Close()

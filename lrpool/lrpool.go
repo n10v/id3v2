@@ -1,4 +1,4 @@
-// Copyright 2016 Albert Nigmatzianov. All rights reserved.
+// Copyright 2017 Albert Nigmatzianov. All rights reserved.
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
@@ -16,11 +16,15 @@ var lrPool = sync.Pool{
 	New: func() interface{} { return new(io.LimitedReader) },
 }
 
-func Get() *io.LimitedReader {
+// Get returns *io.LimitedReader with specified rd and n from pool.
+func Get(rd io.Reader, n int64) *io.LimitedReader {
 	r := lrPool.Get().(*io.LimitedReader)
+	r.R = rd
+	r.N = n
 	return r
 }
 
+// Put puts r back to pool.
 func Put(r *io.LimitedReader) {
 	r.N = 0
 	r.R = nil

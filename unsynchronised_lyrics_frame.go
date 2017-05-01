@@ -17,6 +17,32 @@ import (
 // The information about how to add unsynchronised lyrics/text frame to tag
 // you can see in the docs to tag.AddUnsynchronisedLyricsFrame function.
 //
+// Example of reading USLT frames:
+//
+//	uslfs := tag.GetFrames(tag.CommonID("Unsynchronised lyrics/text transcription"))
+//	if uslfs != nil {
+//		for _, f := range uslfs {
+//			uslf, ok := f.(id3v2.UnsynchronisedLyricsFrame)
+//			if !ok {
+//				log.Fatal("Couldn't assert USLT frame")
+//			}
+//
+//			// Do something with USLT frame.
+//			// For example, print the lyrics:
+//			fmt.Println(uslf.Lyrics)
+//		}
+//	}
+//
+// Example of adding USLT frames to tag:
+//
+//	uslt := id3v2.UnsynchronisedLyricsFrame{
+//		Encoding:          id3v2.ENUTF8,
+//		Language:          "ger",
+//		ContentDescriptor: "Deutsche Nationalhymne",
+//		Lyrics:            "Einigkeit und Recht und Freiheit...",
+//	}
+//	tag.AddUnsynchronisedLyricsFrame(uslt)
+//
 // You must choose a three-letter language code from
 // ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
 type UnsynchronisedLyricsFrame struct {

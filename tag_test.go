@@ -69,6 +69,11 @@ var (
 	unknownFrame   = UnknownFrame{
 		body: []byte("https://soundcloud.com/suicidepart2"),
 	}
+
+	// Parse all frames
+	defaultOpts = Options{
+		Parse: true,
+	}
 )
 
 func init() {
@@ -90,7 +95,7 @@ func init() {
 
 // resetMP3Tag sets the default frames to mp3Name.
 func resetMP3Tag() error {
-	tag, err := Open(mp3Name)
+	tag, err := Open(mp3Name, defaultOpts)
 	if tag == nil || err != nil {
 		return err
 	}
@@ -128,7 +133,7 @@ func resetMP3Tag() error {
 }
 
 func TestCountLenSize(t *testing.T) {
-	tag, err := Open(mp3Name)
+	tag, err := Open(mp3Name, defaultOpts)
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -266,7 +271,7 @@ func TestCheckPermissions(t *testing.T) {
 	originalMode := originalStat.Mode()
 	originalFile.Close()
 
-	tag, err := Open(mp3Name)
+	tag, err := Open(mp3Name, defaultOpts)
 	if err != nil {
 		t.Fatal("Error while parsing a tag:", err)
 	}
@@ -296,7 +301,7 @@ func TestCheckPermissions(t *testing.T) {
 // if no tag is written by tag.Size (tag.WriteTo must not write tag to file
 // if there are 0 frames).
 func TestBlankID(t *testing.T) {
-	tag, err := Open(mp3Name)
+	tag, err := Open(mp3Name, defaultOpts)
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -308,8 +313,8 @@ func TestBlankID(t *testing.T) {
 		t.Error("There should be no frames in tag, but there are", tag.Count())
 	}
 
-	if tag.HasAnyFrames() {
-		t.Error("tag.HasAnyFrames should return false, but it returns true")
+	if tag.HasFrames() {
+		t.Error("tag.HasFrames should return false, but it returns true")
 	}
 
 	if tag.Size() != 0 {
@@ -326,7 +331,7 @@ func TestBlankID(t *testing.T) {
 	}
 
 	// Parse tag. It should be no frames
-	parsedTag, err := Open(mp3Name)
+	parsedTag, err := Open(mp3Name, defaultOpts)
 	if parsedTag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -335,8 +340,8 @@ func TestBlankID(t *testing.T) {
 		t.Error("There should be no frames in parsed tag, but there are", tag.Count())
 	}
 
-	if tag.HasAnyFrames() {
-		t.Error("Parsed tag.HasAnyFrames should return false, but it returns true")
+	if tag.HasFrames() {
+		t.Error("Parsed tag.HasFrames should return false, but it returns true")
 	}
 
 	if tag.Size() != 0 {
@@ -348,7 +353,7 @@ func TestBlankID(t *testing.T) {
 // if tag.Save returns the correct error by writing the comment frame with
 // incorrect length of language code.
 func TestInvalidLanguageCommentFrame(t *testing.T) {
-	tag, err := Open(mp3Name)
+	tag, err := Open(mp3Name, defaultOpts)
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -374,7 +379,7 @@ func TestInvalidLanguageCommentFrame(t *testing.T) {
 // if tag.Save returns the correct error by writing the comment frame with
 // incorrect length of language code.
 func TestInvalidLanguageUSLF(t *testing.T) {
-	tag, err := Open(mp3Name)
+	tag, err := Open(mp3Name, defaultOpts)
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}

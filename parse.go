@@ -20,14 +20,13 @@ const frameHeaderSize = 10
 var errBlankFrame = errors.New("id or size of frame are blank")
 
 type frameHeader struct {
-	ID        string
-	FrameSize int64
+	ID       string
+	BodySize int64
 }
 
-func parseTag(file *os.File) (*Tag, error) {
+func parseTag(file *os.File, opts Options) (*Tag, error) {
 	if file == nil {
-		err := errors.New("Invalid file: file is nil")
-		return nil, err
+		return nil, errors.New("file is nil")
 	}
 
 	header, err := parseHeader(file)
@@ -35,8 +34,7 @@ func parseTag(file *os.File) (*Tag, error) {
 		return newTag(file, 0, 4), nil
 	}
 	if err != nil {
-		err = errors.New("trying to parse tag header: " + err.Error())
-		return nil, err
+		return nil, errors.New("error by parsing tag header: " + err.Error())
 	}
 	if header.Version < 3 {
 		err = errors.New(fmt.Sprint("unsupported version of ID3 tag: ", header.Version))
@@ -44,7 +42,9 @@ func parseTag(file *os.File) (*Tag, error) {
 	}
 
 	t := newTag(file, tagHeaderSize+header.FramesSize, header.Version)
-	err = t.parseAllFrames()
+	if opts.Parse {
+		err = t.parseAllFrames(opts)
+	}
 
 	return t, err
 }
@@ -60,80 +60,94 @@ func newTag(file *os.File, originalSize int64, version byte) *Tag {
 	}
 }
 
-func (t *Tag) parseAllFrames() error {
-	// Initial position of read - beginning of first frame
+func (t *Tag) parseAllFrames(opts Options) error {
+	// Initial position of read - beginning of first frame.
 	if _, err := t.file.Seek(tagHeaderSize, os.SEEK_SET); err != nil {
 		return err
 	}
 
+	// Size of frames in tag = size of whole tag - size of tag header.
 	framesSize := t.originalSize - tagHeaderSize
-	fileReader := lrpool.Get()
-	defer lrpool.Put(fileReader)
-	fileReader.R = t.file
-	fileReader.N = framesSize
 
-	for {
-		id, frame, err := parseFrame(fileReader)
+	// Convert descriptions, specified by user in opts.ParseFrames, to IDs.
+	// Use map for speed.
+	parseIDs := make(map[string]bool, len(opts.ParseFrames))
+	for _, description := range opts.ParseFrames {
+		parseIDs[t.CommonID(description)] = true
+	}
+
+	for framesSize > 0 {
+		// Parse frame header.
+		header, err := parseFrameHeader(t.file)
 		if err == io.EOF || err == errBlankFrame || err == util.ErrInvalidSizeFormat {
 			break
 		}
 		if err != nil {
 			return err
 		}
+		id := header.ID
+		bodySize := header.BodySize
 
+		// Substitute the size of the whole frame from framesSize.
+		framesSize -= frameHeaderSize + bodySize
+
+		// If user set opts.ParseFrames, take it into consideration.
+		if len(parseIDs) > 0 {
+			if !parseIDs[id] {
+				_, err = t.file.Seek(bodySize, os.SEEK_CUR)
+				continue
+			}
+		}
+
+		// Limit t.file by header.BodySize.
+		bodyRd := lrpool.Get(t.file, bodySize)
+		defer lrpool.Put(bodyRd)
+
+		// Parse frame body.
+		frame, err := parseFrameBody(id, bodyRd)
+		if err != nil && err != io.EOF {
+			return err
+		}
+
+		// Add frame to tag.
 		t.AddFrame(id, frame)
+
+		if err == io.EOF {
+			break
+		}
 	}
 
 	return nil
 }
 
-func parseFrame(rd io.Reader) (id string, frame Framer, err error) {
-	header, err := parseFrameHeader(rd)
-	if err != nil {
-		return "", nil, err
-	}
-	id = header.ID
-
-	frameRd := lrpool.Get()
-	defer lrpool.Put(frameRd)
-	frameRd.R = rd
-	frameRd.N = header.FrameSize
-
-	frame, err = parseFrameBody(id, frameRd)
-	return id, frame, err
-}
-
 func parseFrameHeader(rd io.Reader) (frameHeader, error) {
 	var header frameHeader
 
-	// Limit the rd by frameHeaderSize, so fhBuf can read only 'frameHeaderSize'
-	// bytes.
-	headerRd := lrpool.Get()
-	defer lrpool.Put(headerRd)
-	headerRd.R = rd
-	headerRd.N = frameHeaderSize
+	// Limit rd by frameHeaderSize.
+	bodyRd := lrpool.Get(rd, frameHeaderSize)
+	defer lrpool.Put(bodyRd)
 
 	fhBuf := bbpool.Get()
 	defer bbpool.Put(fhBuf)
 
-	_, err := fhBuf.ReadFrom(headerRd)
+	_, err := fhBuf.ReadFrom(bodyRd)
 	if err != nil {
 		return header, err
 	}
-	fhBytes := fhBuf.Bytes()
+	data := fhBuf.Bytes()
 
-	id := string(fhBytes[:4])
-	frameSize, err := util.ParseSize(fhBytes[4:8])
+	id := string(data[:4])
+	bodySize, err := util.ParseSize(data[4:8])
 	if err != nil {
 		return header, err
 	}
 
-	if id == "" || frameSize == 0 {
+	if id == "" || bodySize == 0 {
 		return header, errBlankFrame
 	}
 
 	header.ID = id
-	header.FrameSize = frameSize
+	header.BodySize = bodySize
 	return header, nil
 
 }

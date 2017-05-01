@@ -16,21 +16,22 @@
 //	)
 //
 //	func main() {
-//		// Open file and find tag in it
-//		tag, err := id3v2.Open("file.mp3")
+//		// Open file and parse tag in it.
+//		tag, err := id3v2.Open("file.mp3", id3v2.Options{Parse: true})
 //		if err != nil {
 //			log.Fatal("Error while opening mp3 file: ", err)
 //		}
 //		defer tag.Close()
 //
-//		// Read tags
+//		// Read frames.
 //		fmt.Println(tag.Artist())
 //		fmt.Println(tag.Title())
 //
-//		// Set tags
+//		// Set simple text frames.
 //		tag.SetArtist("Artist")
 //		tag.SetTitle("Title")
 //
+//		// Set comment frame.
 //		comment := id3v2.CommentFrame{
 //			Encoding:    id3v2.ENUTF8,
 //			Language:    "eng",
@@ -39,7 +40,7 @@
 //		}
 //		tag.AddCommentFrame(comment)
 //
-//		// Write it to file
+//		// Write tag to "file.mp3".
 //		if err = tag.Save(); err != nil {
 //			log.Fatal("Error while saving a tag: ", err)
 //		}
@@ -106,17 +107,18 @@ var (
 	Encodings = []util.Encoding{ENISO, ENUTF16, ENUTF16BE, ENUTF8}
 )
 
-// Open opens file with name and finds tag in it.
-func Open(name string) (*Tag, error) {
+// Open opens file with name and passes it to OpenFile.
+func Open(name string, opts Options) (*Tag, error) {
 	file, err := os.Open(name)
 	if err != nil {
 		return nil, err
 	}
 
-	return ParseFile(file)
+	return OpenFile(file, opts)
 }
 
-// ParseFile parses opened file and finds tag in it.
-func ParseFile(file *os.File) (*Tag, error) {
-	return parseTag(file)
+// OpenFile parses opened file and finds tag in it considering opts.
+// If there is no tag in file, OpenFile will create new one with version ID3v2.4.
+func OpenFile(file *os.File, opts Options) (*Tag, error) {
+	return parseTag(file, opts)
 }

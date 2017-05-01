@@ -15,7 +15,12 @@ import (
 // TextFrame is used to work with all text frames
 // (all T*** frames like TIT2 (title), TALB (album) and so on).
 //
-// Example of setting a new text frame to existing tag:
+// Example of reading text frames:
+//
+//	t := tag.GetTextFrame(tag.CommonID("Mood"))
+//	fmt.Println(t.Text)
+//
+// Example of adding text frames to tag:
 //
 //	textFrame := id3v2.TextFrame{
 //		Encoding: id3v2.ENUTF8,

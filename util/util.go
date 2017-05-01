@@ -20,7 +20,7 @@ var (
 
 // FormSize transforms int to byte slice with ID3v2 size (4 * 0b0xxxxxxx).
 //
-// If size more than allowed (256MB), then method returns ErrSizeOverflow.
+// If size more than allowed (256MB), then it returns ErrSizeOverflow.
 func FormSize(n int) ([]byte, error) {
 	maxN := 268435455 // 0b11111... (28 digits)
 	if n > maxN {
@@ -38,10 +38,10 @@ func FormSize(n int) ([]byte, error) {
 }
 
 // ParseSize parses byte slice with ID3v2 size (4 * 0b0xxxxxxx) and returns
-// int64.
+// parsed int64 number.
 //
 // If length of slice is more than 4 or if there is invalid size format (e.g.
-// one byte in slice is like 0b1xxxxxxx), then method returns ErrInvalidSizeFormat.
+// one byte in slice is like 0b1xxxxxxx), then it returns ErrInvalidSizeFormat.
 func ParseSize(data []byte) (int64, error) {
 	if len(data) > bytesPerInt {
 		return 0, ErrInvalidSizeFormat

@@ -28,7 +28,7 @@ It can't:
 * Do unsyncronization
 * Work with extended header, flags, padding, footer
 
-*id3v2 is still in beta. Until version 1.0 the API may be changed.*
+**id3v2 is still in beta. Until version 1.0 the API may be changed.**
 
 If you have **issues with encoding** or you don't know, how to **set
 encoding to frame**, please write new issue!
@@ -53,21 +53,23 @@ import (
 )
 
 func main() {
-	// Open file and find tag in it
-	tag, err := id3v2.Open("file.mp3")
+	// Open file and parse tag in it.
+	tag, err := id3v2.Open("file.mp3", id3v2.Options{Parse: true})
 	if err != nil {
  		log.Fatal("Error while opening mp3 file: ", err)
  	}
 	defer tag.Close()
 
-	// Read tags
+	// Read frames.
 	fmt.Println(tag.Artist())
 	fmt.Println(tag.Title())
 
-  	// Set tags
+  // Set simple text frames.
 	tag.SetArtist("New artist")
 	tag.SetTitle("New title")
 
+
+  // Set comment frame.
 	comment := id3v2.CommentFrame{
 		Encoding:    id3v2.ENUTF8,
 		Language:    "eng",
@@ -76,14 +78,50 @@ func main() {
 	}
 	tag.AddCommentFrame(comment)
 
-	// Write it to file
+	// Write it to "file.mp3".
 	if err = tag.Save(); err != nil {
 		log.Fatal("Error while saving a tag: ", err)
 	}
 }
+```
 
+## Read multiple frames:
+```go
+  pictures := tag.GetFrames(tag.CommonID("Attached picture"))
+  if pictures != nil {
+    for _, f := range pictures {
+      pic, ok := f.(id3v2.PictureFrame)
+      if !ok {
+        log.Fatal("Couldn't assert picture frame")
+      }
+
+      // Do something with picture frame.
+      // For example, print the description:
+      fmt.Println(pic.Description)
+    }
+  }
+```
+
+## Options:
+```go
+// Options influence on processing the tag.
+type Options struct {
+	// Parse defines, if tag will be parsed.
+	Parse bool
+
+	// ParseFrames defines, that frames do you only want to parse. For example,
+	// `ParseFrames: []string{"Artist", "Title"}` will only parse artist
+	// and title frames. You can specify IDs ("TPE1", "TIT2") as well as
+	// descriptions ("Artist", "Title"). If ParseFrame is blank or nil,
+	// id3v2 will parse all frames in tag. It works only if Parse is true.
+	//
+	// It's very useful for performance, so for example
+	// if you want to get only some text frames,
+	// id3v2 will not parse huge picture or unknown frames.
+	ParseFrames []string
+}
 ```
 
 ## Documentation
 
-You can find it here: https://godoc.org/github.com/bogem/id3v2
+https://godoc.org/github.com/bogem/id3v2

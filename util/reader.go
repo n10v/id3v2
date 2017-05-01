@@ -11,11 +11,13 @@ import (
 	"io/ioutil"
 )
 
+// Reader is used for convenient parsing of frames.
 type Reader struct {
 	buf      *bufio.Reader
 	bytesBuf *bytes.Buffer // Need for intermediate calculations
 }
 
+// NewReader returns *Reader with specified rd.
 func NewReader(rd io.Reader) *Reader {
 	return &Reader{buf: bufio.NewReader(rd)}
 }

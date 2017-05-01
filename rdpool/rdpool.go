@@ -17,12 +17,14 @@ var readerPool = sync.Pool{
 	New: func() interface{} { return util.NewReader(nil) },
 }
 
+// Get returns *util.Reader with specified rd.
 func Get(rd io.Reader) *util.Reader {
 	reader := readerPool.Get().(*util.Reader)
 	reader.Reset(rd)
 	return reader
 }
 
-func Put(b *util.Reader) {
-	readerPool.Put(b)
+// Put puts rd back to pool.
+func Put(rd *util.Reader) {
+	readerPool.Put(rd)
 }

@@ -43,7 +43,7 @@ func TestParseInvalidFrameSize(t *testing.T) {
 
 	file.Seek(0, os.SEEK_SET)
 
-	tag, err := ParseFile(file)
+	tag, err := OpenFile(file, defaultOpts)
 	if tag == nil || err != nil {
 		t.Fatal("Error while parsing mp3 file:", err)
 	}
@@ -63,7 +63,7 @@ func TestParse(t *testing.T) {
 		t.Fatal("Error while reseting mp3 file:", err)
 	}
 
-	tag, err := Open(mp3Name)
+	tag, err := Open(mp3Name, defaultOpts)
 	if tag == nil || err != nil {
 		t.Error("Error while opening mp3 file:", err)
 	}
@@ -286,4 +286,34 @@ func compareTwoBytes(actual, expected byte) error {
 		return fmt.Errorf("Expected %v, got %v", expected, actual)
 	}
 	return nil
+}
+
+// TestParseOptionsParseFalse checks,
+// if parseTag will not parse the tag, if Options{Parse: false} is set.
+func TestParseOptionsParseFalse(t *testing.T) {
+	tag, err := Open(mp3Name, Options{Parse: false})
+	if tag == nil || err != nil {
+		t.Fatal("Error while opening mp3 file:", err)
+	}
+	if tag.HasFrames() {
+		t.Errorf("tag has %v frames, but should have no frames at all", tag.Count())
+	}
+}
+
+// TestParseOptionsParseFrames checks,
+// if tag.parseAllFrames will parse only frames, that set in Options.ParseFrames.
+func TestParseOptionsParseFrames(t *testing.T) {
+	tag, err := Open(mp3Name, Options{Parse: true, ParseFrames: []string{"Artist", "Title"}})
+	if tag == nil || err != nil {
+		t.Fatal("Error while opening mp3 file:", err)
+	}
+	if tag.Count() > 2 {
+		t.Errorf("tag should have only artist and title frames, but it has %v frames", tag.Count())
+	}
+	if tag.Artist() == "" {
+		t.Errorf("tag should have an artist, but it doesn't")
+	}
+	if tag.Title() == "" {
+		t.Errorf("tag should have a title, but it doesn't")
+	}
 }
