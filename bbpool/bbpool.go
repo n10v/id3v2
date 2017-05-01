@@ -12,16 +12,18 @@ import (
 	"sync"
 )
 
-var bytesBufferPool = sync.Pool{
+var bbPool = sync.Pool{
 	New: func() interface{} { return new(bytes.Buffer) },
 }
 
+// Get returns *bytes.Buffer from pool.
 func Get() *bytes.Buffer {
-	b := bytesBufferPool.Get().(*bytes.Buffer)
+	b := bbPool.Get().(*bytes.Buffer)
 	return b
 }
 
+// Put puts b back to pool.
 func Put(b *bytes.Buffer) {
 	b.Reset()
-	bytesBufferPool.Put(b)
+	bbPool.Put(b)
 }
