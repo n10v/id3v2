@@ -3,48 +3,6 @@
 // license that can be found in the LICENSE file.
 
 // Package id3v2 is the ID3 parsing and writing library for Go.
-//
-// Example of usage:
-//
-//	package main
-//
-//	import (
-//		"fmt"
-//		"log"
-//
-//		"github.com/bogem/id3v2"
-//	)
-//
-//	func main() {
-//		// Open file and parse tag in it.
-//		tag, err := id3v2.Open("file.mp3", id3v2.Options{Parse: true})
-//		if err != nil {
-//			log.Fatal("Error while opening mp3 file: ", err)
-//		}
-//		defer tag.Close()
-//
-//		// Read frames.
-//		fmt.Println(tag.Artist())
-//		fmt.Println(tag.Title())
-//
-//		// Set simple text frames.
-//		tag.SetArtist("Artist")
-//		tag.SetTitle("Title")
-//
-//		// Set comment frame.
-//		comment := id3v2.CommentFrame{
-//			Encoding:    id3v2.ENUTF8,
-//			Language:    "eng",
-//			Description: "My opinion",
-//			Text:        "Very good song",
-//		}
-//		tag.AddCommentFrame(comment)
-//
-//		// Write tag to file.
-//		if err = tag.Save(); err != nil {
-//			log.Fatal("Error while saving a tag: ", err)
-//		}
-//	}
 package id3v2
 
 import (
