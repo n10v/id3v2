@@ -41,7 +41,7 @@ or you have some **questions**, just write an issue.
 ## Installation
   	$ go get -u github.com/bogem/id3v2
 
-## Example of Usage:
+## Example of Usage
 ```go
 package main
 
@@ -85,7 +85,7 @@ func main() {
 }
 ```
 
-## Read multiple frames:
+## Read multiple frames
 ```go
 pictures := tag.GetFrames(tag.CommonID("Attached picture"))
 if pictures != nil {
@@ -102,7 +102,7 @@ if pictures != nil {
 }
 ```
 
-## Options:
+## Options
 ```go
 // Options influence on processing the tag.
 type Options struct {
