@@ -41,7 +41,7 @@ or you have some **questions**, just write an issue.
 ## Installation
   	$ go get -u github.com/bogem/id3v2
 
-## Example of Usage
+## Example of usage
 ```go
 package main
 
