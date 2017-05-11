@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 
 	"github.com/bogem/id3v2/bbpool"
@@ -24,14 +25,14 @@ type frameHeader struct {
 	BodySize int64
 }
 
-func parseTag(file *os.File, opts Options) (*Tag, error) {
-	if file == nil {
-		return nil, errors.New("file is nil")
+func parseTag(reader io.Reader, opts Options) (*Tag, error) {
+	if reader == nil {
+		return nil, errors.New("reader is nil")
 	}
 
-	header, err := parseHeader(file)
+	header, err := parseHeader(reader)
 	if err == errNoTag {
-		return newTag(file, 0, 4), nil
+		return newTag(reader, 0, 4), nil
 	}
 	if err != nil {
 		return nil, errors.New("error by parsing tag header: " + err.Error())
@@ -41,7 +42,7 @@ func parseTag(file *os.File, opts Options) (*Tag, error) {
 		return nil, err
 	}
 
-	t := newTag(file, tagHeaderSize+header.FramesSize, header.Version)
+	t := newTag(reader, tagHeaderSize+header.FramesSize, header.Version)
 	if opts.Parse {
 		err = t.parseAllFrames(opts)
 	}
@@ -49,23 +50,24 @@ func parseTag(file *os.File, opts Options) (*Tag, error) {
 	return t, err
 }
 
-func newTag(file *os.File, originalSize int64, version byte) *Tag {
-	return &Tag{
+func newTag(reader io.Reader, originalSize int64, version byte) *Tag {
+	tag := &Tag{
 		frames:    make(map[string]Framer),
 		sequences: make(map[string]*sequence),
 
-		file:         file,
+		reader:       reader,
 		originalSize: originalSize,
 		version:      version,
 	}
+
+	if file, ok := reader.(*os.File); ok {
+		tag.file = file
+	}
+
+	return tag
 }
 
 func (t *Tag) parseAllFrames(opts Options) error {
-	// Initial position of read - beginning of first frame.
-	if _, err := t.file.Seek(tagHeaderSize, os.SEEK_SET); err != nil {
-		return err
-	}
-
 	// Size of frames in tag = size of whole tag - size of tag header.
 	framesSize := t.originalSize - tagHeaderSize
 
@@ -78,7 +80,7 @@ func (t *Tag) parseAllFrames(opts Options) error {
 
 	for framesSize > 0 {
 		// Parse frame header.
-		header, err := parseFrameHeader(t.file)
+		header, err := parseFrameHeader(t.reader)
 		if err == io.EOF || err == errBlankFrame || err == util.ErrInvalidSizeFormat {
 			break
 		}
@@ -94,13 +96,13 @@ func (t *Tag) parseAllFrames(opts Options) error {
 		// If user set opts.ParseFrames, take it into consideration.
 		if len(parseIDs) > 0 {
 			if !parseIDs[id] {
-				_, err = t.file.Seek(bodySize, os.SEEK_CUR)
+				_, err = io.CopyN(ioutil.Discard, t.reader, bodySize)
 				continue
 			}
 		}
 
 		// Limit t.file by header.BodySize.
-		bodyRd := lrpool.Get(t.file, bodySize)
+		bodyRd := lrpool.Get(t.reader, bodySize)
 		defer lrpool.Put(bodyRd)
 
 		// Parse frame body.
