@@ -22,7 +22,6 @@ type Tag struct {
 	sequences map[string]*sequence
 
 	reader io.Reader
-	file   *os.File
 
 	originalSize int64
 	version      byte
@@ -265,22 +264,25 @@ func (t *Tag) SetVersion(version byte) {
 	t.version = version
 }
 
-// Save writes t to the file. If there are no frames in tag, Save will write
+// Save writes tag to the file, if tag was opened with a file.
+// If there are no frames in tag, Save will write
 // only music part without any ID3v2 information.
+// If tag was initiliazed not with file, it returns ErrNoFile.
 func (t *Tag) Save() error {
-	if t.file == nil {
+	file, ok := t.reader.(*os.File)
+	if !ok {
 		return ErrNoFile
 	}
 
 	// Get original file mode.
-	originalFile := t.file
+	originalFile := file
 	originalStat, err := originalFile.Stat()
 	if err != nil {
 		return err
 	}
 
 	// Create a temp file for mp3 file, which will contain new tag.
-	name := t.file.Name() + "-id3v2"
+	name := file.Name() + "-id3v2"
 	newFile, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE, originalStat.Mode())
 	if err != nil {
 		return err
@@ -314,8 +316,8 @@ func (t *Tag) Save() error {
 		return err
 	}
 
-	// Set t.file to new file with original name.
-	t.file, err = os.Open(originalFile.Name())
+	// Set t.reader to new file with original name.
+	t.reader, err = os.Open(originalFile.Name())
 	if err != nil {
 		return err
 	}
@@ -399,12 +401,12 @@ func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
 	return nil
 }
 
-// Close closes t's file, rendering it unusable for I/O.
-// It returns an error, if any.
+// Close closes t's file, if tag was opened with a file.
+// If tag was initiliazed not with file, it returns ErrNoFile.
 func (t *Tag) Close() error {
-	if t.file == nil {
+	file, ok := t.reader.(*os.File)
+	if !ok {
 		return ErrNoFile
 	}
-
-	return t.file.Close()
+	return file.Close()
 }

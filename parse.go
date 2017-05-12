@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
 
 	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/lrpool"
@@ -50,18 +49,14 @@ func parseTag(rd io.Reader, opts Options) (*Tag, error) {
 	return t, err
 }
 
-func newTag(reader io.Reader, originalSize int64, version byte) *Tag {
+func newTag(rd io.Reader, originalSize int64, version byte) *Tag {
 	tag := &Tag{
 		frames:    make(map[string]Framer),
 		sequences: make(map[string]*sequence),
 
-		reader:       reader,
+		reader:       rd,
 		originalSize: originalSize,
 		version:      version,
-	}
-
-	if file, ok := reader.(*os.File); ok {
-		tag.file = file
 	}
 
 	return tag
