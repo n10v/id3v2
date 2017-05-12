@@ -6,6 +6,7 @@ package id3v2
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -13,6 +14,8 @@ import (
 	"github.com/bogem/id3v2/bwpool"
 	"github.com/bogem/id3v2/util"
 )
+
+var ErrNoFile = errors.New("tag was not initialized with file")
 
 // Tag stores all information about opened tag.
 type Tag struct {
@@ -267,7 +270,7 @@ func (t *Tag) SetVersion(version byte) {
 // only music part without any ID3v2 information.
 func (t *Tag) Save() error {
 	if t.file == nil {
-		return fmt.Errorf("Parser not inited with file, it's just a stream")
+		return ErrNoFile
 	}
 
 	// Get original file mode.
@@ -401,7 +404,7 @@ func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
 // It returns an error, if any.
 func (t *Tag) Close() error {
 	if t.file == nil {
-		return fmt.Errorf("Parser not inited with file, it's just a stream")
+		return ErrNoFile
 	}
 
 	return t.file.Close()

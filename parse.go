@@ -25,14 +25,14 @@ type frameHeader struct {
 	BodySize int64
 }
 
-func parseTag(reader io.Reader, opts Options) (*Tag, error) {
-	if reader == nil {
+func parseTag(rd io.Reader, opts Options) (*Tag, error) {
+	if rd == nil {
 		return nil, errors.New("reader is nil")
 	}
 
-	header, err := parseHeader(reader)
+	header, err := parseHeader(rd)
 	if err == errNoTag {
-		return newTag(reader, 0, 4), nil
+		return newTag(rd, 0, 4), nil
 	}
 	if err != nil {
 		return nil, errors.New("error by parsing tag header: " + err.Error())
@@ -42,7 +42,7 @@ func parseTag(reader io.Reader, opts Options) (*Tag, error) {
 		return nil, err
 	}
 
-	t := newTag(reader, tagHeaderSize+header.FramesSize, header.Version)
+	t := newTag(rd, tagHeaderSize+header.FramesSize, header.Version)
 	if opts.Parse {
 		err = t.parseAllFrames(opts)
 	}

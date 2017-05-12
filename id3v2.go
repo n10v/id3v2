@@ -82,9 +82,7 @@ func OpenFile(file *os.File, opts Options) (*Tag, error) {
 	return parseTag(file, opts)
 }
 
-// OpenStream parses opened stream and finds tag in it considering opts.
-// If there is no tag in stream, OpenStream will create new one with version ID3v2.4.
-// you can use WriteTo to get the metadata
-func OpenStream(stream io.Reader, opts Options) (*Tag, error) {
+// ParseReader parses opened stream and finds tag in it considering opts.
+func ParseReader(stream io.Reader, opts Options) (*Tag, error) {
 	return parseTag(stream, opts)
 }
