@@ -43,7 +43,7 @@ func TestParseInvalidFrameSize(t *testing.T) {
 
 	file.Seek(0, os.SEEK_SET)
 
-	tag, err := OpenFile(file, defaultOpts)
+	tag, err := ParseReader(file, defaultOpts)
 	if tag == nil || err != nil {
 		t.Fatal("Error while parsing mp3 file:", err)
 	}

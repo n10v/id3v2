@@ -67,22 +67,17 @@ var (
 )
 
 // Open opens file with name and passes it to OpenFile.
+// If there is no tag in file, it will create new one with version ID3v2.4.
 func Open(name string, opts Options) (*Tag, error) {
 	file, err := os.Open(name)
 	if err != nil {
 		return nil, err
 	}
-
-	return OpenFile(file, opts)
+	return ParseReader(file, opts)
 }
 
-// OpenFile parses opened file and finds tag in it considering opts.
-// If there is no tag in file, OpenFile will create new one with version ID3v2.4.
-func OpenFile(file *os.File, opts Options) (*Tag, error) {
-	return parseTag(file, opts)
-}
-
-// ParseReader parses opened stream and finds tag in it considering opts.
-func ParseReader(stream io.Reader, opts Options) (*Tag, error) {
-	return parseTag(stream, opts)
+// ParseReader parses rd and finds tag in it considering opts.
+// If there is no tag in rd, it will create new one with version ID3v2.4.
+func ParseReader(rd io.Reader, opts Options) (*Tag, error) {
+	return parseTag(rd, opts)
 }
