@@ -88,17 +88,17 @@ func (t *Tag) parseAllFrames(opts Options) error {
 		// Substitute the size of the whole frame from framesSize.
 		framesSize -= frameHeaderSize + bodySize
 
+		// Limit t.reader by header.BodySize.
+		bodyRd := lrpool.Get(t.reader, bodySize)
+		defer lrpool.Put(bodyRd)
+
 		// If user set opts.ParseFrames, take it into consideration.
 		if len(parseIDs) > 0 {
 			if !parseIDs[id] {
-				_, err = io.CopyN(ioutil.Discard, t.reader, bodySize)
+				_, err = io.Copy(ioutil.Discard, bodyRd)
 				continue
 			}
 		}
-
-		// Limit t.file by header.BodySize.
-		bodyRd := lrpool.Get(t.reader, bodySize)
-		defer lrpool.Put(bodyRd)
 
 		// Parse frame body.
 		frame, err := parseFrameBody(id, bodyRd)
