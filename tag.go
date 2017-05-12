@@ -7,7 +7,6 @@ package id3v2
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 
