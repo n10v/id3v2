@@ -22,7 +22,7 @@ It can:
 comments and attached pictures
 * Set several USLTs, comments and attached pictures
 * Work with all available encodings
-* Read tags in multiple goroutines
+* Be used in multiple goroutines
 
 It can't:
 * Do unsyncronization
