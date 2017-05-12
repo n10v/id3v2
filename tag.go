@@ -6,6 +6,7 @@ package id3v2
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"os"
 
@@ -13,12 +14,16 @@ import (
 	"github.com/bogem/id3v2/util"
 )
 
+var ErrNoFile = errors.New("tag was not initialized with file")
+
 // Tag stores all information about opened tag.
 type Tag struct {
 	frames    map[string]Framer
 	sequences map[string]*sequence
 
-	file         *os.File
+	reader io.Reader
+	file   *os.File
+
 	originalSize int64
 	version      byte
 }
@@ -263,6 +268,10 @@ func (t *Tag) SetVersion(version byte) {
 // Save writes t to the file. If there are no frames in tag, Save will write
 // only music part without any ID3v2 information.
 func (t *Tag) Save() error {
+	if t.file == nil {
+		return ErrNoFile
+	}
+
 	// Get original file mode.
 	originalFile := t.file
 	originalStat, err := originalFile.Stat()
@@ -393,5 +402,9 @@ func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
 // Close closes t's file, rendering it unusable for I/O.
 // It returns an error, if any.
 func (t *Tag) Close() error {
+	if t.file == nil {
+		return ErrNoFile
+	}
+
 	return t.file.Close()
 }

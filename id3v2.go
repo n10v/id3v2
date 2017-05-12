@@ -6,6 +6,7 @@
 package id3v2
 
 import (
+	"io"
 	"os"
 
 	"github.com/bogem/id3v2/util"
@@ -79,4 +80,9 @@ func Open(name string, opts Options) (*Tag, error) {
 // If there is no tag in file, OpenFile will create new one with version ID3v2.4.
 func OpenFile(file *os.File, opts Options) (*Tag, error) {
 	return parseTag(file, opts)
+}
+
+// ParseReader parses opened stream and finds tag in it considering opts.
+func ParseReader(stream io.Reader, opts Options) (*Tag, error) {
+	return parseTag(stream, opts)
 }
