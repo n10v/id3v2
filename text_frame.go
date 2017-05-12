@@ -17,8 +17,8 @@ import (
 //
 // Example of reading text frames:
 //
-//	t := tag.GetTextFrame(tag.CommonID("Mood"))
-//	fmt.Println(t.Text)
+//	tf := tag.GetTextFrame(tag.CommonID("Mood"))
+//	fmt.Println(tf.Text)
 //
 // Example of adding text frames to tag:
 //

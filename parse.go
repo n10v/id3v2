@@ -41,12 +41,12 @@ func parseTag(rd io.Reader, opts Options) (*Tag, error) {
 		return nil, err
 	}
 
-	t := newTag(rd, tagHeaderSize+header.FramesSize, header.Version)
+	tag := newTag(rd, tagHeaderSize+header.FramesSize, header.Version)
 	if opts.Parse {
-		err = t.parseAllFrames(opts)
+		err = tag.parseAllFrames(opts)
 	}
 
-	return t, err
+	return tag, err
 }
 
 func newTag(rd io.Reader, originalSize int64, version byte) *Tag {
@@ -62,20 +62,20 @@ func newTag(rd io.Reader, originalSize int64, version byte) *Tag {
 	return tag
 }
 
-func (t *Tag) parseAllFrames(opts Options) error {
+func (tag *Tag) parseAllFrames(opts Options) error {
 	// Size of frames in tag = size of whole tag - size of tag header.
-	framesSize := t.originalSize - tagHeaderSize
+	framesSize := tag.originalSize - tagHeaderSize
 
 	// Convert descriptions, specified by user in opts.ParseFrames, to IDs.
 	// Use map for speed.
 	parseIDs := make(map[string]bool, len(opts.ParseFrames))
 	for _, description := range opts.ParseFrames {
-		parseIDs[t.CommonID(description)] = true
+		parseIDs[tag.CommonID(description)] = true
 	}
 
 	for framesSize > 0 {
 		// Parse frame header.
-		header, err := parseFrameHeader(t.reader)
+		header, err := parseFrameHeader(tag.reader)
 		if err == io.EOF || err == errBlankFrame || err == util.ErrInvalidSizeFormat {
 			break
 		}
@@ -88,8 +88,8 @@ func (t *Tag) parseAllFrames(opts Options) error {
 		// Substitute the size of the whole frame from framesSize.
 		framesSize -= frameHeaderSize + bodySize
 
-		// Limit t.reader by header.BodySize.
-		bodyRd := lrpool.Get(t.reader, bodySize)
+		// Limit tag.reader by header.BodySize.
+		bodyRd := lrpool.Get(tag.reader, bodySize)
 		defer lrpool.Put(bodyRd)
 
 		// If user set opts.ParseFrames, take it into consideration.
@@ -107,7 +107,7 @@ func (t *Tag) parseAllFrames(opts Options) error {
 		}
 
 		// Add frame to tag.
-		t.AddFrame(id, frame)
+		tag.AddFrame(id, frame)
 
 		if err == io.EOF {
 			break
