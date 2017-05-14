@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -41,7 +42,7 @@ func TestParseInvalidFrameSize(t *testing.T) {
 	// Write invalid frame (size byte can't be more than 127)
 	file.Write([]byte{0x54, 0x49, 0x54, 0x32, 255, 255, 255, 255, 00, 00})
 
-	file.Seek(0, os.SEEK_SET)
+	file.Seek(0, io.SeekStart)
 
 	tag, err := ParseReader(file, defaultOpts)
 	if tag == nil || err != nil {

@@ -66,7 +66,7 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 	if err != nil {
 		return
 	}
-	n += 1
+	n++
 
 	if len(cf.Language) != 3 {
 		return n, errors.New("language code must consist of three letters according to ISO 639-2")

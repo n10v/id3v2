@@ -45,7 +45,7 @@ func (tf TextFrame) WriteTo(w io.Writer) (n int64, err error) {
 	if err != nil {
 		return
 	}
-	n += 1
+	n++
 
 	i, err = bw.WriteString(tf.Text)
 	if err != nil {

@@ -72,7 +72,7 @@ func (pf PictureFrame) WriteTo(w io.Writer) (n int64, err error) {
 	if err != nil {
 		return
 	}
-	n += 1
+	n++
 
 	i, err = bw.WriteString(pf.MimeType)
 	if err != nil {
@@ -84,13 +84,13 @@ func (pf PictureFrame) WriteTo(w io.Writer) (n int64, err error) {
 	if err != nil {
 		return
 	}
-	n += 1
+	n++
 
 	err = bw.WriteByte(pf.PictureType)
 	if err != nil {
 		return
 	}
-	n += 1
+	n++
 
 	i, err = bw.WriteString(pf.Description)
 	if err != nil {

@@ -298,7 +298,7 @@ func (tag *Tag) Save() error {
 	}
 
 	// Seek to a music part of original file.
-	if _, err = originalFile.Seek(tag.originalSize, os.SEEK_SET); err != nil {
+	if _, err = originalFile.Seek(tag.originalSize, io.SeekStart); err != nil {
 		return err
 	}
 
