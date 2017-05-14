@@ -57,9 +57,7 @@ func TestParseInvalidFrameSize(t *testing.T) {
 
 // TestParse compares parsed frames with expected frames.
 func TestParse(t *testing.T) {
-	var err error
-
-	if err = resetMP3Tag(); err != nil {
+	if err := resetMP3Tag(); err != nil {
 		t.Fatal("Error while reseting mp3 file:", err)
 	}
 
@@ -67,6 +65,7 @@ func TestParse(t *testing.T) {
 	if tag == nil || err != nil {
 		t.Error("Error while opening mp3 file:", err)
 	}
+	defer tag.Close()
 
 	if err = compareTwoStrings(tag.Artist(), "Artist"); err != nil {
 		t.Error(err)

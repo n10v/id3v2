@@ -99,6 +99,7 @@ func resetMP3Tag() error {
 	if tag == nil || err != nil {
 		return err
 	}
+	defer tag.Close()
 
 	tag.SetTitle("Title")
 	tag.SetArtist("Artist")
@@ -121,15 +122,7 @@ func resetMP3Tag() error {
 	// Set unknown frame
 	tag.AddFrame(unknownFrameID, unknownFrame)
 
-	if err = tag.Save(); err != nil {
-		return err
-	}
-
-	if err = tag.Close(); err != nil {
-		return err
-	}
-
-	return nil
+	return tag.Save()
 }
 
 func TestCountLenSize(t *testing.T) {
@@ -137,6 +130,7 @@ func TestCountLenSize(t *testing.T) {
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
+	defer tag.Close()
 
 	// Check count
 	if tag.Count() != countOfFrames {
@@ -176,10 +170,6 @@ func TestCountLenSize(t *testing.T) {
 	if tag.Size() != tagSize {
 		t.Errorf("Expected tag.Size(): %v, got: %v", tagSize, tag.Size())
 	}
-
-	if err = tag.Close(); err != nil {
-		t.Error("Error while closing a tag:", err)
-	}
 }
 
 // TestIntegrityOfMusicAtTheBeginning checks
@@ -190,6 +180,7 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 	if err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
+	defer mp3.Close()
 
 	rd := bufio.NewReader(mp3)
 	n, err := rd.Discard(tagSize)
@@ -213,10 +204,6 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 	if !bytes.Equal(expected, got) {
 		t.Fatalf("Expected %v, got %v", expected, got)
 	}
-
-	if err = mp3.Close(); err != nil {
-		t.Error("Error while closing a tag:", err)
-	}
 }
 
 // TestIntegrityOfMusicAtTheEnd checks
@@ -227,6 +214,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 	if err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
+	defer mp3.Close()
 
 	rd := bufio.NewReader(mp3)
 	expected := []byte{85, 85, 85, 85, 85, 85, 85}
@@ -251,10 +239,6 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 	if !bytes.Equal(expected, got) {
 		t.Fatalf("Expected %v, got %v", expected, got)
 	}
-
-	if err = mp3.Close(); err != nil {
-		t.Error("Error while closing a tag:", err)
-	}
 }
 
 // TestCheckPermissions checks
@@ -278,9 +262,7 @@ func TestCheckPermissions(t *testing.T) {
 	if err = tag.Save(); err != nil {
 		t.Error("Error while saving a tag:", err)
 	}
-	if err = tag.Close(); err != nil {
-		t.Error("Error while closing a tag:", err)
-	}
+	tag.Close()
 
 	newFile, err := os.Open(mp3Name)
 	if err != nil {
@@ -305,6 +287,7 @@ func TestBlankID(t *testing.T) {
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
+	defer tag.Close()
 
 	tag.DeleteAllFrames()
 	tag.AddFrame("", unknownFrame)
@@ -326,11 +309,7 @@ func TestBlankID(t *testing.T) {
 		t.Error("Error while saving a tag:", err)
 	}
 
-	if err = tag.Close(); err != nil {
-		t.Error("Error while closing a tag:", err)
-	}
-
-	// Parse tag. It should be no frames
+	// Parse tag. It should have no frames.
 	parsedTag, err := Open(mp3Name, defaultOpts)
 	if parsedTag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
@@ -357,6 +336,7 @@ func TestInvalidLanguageCommentFrame(t *testing.T) {
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
+	defer tag.Close()
 
 	tag.DeleteAllFrames()
 	tag.AddCommentFrame(CommentFrame{
@@ -383,6 +363,7 @@ func TestInvalidLanguageUSLF(t *testing.T) {
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
+	defer tag.Close()
 
 	tag.DeleteAllFrames()
 	tag.AddUnsynchronisedLyricsFrame(UnsynchronisedLyricsFrame{
