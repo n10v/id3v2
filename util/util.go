@@ -12,8 +12,6 @@ const (
 )
 
 var (
-	bSize = make([]byte, bytesPerInt) // Made for reusing in FormSize
-
 	ErrInvalidSizeFormat = errors.New("parsing size: invalid format of tag's/frame's size")
 	ErrSizeOverflow      = errors.New("forming size: size of tag/frame is more than allowed in id3 tag")
 )
@@ -22,6 +20,7 @@ var (
 //
 // If size more than allowed (256MB), then it returns ErrSizeOverflow.
 func FormSize(n int) ([]byte, error) {
+	bSize := make([]byte, bytesPerInt)
 	maxN := 268435455 // 0b11111... (28 digits)
 	if n > maxN {
 		return nil, ErrSizeOverflow
