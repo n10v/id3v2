@@ -132,17 +132,17 @@ func TestCountLenSize(t *testing.T) {
 	}
 	defer tag.Close()
 
-	// Check count
+	// Check count.
 	if tag.Count() != countOfFrames {
 		t.Errorf("Expected frames: %v, got: %v", countOfFrames, tag.Count())
 	}
 
-	// Check len of tag.AllFrames()
+	// Check len of tag.AllFrames().
 	if len(tag.AllFrames()) != 9 {
 		t.Errorf("Expected: %v, got: %v", 9, len(tag.AllFrames()))
 	}
 
-	// Check saved tag size by reading the 6:10 bytes of mp3 file
+	// Check saved tag size by reading the 6:10 bytes of mp3 file.
 	mp3, err := os.Open(mp3Name)
 	if err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
@@ -165,7 +165,7 @@ func TestCountLenSize(t *testing.T) {
 		t.Errorf("Expected size of frames: %v, got: %v", framesSize, size)
 	}
 
-	// Check tag.Size
+	// Check tag.Size().
 	tagSize := tagHeaderSize + framesSize
 	if tag.Size() != tagSize {
 		t.Errorf("Expected tag.Size(): %v, got: %v", tagSize, tag.Size())
@@ -173,7 +173,7 @@ func TestCountLenSize(t *testing.T) {
 }
 
 // TestIntegrityOfMusicAtTheBeginning checks
-// if tag.Save doesn't truncate or add some extra bytes at the beginning
+// if tag.Save() doesn't truncate or add some extra bytes at the beginning
 // of music part.
 func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 	mp3, err := os.Open(mp3Name)
@@ -207,7 +207,7 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 }
 
 // TestIntegrityOfMusicAtTheEnd checks
-// if tag.Save doesn't truncate music part or add some extra bytes at the end
+// if tag.Save() doesn't truncate music part or add some extra bytes at the end
 // of music part.
 func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 	mp3, err := os.Open(mp3Name)
@@ -242,7 +242,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 }
 
 // TestCheckPermissions checks
-// if tag.Save creates file with the same permissions of original file.
+// if tag.Save() creates file with the same permissions of original file.
 func TestCheckPermissions(t *testing.T) {
 	originalFile, err := os.Open(mp3Name)
 	if err != nil {
@@ -280,7 +280,7 @@ func TestCheckPermissions(t *testing.T) {
 }
 
 // TestBlankID deletes all frames in tag, adds frame with blank id and checks
-// if no tag is written by tag.Size (tag.WriteTo must not write tag to file
+// if no tag is written by tag.Size() (tag.WriteTo() must not write tag to file
 // if there are 0 frames).
 func TestBlankID(t *testing.T) {
 	tag, err := Open(mp3Name, defaultOpts)
@@ -304,7 +304,7 @@ func TestBlankID(t *testing.T) {
 		t.Error("Size of tag should be 0. Actual tag size:", tag.Size())
 	}
 
-	// tag.Save should write no frames to file
+	// tag.Save() should write no frames to file.
 	if err = tag.Save(); err != nil {
 		t.Error("Error while saving a tag:", err)
 	}
@@ -329,7 +329,7 @@ func TestBlankID(t *testing.T) {
 }
 
 // TestInvalidLanguageCommentFrame checks,
-// if tag.Save returns the correct error by writing the comment frame with
+// if tag.Save() returns the correct error by writing the comment frame with
 // incorrect length of language code.
 func TestInvalidLanguageCommentFrame(t *testing.T) {
 	tag, err := Open(mp3Name, defaultOpts)
@@ -356,7 +356,7 @@ func TestInvalidLanguageCommentFrame(t *testing.T) {
 }
 
 // TestInvalidLanguageUSLF checks,
-// if tag.Save returns the correct error by writing the comment frame with
+// if tag.Save() returns the correct error by writing the comment frame with
 // incorrect length of language code.
 func TestInvalidLanguageUSLF(t *testing.T) {
 	tag, err := Open(mp3Name, defaultOpts)

@@ -37,9 +37,9 @@ func TestParseInvalidFrameSize(t *testing.T) {
 	if err := bw.Flush(); err != nil {
 		t.Fatal(err)
 	}
-	// Write valid TIT2 frame
+	// Write valid TIT2 frame.
 	file.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03, 0x54, 0x69, 0x74, 0x6C, 0x65})
-	// Write invalid frame (size byte can't be more than 127)
+	// Write invalid frame (size byte can't be more than 127).
 	file.Write([]byte{0x54, 0x49, 0x54, 0x32, 255, 255, 255, 255, 00, 00})
 
 	file.Seek(0, io.SeekStart)
@@ -289,7 +289,7 @@ func compareTwoBytes(actual, expected byte) error {
 }
 
 // TestParseOptionsParseFalse checks,
-// if parseTag will not parse the tag, if Options{Parse: false} is set.
+// if parseTag() will not parse the tag, if Options{Parse: false} is set.
 func TestParseOptionsParseFalse(t *testing.T) {
 	tag, err := Open(mp3Name, Options{Parse: false})
 	if tag == nil || err != nil {
@@ -301,7 +301,7 @@ func TestParseOptionsParseFalse(t *testing.T) {
 }
 
 // TestParseOptionsParseFrames checks,
-// if tag.parseAllFrames will parse only frames, that set in Options.ParseFrames.
+// if tag.parseAllFrames() will parse only frames, that set in Options.ParseFrames.
 func TestParseOptionsParseFrames(t *testing.T) {
 	tag, err := Open(mp3Name, Options{Parse: true, ParseFrames: []string{"Artist", "Title"}})
 	if tag == nil || err != nil {
