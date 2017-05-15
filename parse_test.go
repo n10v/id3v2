@@ -18,6 +18,8 @@ import (
 // valid TIT2 frame and frame with invalid size to it, then checks
 // if valid frame is parsed and there is only this frame in tag.
 func TestParseInvalidFrameSize(t *testing.T) {
+	t.Parallel()
+
 	buf := new(bytes.Buffer)
 	bw := bufio.NewWriter(buf)
 	size, _ := util.FormSize(16 + 10)
