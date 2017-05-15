@@ -9,28 +9,20 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/bogem/id3v2/util"
 )
 
-// TestParseInvalidFrameSize creates new temp file, writes tag header,
+// TestParseInvalidFrameSize creates new empty tag, writes tag header,
 // valid TIT2 frame and frame with invalid size to it, then checks
 // if valid frame is parsed and there is only this frame in tag.
 func TestParseInvalidFrameSize(t *testing.T) {
-	file, err := ioutil.TempFile("", "")
-	if err != nil {
-		t.Fatal("Error while opening mp3 file:", err)
-	}
-	defer os.Remove(file.Name())
-
+	buf := new(bytes.Buffer)
+	bw := bufio.NewWriter(buf)
 	size, _ := util.FormSize(16 + 10)
 
-	// Write tag header
-	bw := bufio.NewWriter(file)
+	// Write tag header.
 	if err := writeTagHeader(bw, size, 4); err != nil {
 		t.Fatal(err)
 	}
@@ -38,13 +30,12 @@ func TestParseInvalidFrameSize(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Write valid TIT2 frame.
-	file.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03, 0x54, 0x69, 0x74, 0x6C, 0x65})
+	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03}) // Header and encoding.
+	buf.WriteString("Title")
 	// Write invalid frame (size byte can't be more than 127).
-	file.Write([]byte{0x54, 0x49, 0x54, 0x32, 255, 255, 255, 255, 00, 00})
+	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 255, 255, 255, 255, 00, 00})
 
-	file.Seek(0, io.SeekStart)
-
-	tag, err := ParseReader(file, defaultOpts)
+	tag, err := ParseReader(buf, defaultOpts)
 	if tag == nil || err != nil {
 		t.Fatal("Error while parsing mp3 file:", err)
 	}
