@@ -81,3 +81,8 @@ func Open(name string, opts Options) (*Tag, error) {
 func ParseReader(rd io.Reader, opts Options) (*Tag, error) {
 	return parseTag(rd, opts)
 }
+
+// NewEmptyTag returns an empty ID3v2.4 tag without any frames and reader.
+func NewEmptyTag() *Tag {
+	return newTag(nil, 0, 4)
+}
