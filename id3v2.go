@@ -82,7 +82,7 @@ func ParseReader(rd io.Reader, opts Options) (*Tag, error) {
 	return parseTag(rd, opts)
 }
 
-//Generate an empty id3 tag without having a stream to start from
-func Empty() *Tag {
+// NewEmptyTag returns an empty ID3v2.4 tag without any frames and reader.
+func NewEmptyTag() *Tag {
 	return newTag(nil, 0, 4)
 }
