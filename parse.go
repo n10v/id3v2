@@ -30,7 +30,7 @@ func parseTag(rd io.Reader, opts Options) (*Tag, error) {
 	}
 
 	header, err := parseHeader(rd)
-	if err == errNoTag {
+	if err == errNoTag || err == io.EOF {
 		return newTag(rd, 0, 4), nil
 	}
 	if err != nil {
