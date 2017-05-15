@@ -86,3 +86,7 @@ func OpenFile(file *os.File, opts Options) (*Tag, error) {
 func ParseReader(stream io.Reader, opts Options) (*Tag, error) {
 	return parseTag(stream, opts)
 }
+
+func Empty() *Tag {
+	return newTag(nil, 0, 4)
+}
