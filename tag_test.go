@@ -381,3 +381,44 @@ func TestInvalidLanguageUSLF(t *testing.T) {
 	}
 
 }
+
+// TestSaveEmptyTag checks,
+// if tag.Save() for empty tag returns an error.
+func TestSaveEmptyTag(t *testing.T) {
+	t.Parallel()
+	tag := NewEmptyTag()
+	tag.SetArtist("Artist")
+	tag.SetTitle("Title")
+	if err := tag.Save(); err == nil {
+		t.Error("By saving empty tag we wait for an error, but it's not returned.")
+	}
+}
+
+// TestEmptyTagWriteTo checks,
+// if tag.WriteTo() for empty tag works correctly.
+func TestEmptyTagWriteTo(t *testing.T) {
+	t.Parallel()
+	tag := NewEmptyTag()
+	tag.SetArtist("Artist")
+	tag.SetTitle("Title")
+
+	buf := new(bytes.Buffer)
+	if _, err := tag.WriteTo(buf); err != nil {
+		t.Fatal("Error while writing to buf:", err)
+	}
+	if buf.Len() == 0 {
+		t.Fatal("buf is empty, but it must have tag.")
+	}
+
+	parsedTag, err := ParseReader(buf, Options{Parse: true})
+	if err != nil {
+		t.Fatal("Error while parsing buf:", err)
+	}
+	if parsedTag.Artist() != "Artist" {
+		t.Error("Expected Artist, got", parsedTag.Artist())
+	}
+	if parsedTag.Title() != "Title" {
+		t.Errorf("Expected Title, got", parsedTag.Title())
+	}
+
+}
