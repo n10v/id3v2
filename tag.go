@@ -336,6 +336,10 @@ func (tag *Tag) Save() error {
 // It returns the number of bytes written and error during the write.
 // It returns nil as error if the write was successful.
 func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
+	if w == nil {
+		return 0, errors.New("w is nil")
+	}
+
 	// Form size of frames
 	framesSize := tag.Size() - tagHeaderSize
 	if framesSize <= 0 {
