@@ -14,6 +14,16 @@ var (
 	sizeBytes = []byte{0, 0, 0x77, 0x77}
 )
 
+func TestWriteBytesSize(t *testing.T) {
+	buf := make([]byte, 4)
+	if err := WriteBytesSize(buf, sizeInt); err != nil {
+		t.Error(err)
+	}
+	if !bytes.Equal(buf, sizeBytes) {
+		t.Errorf("Expected: %v, got: %v", sizeBytes, buf)
+	}
+}
+
 func TestParseSize(t *testing.T) {
 	size, err := ParseSize(sizeBytes)
 	if err != nil {
@@ -24,19 +34,12 @@ func TestParseSize(t *testing.T) {
 	}
 }
 
-func TestFormSize(t *testing.T) {
-	size, err := FormSize(sizeInt)
-	if err != nil {
-		t.Error(err)
-	}
-	if !bytes.Equal(sizeBytes, size) {
-		t.Errorf("Expected: %v, got: %v", sizeBytes, size)
-	}
-}
+func BenchmarkWriteBytesSize(b *testing.B) {
+	buf := make([]byte, 4)
 
-func BenchmarkFormSize(b *testing.B) {
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if _, err := FormSize(268435454); err != nil {
+		if err := WriteBytesSize(buf, 268435454); err != nil {
 			b.Fatal(err)
 		}
 	}

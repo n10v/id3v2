@@ -10,8 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"testing"
-
-	"github.com/bogem/id3v2/util"
 )
 
 // TestParseInvalidFrameSize creates an empty tag, writes tag header,
@@ -22,10 +20,10 @@ func TestParseInvalidFrameSize(t *testing.T) {
 
 	buf := new(bytes.Buffer)
 	bw := bufio.NewWriter(buf)
-	size, _ := util.FormSize(16 + 10)
 
 	// Write tag header.
-	if err := writeTagHeader(bw, size, 4); err != nil {
+	dst := make([]byte, 4)
+	if err := writeTagHeader(bw, dst, tagHeaderSize+16, 4); err != nil {
 		t.Fatal(err)
 	}
 	if err := bw.Flush(); err != nil {
@@ -34,7 +32,7 @@ func TestParseInvalidFrameSize(t *testing.T) {
 	// Write valid TIT2 frame.
 	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03}) // header and encoding
 	buf.WriteString("Title")
-	// Write invalid frame (size byte can't be more than 127).
+	// Write invalid frame (size byte can't be greater than 127).
 	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 255, 255, 255, 255, 00, 00})
 
 	tag, err := ParseReader(buf, defaultOpts)

@@ -58,7 +58,13 @@ func isID3Tag(data []byte) bool {
 	return string(data[0:3]) == id3Identifier
 }
 
-func writeTagHeader(bw *bufio.Writer, framesSize []byte, version byte) error {
+// writeTagHeader writes tag header with framesSize and version to bw.
+// buf is needed for util.WriteBytesSize.
+func writeTagHeader(bw *bufio.Writer, buf []byte, framesSize int, version byte) error {
+	if err := util.WriteBytesSize(buf, framesSize); err != nil {
+		return err
+	}
+
 	// Identifier
 	if _, err := bw.WriteString(id3Identifier); err != nil {
 		return err
@@ -80,7 +86,7 @@ func writeTagHeader(bw *bufio.Writer, framesSize []byte, version byte) error {
 	}
 
 	// Size of frames
-	if _, err := bw.Write(framesSize); err != nil {
+	if _, err := bw.Write(buf); err != nil {
 		return err
 	}
 

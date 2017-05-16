@@ -7,42 +7,48 @@ package util
 import "errors"
 
 const (
-	bytesPerInt = 4
-	sizeBase    = 7
+	// ID3SizeLen is length of ID3v2 size specification format (4 * 0b0xxxxxxx).
+	ID3SizeLen = 4
+
+	maxSize  = 268435455 // == 0b11111... (28 digits)
+	sizeBase = 7
 )
 
 var (
-	ErrInvalidSizeFormat = errors.New("parsing size: invalid format of tag's/frame's size")
-	ErrSizeOverflow      = errors.New("forming size: size of tag/frame is more than allowed in id3 tag")
+	ErrSizeOverflow      = errors.New("size of tag/frame is greater than allowed in id3 tag")
+	ErrDstIsSmall        = errors.New("len(dst) is small. It should be >= 4")
+	ErrInvalidSizeFormat = errors.New("invalid format of tag's/frame's size")
 )
 
-// FormSize transforms int to byte slice with ID3v2 size (4 * 0b0xxxxxxx).
+// WriteBytesSize writes size to last 4 bytes of dst in form
+// of ID3v2 size specification format (4 * 0b0xxxxxxx).
 //
-// If size more than allowed (256MB), then it returns ErrSizeOverflow.
-func FormSize(n int) ([]byte, error) {
-	bSize := make([]byte, bytesPerInt)
-	maxN := 268435455 // 0b11111... (28 digits)
-	if n > maxN {
-		return nil, ErrSizeOverflow
+// If len(dst) is smaller than 4, it returns ErrDstIsSmall.
+// If size is greater than allowed (256MB), then it returns ErrSizeOverflow.
+func WriteBytesSize(dst []byte, size int) error {
+	if len(dst) < ID3SizeLen {
+		return ErrDstIsSmall
+	}
+	if size > maxSize {
+		return ErrSizeOverflow
 	}
 
-	mask := 1<<sizeBase - 1
-
-	for i := range bSize {
-		bSize[len(bSize)-1-i] = byte(n & mask)
-		n >>= sizeBase
+	mask := 1<<sizeBase - 1 // == 0b01111111
+	for i := 0; i < ID3SizeLen; i++ {
+		dst[len(dst)-1-i] = byte(size & mask)
+		size >>= sizeBase
 	}
 
-	return bSize, nil
+	return nil
 }
 
-// ParseSize parses byte slice with ID3v2 size (4 * 0b0xxxxxxx) and returns
-// parsed int64 number.
+// ParseSize parses data in form of ID3v2 size specification format (4 * 0b0xxxxxxx)
+// and returns parsed int64 number.
 //
-// If length of slice is more than 4 or if there is invalid size format (e.g.
-// one byte in slice is like 0b1xxxxxxx), then it returns ErrInvalidSizeFormat.
+// If length of data is greater than 4 or if there is invalid size format (e.g.
+// one byte in data is like 0b1xxxxxxx), then it returns ErrInvalidSizeFormat.
 func ParseSize(data []byte) (int64, error) {
-	if len(data) > bytesPerInt {
+	if len(data) > ID3SizeLen {
 		return 0, ErrInvalidSizeFormat
 	}
 

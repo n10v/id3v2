@@ -18,6 +18,9 @@ var ErrNoFile = errors.New("tag was not initialized with file")
 
 // Tag stores all information about opened tag.
 type Tag struct {
+	// buf is used for util.WriteBytesSize in tag.WriteTo().
+	buf []byte
+
 	frames    map[string]Framer
 	sequences map[string]*sequence
 
@@ -254,7 +257,7 @@ func (tag *Tag) Version() byte {
 }
 
 // SetVersion sets given ID3v2 version to tag.
-// If version is less than 3 or more than 4, then this method will do nothing.
+// If version is less than 3 or greater than 4, then this method will do nothing.
 // If tag has some frames, which are deprecated or changed in given version,
 // then to your notice you can delete, change or just stay them.
 func (tag *Tag) SetVersion(version byte) {
@@ -339,6 +342,9 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	if w == nil {
 		return 0, errors.New("w is nil")
 	}
+	if len(tag.buf) < 4 {
+		tag.buf = make([]byte, 4)
+	}
 
 	// Form size of frames
 	framesSize := tag.Size() - tagHeaderSize
@@ -346,23 +352,17 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 		return 0, nil
 	}
 
-	byteFramesSize, err := util.FormSize(framesSize)
-	if err != nil {
-		return 0, err
-	}
-
+	// Write tag header.
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
-
-	// Write tag header.
-	if err := writeTagHeader(bw, byteFramesSize, tag.version); err != nil {
+	if err := writeTagHeader(bw, tag.buf, framesSize, tag.version); err != nil {
 		return n, err
 	}
 	n += tagHeaderSize
 
 	// Write frames.
 	err = tag.iterateOverAllFrames(func(id string, f Framer) error {
-		nn, err := writeFrame(bw, id, f)
+		nn, err := writeFrame(bw, tag.buf, id, f)
 		n += nn
 		return err
 	})
@@ -373,8 +373,10 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	return n, bw.Flush()
 }
 
-func writeFrame(bw *bufio.Writer, id string, frame Framer) (int64, error) {
-	if err := writeFrameHeader(bw, id, frame.Size()); err != nil {
+// writeFrame writes whole frame to bw.
+// buf is needed for util.WriteBytesSize in writeFrameHeader.
+func writeFrame(bw *bufio.Writer, buf []byte, id string, frame Framer) (int64, error) {
+	if err := writeFrameHeader(bw, buf, id, frame.Size()); err != nil {
 		return 0, err
 	}
 
@@ -382,9 +384,10 @@ func writeFrame(bw *bufio.Writer, id string, frame Framer) (int64, error) {
 	return frameHeaderSize + frameSize, err
 }
 
-func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
-	size, err := util.FormSize(frameSize)
-	if err != nil {
+// writeFrameHeader writes frame header with id and frameSize to bw.
+// buf is needed for util.WriteBytesSize.
+func writeFrameHeader(bw *bufio.Writer, buf []byte, id string, frameSize int) error {
+	if err := util.WriteBytesSize(buf, frameSize); err != nil {
 		return err
 	}
 
@@ -394,7 +397,7 @@ func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
 	}
 
 	// Size
-	if _, err := bw.Write(size); err != nil {
+	if _, err := bw.Write(buf); err != nil {
 		return err
 	}
 

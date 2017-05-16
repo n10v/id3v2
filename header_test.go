@@ -12,10 +12,10 @@ import (
 
 var (
 	th = tagHeader{
-		FramesSize: 0,
+		FramesSize: 15351,
 		Version:    4,
 	}
-	thb = []byte{73, 68, 51, 4, 0, 0, 0, 0, 0, 0}
+	thb = []byte{73, 68, 51, 4, 0, 0, 0, 0, 0x77, 0x77}
 )
 
 func TestParseHeader(t *testing.T) {
@@ -24,14 +24,16 @@ func TestParseHeader(t *testing.T) {
 		t.Error(err)
 	}
 	if parsed != th {
-		t.Fail()
+		t.Fatalf("Expected: %v, got: %v", th, parsed)
 	}
 }
 
 func TestWriteTagHeader(t *testing.T) {
 	buf := new(bytes.Buffer)
 	bw := bufio.NewWriter(buf)
-	if err := writeTagHeader(bw, []byte{0, 0, 0, 0}, 4); err != nil {
+	dst := make([]byte, 4)
+
+	if err := writeTagHeader(bw, dst, 15351, 4); err != nil {
 		t.Fatal(err)
 	}
 	if err := bw.Flush(); err != nil {
