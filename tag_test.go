@@ -138,7 +138,7 @@ func TestCountLenSize(t *testing.T) {
 	}
 
 	// Check len of tag.AllFrames().
-	if len(tag.AllFrames()) != 9 {
+	if len(tag.AllFrames()) != 9 { // 9 - count of all ids
 		t.Errorf("Expected: %v, got: %v", 9, len(tag.AllFrames()))
 	}
 
@@ -280,7 +280,7 @@ func TestCheckPermissions(t *testing.T) {
 }
 
 // TestBlankID creates empty tag, adds frame with blank id and checks
-// if no tag is written by tag.WriteTo() (it must not write tag to file
+// if no tag is written by tag.WriteTo() (it must not write tag to buf
 // if there are no or only blank frames).
 func TestBlankID(t *testing.T) {
 	t.Parallel()
@@ -370,7 +370,7 @@ func TestSaveEmptyTag(t *testing.T) {
 }
 
 // TestEmptyTagWriteTo checks,
-// if tag.WriteTo() for empty tag works correctly.
+// if tag.WriteTo() works correctly for empty tag.
 func TestEmptyTagWriteTo(t *testing.T) {
 	t.Parallel()
 
