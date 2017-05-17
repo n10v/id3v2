@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/bogem/id3v2/util"
@@ -425,4 +426,41 @@ func TestResetTag(t *testing.T) {
 	if tag.Count() != countOfFrames {
 		t.Errorf("Expected frames: %v, got: %v", countOfFrames, tag.Count())
 	}
+}
+
+// TestConcurrent creates sync.Pool with tags, executes 100 goroutines and
+// checks if id3v2 works correctly in concurrent environment (one tag per goroutine).
+func TestConcurrent(t *testing.T) {
+	tagPool := sync.Pool{New: func() interface{} { return NewEmptyTag() }}
+
+	var wg sync.WaitGroup
+	wg.Add(100)
+	for i := 0; i < 100; i++ {
+		go func() {
+			defer wg.Done()
+
+			tag := tagPool.Get().(*Tag)
+			defer tagPool.Put(tag)
+
+			file, err := os.Open(mp3Name)
+			if err != nil {
+				t.Fatal("Error while opening mp3:", err)
+			}
+			defer file.Close()
+
+			if err := tag.Reset(file, defaultOpts); err != nil {
+				t.Fatal("Error while reseting tag to file:", err)
+			}
+
+			// Just check if it's correctly parsed.
+			if tag.Count() != countOfFrames {
+				t.Fatalf("Expected frames: %v, got: %v", countOfFrames, tag.Count())
+			}
+
+			if _, err := tag.WriteTo(ioutil.Discard); err != nil {
+				t.Fatalf("Error while writing to ioutil.Discard:", err)
+			}
+		}()
+	}
+	wg.Wait()
 }

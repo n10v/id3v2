@@ -13,69 +13,6 @@ import (
 	"testing"
 )
 
-// TestParseInvalidFrameSize creates an empty tag, writes tag header,
-// valid TIT2 frame and frame with invalid size, then checks
-// if valid frame is parsed and there is only this frame in tag.
-func TestParseInvalidFrameSize(t *testing.T) {
-	t.Parallel()
-
-	buf := new(bytes.Buffer)
-	bw := bufio.NewWriter(buf)
-
-	// Write tag header.
-	dst := make([]byte, 4)
-	if err := writeTagHeader(bw, dst, tagHeaderSize+16, 4); err != nil {
-		t.Fatal(err)
-	}
-	if err := bw.Flush(); err != nil {
-		t.Fatal(err)
-	}
-	// Write valid TIT2 frame.
-	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03}) // header and encoding
-	buf.WriteString("Title")
-	// Write invalid frame (size byte can't be greater than 127).
-	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 255, 255, 255, 255, 00, 00})
-
-	tag, err := ParseReader(buf, defaultOpts)
-	if tag == nil || err != nil {
-		t.Fatal("Error while parsing mp3 file:", err)
-	}
-	if tag.Title() != "Title" {
-		t.Errorf("Expected title: %q, got: %q", "Title", tag.Title())
-	}
-	if tag.Count() != 1 {
-		t.Error("There should be only 1 frame in tag, but there are", tag.Count())
-	}
-}
-
-// TestParseEmptyReader checks if ParseReader() correctly parses empty readers.
-func TestParseEmptyReader(t *testing.T) {
-	t.Parallel()
-
-	tag, err := ParseReader(new(bytes.Buffer), Options{Parse: true})
-	if err != nil {
-		t.Error("Error while parsing empty reader:", err)
-	}
-	if tag.HasFrames() {
-		t.Error("Tag should not have any frames, but it has", tag.Count())
-	}
-}
-
-// TestParseReaderNil checks
-// if ParseReader returns correct error when calling ParseReader(nil, Options{}).
-func TestParseReaderNil(t *testing.T) {
-	t.Parallel()
-
-	_, err := ParseReader(nil, Options{Parse: true})
-	if err == nil {
-		t.Fatal("Expected that err is not nil, but err is nil")
-	}
-	if !strings.Contains(err.Error(), "rd is nil") {
-		t.Fatalf("Expected err contains %q, got %q", "rd is nil", err)
-	}
-
-}
-
 // TestParse compares parsed frames with expected frames.
 func TestParse(t *testing.T) {
 	if err := resetMP3Tag(); err != nil {
@@ -320,4 +257,67 @@ func TestParseOptionsParseFrames(t *testing.T) {
 	if tag.Title() == "" {
 		t.Errorf("tag should have a title, but it doesn't")
 	}
+}
+
+// TestParseInvalidFrameSize creates an empty tag, writes tag header,
+// valid TIT2 frame and frame with invalid size, then checks
+// if valid frame is parsed and there is only this frame in tag.
+func TestParseInvalidFrameSize(t *testing.T) {
+	t.Parallel()
+
+	buf := new(bytes.Buffer)
+	bw := bufio.NewWriter(buf)
+
+	// Write tag header.
+	dst := make([]byte, 4)
+	if err := writeTagHeader(bw, dst, tagHeaderSize+16, 4); err != nil {
+		t.Fatal(err)
+	}
+	if err := bw.Flush(); err != nil {
+		t.Fatal(err)
+	}
+	// Write valid TIT2 frame.
+	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03}) // header and encoding
+	buf.WriteString("Title")
+	// Write invalid frame (size byte can't be greater than 127).
+	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 255, 255, 255, 255, 00, 00})
+
+	tag, err := ParseReader(buf, defaultOpts)
+	if tag == nil || err != nil {
+		t.Fatal("Error while parsing mp3 file:", err)
+	}
+	if tag.Title() != "Title" {
+		t.Errorf("Expected title: %q, got: %q", "Title", tag.Title())
+	}
+	if tag.Count() != 1 {
+		t.Error("There should be only 1 frame in tag, but there are", tag.Count())
+	}
+}
+
+// TestParseEmptyReader checks if ParseReader() correctly parses empty readers.
+func TestParseEmptyReader(t *testing.T) {
+	t.Parallel()
+
+	tag, err := ParseReader(new(bytes.Buffer), Options{Parse: true})
+	if err != nil {
+		t.Error("Error while parsing empty reader:", err)
+	}
+	if tag.HasFrames() {
+		t.Error("Tag should not have any frames, but it has", tag.Count())
+	}
+}
+
+// TestParseReaderNil checks
+// if ParseReader returns correct error when calling ParseReader(nil, Options{}).
+func TestParseReaderNil(t *testing.T) {
+	t.Parallel()
+
+	_, err := ParseReader(nil, Options{Parse: true})
+	if err == nil {
+		t.Fatal("Expected that err is not nil, but err is nil")
+	}
+	if !strings.Contains(err.Error(), "rd is nil") {
+		t.Fatalf("Expected err contains %q, got %q", "rd is nil", err)
+	}
+
 }
