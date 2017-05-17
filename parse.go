@@ -6,9 +6,9 @@ package id3v2
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
+	"strconv"
 
 	"github.com/bogem/id3v2/bbpool"
 	"github.com/bogem/id3v2/lrpool"
@@ -24,45 +24,43 @@ type frameHeader struct {
 	BodySize int64
 }
 
-func parseTag(rd io.Reader, opts Options) (*Tag, error) {
+// parse finds ID3v2 tag in rd and parses it to tag considering opts.
+func (tag *Tag) parse(rd io.Reader, opts Options) error {
 	if rd == nil {
-		return nil, errors.New("reader is nil")
+		return errors.New("reader is nil")
 	}
 
 	header, err := parseHeader(rd)
 	if err == errNoTag || err == io.EOF {
-		return newTag(rd, 0, 4), nil
+		tag.init(rd, 0, 4)
+		return nil
 	}
 	if err != nil {
-		return nil, errors.New("error by parsing tag header: " + err.Error())
+		return errors.New("error by parsing tag header: " + err.Error())
 	}
 	if header.Version < 3 {
-		err = errors.New(fmt.Sprint("unsupported version of ID3 tag: ", header.Version))
-		return nil, err
+		err = errors.New("unsupported version of ID3 tag: " + strconv.Itoa(int(header.Version)))
+		return err
 	}
 
-	tag := newTag(rd, tagHeaderSize+header.FramesSize, header.Version)
+	tag.init(rd, tagHeaderSize+header.FramesSize, header.Version)
 	if opts.Parse {
-		err = tag.parseAllFrames(opts)
+		err = tag.parseFrames(opts)
 	}
-
-	return tag, err
+	return err
 }
 
-func newTag(rd io.Reader, originalSize int64, version byte) *Tag {
-	tag := &Tag{
-		frames:    make(map[string]Framer),
-		sequences: make(map[string]*sequence),
-
-		reader:       rd,
-		originalSize: originalSize,
-		version:      version,
-	}
-
-	return tag
+// init initializes tag by deleting all frames in it, setting reader,
+// originialSize and version.
+// init doesn't parse frames, it only set the fields.
+func (tag *Tag) init(rd io.Reader, originalSize int64, version byte) {
+	tag.DeleteAllFrames()
+	tag.reader = rd
+	tag.originalSize = originalSize
+	tag.version = version
 }
 
-func (tag *Tag) parseAllFrames(opts Options) error {
+func (tag *Tag) parseFrames(opts Options) error {
 	// Size of frames in tag = size of whole tag - size of tag header.
 	framesSize := tag.originalSize - tagHeaderSize
 
@@ -95,7 +93,7 @@ func (tag *Tag) parseAllFrames(opts Options) error {
 		// If user set opts.ParseFrames, take it into consideration.
 		if len(parseIDs) > 0 {
 			if !parseIDs[id] {
-				io.CopyN(ioutil.Discard, tag.reader, bodySize)
+				io.Copy(ioutil.Discard, bodyRd)
 				continue
 			}
 		}
@@ -146,7 +144,6 @@ func parseFrameHeader(rd io.Reader) (frameHeader, error) {
 	header.ID = id
 	header.BodySize = bodySize
 	return header, nil
-
 }
 
 func parseFrameBody(id string, rd io.Reader) (Framer, error) {

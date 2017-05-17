@@ -79,10 +79,14 @@ func Open(name string, opts Options) (*Tag, error) {
 // ParseReader parses rd and finds tag in it considering opts.
 // If there is no tag in rd, it will create new one with version ID3v2.4.
 func ParseReader(rd io.Reader, opts Options) (*Tag, error) {
-	return parseTag(rd, opts)
+	tag := NewEmptyTag()
+	err := tag.parse(rd, opts)
+	return tag, err
 }
 
 // NewEmptyTag returns an empty ID3v2.4 tag without any frames and reader.
 func NewEmptyTag() *Tag {
-	return newTag(nil, 0, 4)
+	tag := new(Tag)
+	tag.init(nil, 0, 4)
+	return tag
 }

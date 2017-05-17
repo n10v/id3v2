@@ -310,7 +310,7 @@ func TestBlankID(t *testing.T) {
 	}
 }
 
-// TestInvalidLanguageCommentFrame checks,
+// TestInvalidLanguageCommentFrame checks
 // if tag.WriteTo() returns the correct error by writing the comment frame with
 // incorrect length of language code.
 func TestInvalidLanguageCommentFrame(t *testing.T) {
@@ -333,7 +333,7 @@ func TestInvalidLanguageCommentFrame(t *testing.T) {
 
 }
 
-// TestInvalidLanguageUSLF checks,
+// TestInvalidLanguageUSLF checks
 // if tag.WriteTo() returns the correct error by writing the comment frame with
 // incorrect length of language code.
 func TestInvalidLanguageUSLF(t *testing.T) {
@@ -356,7 +356,7 @@ func TestInvalidLanguageUSLF(t *testing.T) {
 
 }
 
-// TestSaveEmptyTag checks,
+// TestSaveEmptyTag checks
 // if tag.Save() returns an error for empty tag.
 func TestSaveEmptyTag(t *testing.T) {
 	t.Parallel()
@@ -369,7 +369,7 @@ func TestSaveEmptyTag(t *testing.T) {
 	}
 }
 
-// TestEmptyTagWriteTo checks,
+// TestEmptyTagWriteTo checks
 // if tag.WriteTo() works correctly for empty tag.
 func TestEmptyTagWriteTo(t *testing.T) {
 	t.Parallel()
@@ -398,7 +398,7 @@ func TestEmptyTagWriteTo(t *testing.T) {
 	}
 }
 
-// TestParseEmptyReader checks, if ParseReader correctly parses empty readers.
+// TestParseEmptyReader checks if ParseReader() correctly parses empty readers.
 func TestParseEmptyReader(t *testing.T) {
 	t.Parallel()
 
@@ -411,9 +411,28 @@ func TestParseEmptyReader(t *testing.T) {
 	}
 }
 
-// TestWriteToNil checks, if tag.WriteTo returns an error when writing to nil.
-func TestWriteToNil(t *testing.T) {
+// TestWriteTagToNil checks if tag.WriteTo() returns an error when writing to nil.
+func TestWriteTagToNil(t *testing.T) {
 	if _, err := NewEmptyTag().WriteTo(nil); err == nil {
 		t.Fatal("tag.WriteTo() should return an error when writing to nil")
+	}
+}
+
+// TestResetTag checks if tag.Reset() correctly parses mp3.
+func TestResetTag(t *testing.T) {
+	mp3, err := os.Open(mp3Name)
+	if err != nil {
+		t.Fatal("Error while opening mp3 file:", err)
+	}
+	defer mp3.Close()
+
+	tag := NewEmptyTag()
+	if err := tag.Reset(mp3, defaultOpts); err != nil {
+		t.Fatal("Error while reseting tag:", err)
+	}
+
+	// Check if it parsed.
+	if tag.Count() != countOfFrames {
+		t.Errorf("Expected frames: %v, got: %v", countOfFrames, tag.Count())
 	}
 }

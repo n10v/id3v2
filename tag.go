@@ -108,14 +108,24 @@ func (tag *Tag) AllFrames() map[string][]Framer {
 
 // DeleteAllFrames deletes all frames in tag.
 func (tag *Tag) DeleteAllFrames() {
-	tag.frames = make(map[string]Framer)
-	tag.sequences = make(map[string]*sequence)
+	if tag.frames == nil || len(tag.frames) > 0 {
+		tag.frames = make(map[string]Framer)
+	}
+	if tag.sequences == nil || len(tag.sequences) > 0 {
+		tag.sequences = make(map[string]*sequence)
+	}
 }
 
 // DeleteFrames deletes frames in tag with given id.
 func (tag *Tag) DeleteFrames(id string) {
 	delete(tag.frames, id)
 	delete(tag.sequences, id)
+}
+
+// Reset deletes all frames in tag and parses rd considering opts.
+func (tag *Tag) Reset(rd io.Reader, opts Options) error {
+	tag.DeleteAllFrames()
+	return tag.parse(rd, opts)
 }
 
 // GetFrames returns frames with corresponding id.
