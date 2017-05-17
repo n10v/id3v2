@@ -356,7 +356,7 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 		tag.buf = make([]byte, 4)
 	}
 
-	// Form size of frames
+	// Count size of frames.
 	framesSize := tag.Size() - tagHeaderSize
 	if framesSize <= 0 {
 		return 0, nil
