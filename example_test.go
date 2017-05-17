@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
+	"sync"
 
 	"github.com/bogem/id3v2"
 )
@@ -37,6 +39,34 @@ func Example() {
 	if err = tag.Save(); err != nil {
 		log.Fatal("Error while saving a tag: ", err)
 	}
+}
+
+func Example_concurrent() {
+	tagPool := sync.Pool{New: func() interface{} { return id3v2.NewEmptyTag() }}
+
+	var wg sync.WaitGroup
+	wg.Add(100)
+	for i := 0; i < 100; i++ {
+		go func() {
+			defer wg.Done()
+
+			tag := tagPool.Get().(*id3v2.Tag)
+			defer tagPool.Put(tag)
+
+			file, err := os.Open("file.mp3")
+			if err != nil {
+				log.Fatal("Error while opening file:", err)
+			}
+			defer file.Close()
+
+			if err := tag.Reset(file, id3v2.Options{Parse: true}); err != nil {
+				log.Fatal("Error while reseting tag to file:", err)
+			}
+
+			fmt.Println(tag.Artist() + " - " + tag.Title())
+		}()
+	}
+	wg.Wait()
 }
 
 func ExampleTag_AddAttachedPicture() {
