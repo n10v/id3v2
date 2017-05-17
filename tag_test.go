@@ -356,9 +356,9 @@ func TestInvalidLanguageUSLF(t *testing.T) {
 
 }
 
-// TestSaveEmptyTag checks
-// if tag.Save() returns an error for empty tag.
-func TestSaveEmptyTag(t *testing.T) {
+// TestSaveAndCloseEmptyTag checks
+// if tag.Save() and tag.Close() return an error for empty tag.
+func TestSaveAndCloseEmptyTag(t *testing.T) {
 	t.Parallel()
 
 	tag := NewEmptyTag()
@@ -366,6 +366,9 @@ func TestSaveEmptyTag(t *testing.T) {
 	tag.SetTitle("Title")
 	if err := tag.Save(); err == nil {
 		t.Error("By saving empty tag we wait for an error, but it's not returned")
+	}
+	if err := tag.Close(); err == nil {
+		t.Error("By closing empty tag we wait for an error, but it's not returned")
 	}
 }
 
@@ -398,21 +401,10 @@ func TestEmptyTagWriteTo(t *testing.T) {
 	}
 }
 
-// TestParseEmptyReader checks if ParseReader() correctly parses empty readers.
-func TestParseEmptyReader(t *testing.T) {
-	t.Parallel()
-
-	tag, err := ParseReader(new(bytes.Buffer), Options{Parse: true})
-	if err != nil {
-		t.Error("Error while parsing empty reader:", err)
-	}
-	if tag.HasFrames() {
-		t.Error("Tag should not have any frames, but it has", tag.Count())
-	}
-}
-
 // TestWriteTagToNil checks if tag.WriteTo() returns an error when writing to nil.
 func TestWriteTagToNil(t *testing.T) {
+	t.Parallel()
+
 	if _, err := NewEmptyTag().WriteTo(nil); err == nil {
 		t.Fatal("tag.WriteTo() should return an error when writing to nil")
 	}

@@ -7,6 +7,7 @@ package id3v2
 import (
 	"bufio"
 	"bytes"
+	"strings"
 	"testing"
 )
 
@@ -18,6 +19,7 @@ var (
 	thb = []byte{73, 68, 51, 4, 0, 0, 0, 0, 0x77, 0x77}
 )
 
+// TestParseHeader checks if parseHeader works right with correct tag header.
 func TestParseHeader(t *testing.T) {
 	parsed, err := parseHeader(bytes.NewReader(thb))
 	if err != nil {
@@ -28,6 +30,7 @@ func TestParseHeader(t *testing.T) {
 	}
 }
 
+// TestWriteTagHeader checks if writeTagHeader works right with correct tag header.
 func TestWriteTagHeader(t *testing.T) {
 	buf := new(bytes.Buffer)
 	bw := bufio.NewWriter(buf)
@@ -41,5 +44,26 @@ func TestWriteTagHeader(t *testing.T) {
 	}
 	if !bytes.Equal(thb, buf.Bytes()) {
 		t.Fatalf("Expected %v, got %v", thb, buf.Bytes())
+	}
+}
+
+// TestSmallTagHeader checks if parseHeader returns an error
+// when size of reader is smaller than tagHeaderSize.
+func TestSmallTagHeader(t *testing.T) {
+	_, err := parseHeader(bytes.NewReader([]byte{0, 0, 0}))
+	if err == nil {
+		t.Fatal("Expected that err is not nil, but err is nil")
+	}
+	if !strings.Contains(err.Error(), "less than expected") {
+		t.Fatalf("Expected err contains %q, got %q", "less than expected", err)
+	}
+}
+
+// TestIsNotID3 checks if parseHeader returns correct error
+// when there is no "ID3" literal at the beginning.
+func TestIsNotID3(t *testing.T) {
+	_, err := parseHeader(bytes.NewReader([]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}))
+	if err != errNoTag {
+		t.Fatalf("Expected: %q, got: %q", errNoTag, err)
 	}
 }

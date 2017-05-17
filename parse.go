@@ -27,7 +27,7 @@ type frameHeader struct {
 // parse finds ID3v2 tag in rd and parses it to tag considering opts.
 func (tag *Tag) parse(rd io.Reader, opts Options) error {
 	if rd == nil {
-		return errors.New("reader is nil")
+		return errors.New("rd is nil")
 	}
 
 	header, err := parseHeader(rd)

@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -45,6 +46,34 @@ func TestParseInvalidFrameSize(t *testing.T) {
 	if tag.Count() != 1 {
 		t.Error("There should be only 1 frame in tag, but there are", tag.Count())
 	}
+}
+
+// TestParseEmptyReader checks if ParseReader() correctly parses empty readers.
+func TestParseEmptyReader(t *testing.T) {
+	t.Parallel()
+
+	tag, err := ParseReader(new(bytes.Buffer), Options{Parse: true})
+	if err != nil {
+		t.Error("Error while parsing empty reader:", err)
+	}
+	if tag.HasFrames() {
+		t.Error("Tag should not have any frames, but it has", tag.Count())
+	}
+}
+
+// TestParseReaderNil checks
+// if ParseReader returns correct error when calling ParseReader(nil, Options{}).
+func TestParseReaderNil(t *testing.T) {
+	t.Parallel()
+
+	_, err := ParseReader(nil, Options{Parse: true})
+	if err == nil {
+		t.Fatal("Expected that err is not nil, but err is nil")
+	}
+	if !strings.Contains(err.Error(), "rd is nil") {
+		t.Fatalf("Expected err contains %q, got %q", "rd is nil", err)
+	}
+
 }
 
 // TestParse compares parsed frames with expected frames.
