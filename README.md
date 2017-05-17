@@ -68,7 +68,6 @@ func main() {
 	tag.SetArtist("New artist")
 	tag.SetTitle("New title")
 
-
 	// Set comment frame.
 	comment := id3v2.CommentFrame{
 		Encoding:    id3v2.ENUTF8,
