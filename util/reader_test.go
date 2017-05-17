@@ -15,6 +15,8 @@ var (
 )
 
 func TestReadTillDelim(t *testing.T) {
+	t.Parallel()
+
 	bsReader := NewReader(bytes.NewReader(bs))
 
 	firstIndexOf55 := bytes.Index(bs, []byte{55})
@@ -36,6 +38,8 @@ func TestReadTillDelim(t *testing.T) {
 }
 
 func TestReadTillZero(t *testing.T) {
+	t.Parallel()
+
 	bsReader := NewReader(bytes.NewReader(bs))
 
 	read, err := bsReader.ReadTillDelim(0)
@@ -51,6 +55,8 @@ func TestReadTillZero(t *testing.T) {
 }
 
 func TestNext(t *testing.T) {
+	t.Parallel()
+
 	bsReader := NewReader(bytes.NewReader(bs))
 	n := 5 // Read 5 elements
 
@@ -70,6 +76,8 @@ func TestNext(t *testing.T) {
 }
 
 func TestReadTillDelimEOF(t *testing.T) {
+	t.Parallel()
+
 	bsReader := NewReader(bytes.NewReader(bs))
 	_, err := bsReader.ReadTillDelim(234)
 	if err != io.EOF {
@@ -78,6 +86,8 @@ func TestReadTillDelimEOF(t *testing.T) {
 }
 
 func TestReadTillDelims(t *testing.T) {
+	t.Parallel()
+
 	bsReader := NewReader(bytes.NewReader(bs))
 	delims := []byte{55, 66}
 	expectedLen := 9

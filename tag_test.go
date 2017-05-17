@@ -330,7 +330,6 @@ func TestInvalidLanguageCommentFrame(t *testing.T) {
 	if !strings.Contains(err.Error(), "must consist") {
 		t.Fatalf("Incorrect error. Expected error contains %q, got %q", "must consist", err)
 	}
-
 }
 
 // TestInvalidLanguageUSLF checks
@@ -353,7 +352,6 @@ func TestInvalidLanguageUSLF(t *testing.T) {
 	if !strings.Contains(err.Error(), "must consist") {
 		t.Fatalf("Incorrect error. Expected error contains %q, got %q", "must consist", err)
 	}
-
 }
 
 // TestSaveAndCloseEmptyTag checks

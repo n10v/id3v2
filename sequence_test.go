@@ -7,6 +7,8 @@ package id3v2
 import "testing"
 
 func TestSequenceCacheUpdate(t *testing.T) {
+	t.Parallel()
+
 	s := newSequence()
 	s.AddFrame(PictureFrame{Description: "A"})
 	if len(s.Frames()) != 1 {
@@ -19,6 +21,8 @@ func TestSequenceCacheUpdate(t *testing.T) {
 }
 
 func TestSequenceCommentFramesUniqueness(t *testing.T) {
+	t.Parallel()
+
 	s := newSequence()
 	s.AddFrame(CommentFrame{Language: "A", Description: "A"})
 	if s.Count() != 1 {
@@ -35,6 +39,8 @@ func TestSequenceCommentFramesUniqueness(t *testing.T) {
 }
 
 func TestSequencePictureFramesUniqueness(t *testing.T) {
+	t.Parallel()
+
 	s := newSequence()
 	s.AddFrame(PictureFrame{Description: "A"})
 	if s.Count() != 1 {
@@ -51,6 +57,8 @@ func TestSequencePictureFramesUniqueness(t *testing.T) {
 }
 
 func TestSequenceUSLFsUniqueness(t *testing.T) {
+	t.Parallel()
+
 	s := newSequence()
 	s.AddFrame(UnsynchronisedLyricsFrame{Language: "A", ContentDescriptor: "A"})
 	if s.Count() != 1 {

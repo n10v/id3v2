@@ -21,6 +21,8 @@ var (
 
 // TestParseHeader checks if parseHeader works right with correct tag header.
 func TestParseHeader(t *testing.T) {
+	t.Parallel()
+
 	parsed, err := parseHeader(bytes.NewReader(thb))
 	if err != nil {
 		t.Error(err)
@@ -32,6 +34,8 @@ func TestParseHeader(t *testing.T) {
 
 // TestWriteTagHeader checks if writeTagHeader works right with correct tag header.
 func TestWriteTagHeader(t *testing.T) {
+	t.Parallel()
+
 	buf := new(bytes.Buffer)
 	bw := bufio.NewWriter(buf)
 	dst := make([]byte, 4)
@@ -50,6 +54,8 @@ func TestWriteTagHeader(t *testing.T) {
 // TestSmallTagHeader checks if parseHeader returns an error
 // when size of reader is smaller than tagHeaderSize.
 func TestSmallTagHeader(t *testing.T) {
+	t.Parallel()
+
 	_, err := parseHeader(bytes.NewReader([]byte{0, 0, 0}))
 	if err == nil {
 		t.Fatal("Expected that err is not nil, but err is nil")
@@ -62,6 +68,8 @@ func TestSmallTagHeader(t *testing.T) {
 // TestIsNotID3 checks if parseHeader returns correct error
 // when there is no "ID3" literal at the beginning.
 func TestIsNotID3(t *testing.T) {
+	t.Parallel()
+
 	_, err := parseHeader(bytes.NewReader([]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}))
 	if err != errNoTag {
 		t.Fatalf("Expected: %q, got: %q", errNoTag, err)

@@ -15,6 +15,8 @@ var (
 )
 
 func TestWriteBytesSize(t *testing.T) {
+	t.Parallel()
+
 	buf := make([]byte, 4)
 	if err := WriteBytesSize(buf, sizeInt); err != nil {
 		t.Error(err)
@@ -25,6 +27,8 @@ func TestWriteBytesSize(t *testing.T) {
 }
 
 func TestParseSize(t *testing.T) {
+	t.Parallel()
+
 	size, err := ParseSize(sizeBytes)
 	if err != nil {
 		t.Error(err)
