@@ -25,6 +25,7 @@ type frameHeader struct {
 }
 
 // parse finds ID3v2 tag in rd and parses it to tag considering opts.
+// If rd is smaller than expected, it returns ErrSmallHeaderSize.
 func (tag *Tag) parse(rd io.Reader, opts Options) error {
 	if rd == nil {
 		return errors.New("rd is nil")

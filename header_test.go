@@ -7,7 +7,6 @@ package id3v2
 import (
 	"bufio"
 	"bytes"
-	"strings"
 	"testing"
 )
 
@@ -57,10 +56,7 @@ func TestSmallTagHeader(t *testing.T) {
 	t.Parallel()
 
 	_, err := parseHeader(bytes.NewReader([]byte{0, 0, 0}))
-	if err == nil {
-		t.Fatal("Expected that err is not nil, but err is nil")
-	}
-	if !strings.Contains(err.Error(), "less than expected") {
+	if err != ErrSmallHeaderSize {
 		t.Fatalf("Expected err contains %q, got %q", "less than expected", err)
 	}
 }
