@@ -93,7 +93,9 @@ func (tag *Tag) parseFrames(opts Options) error {
 		// If user set opts.ParseFrames, take it into consideration.
 		if len(parseIDs) > 0 {
 			if !parseIDs[id] {
-				io.Copy(ioutil.Discard, bodyRd)
+				if _, err := io.Copy(ioutil.Discard, bodyRd); err != nil {
+					return err
+				}
 				continue
 			}
 		}
