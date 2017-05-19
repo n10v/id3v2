@@ -9,7 +9,8 @@ import "testing"
 func TestSequenceCacheUpdate(t *testing.T) {
 	t.Parallel()
 
-	s := newSequence()
+	s := getSequence()
+	defer putSequence(s)
 	s.AddFrame(PictureFrame{Description: "A"})
 	if len(s.Frames()) != 1 {
 		t.Errorf("Expected %v frames, got %v", 1, len(s.Frames()))
@@ -23,7 +24,8 @@ func TestSequenceCacheUpdate(t *testing.T) {
 func TestSequenceCommentFramesUniqueness(t *testing.T) {
 	t.Parallel()
 
-	s := newSequence()
+	s := getSequence()
+	defer putSequence(s)
 	s.AddFrame(CommentFrame{Language: "A", Description: "A"})
 	if s.Count() != 1 {
 		t.Errorf("Expected %v frames, got %v", 1, s.Count())
@@ -41,7 +43,8 @@ func TestSequenceCommentFramesUniqueness(t *testing.T) {
 func TestSequencePictureFramesUniqueness(t *testing.T) {
 	t.Parallel()
 
-	s := newSequence()
+	s := getSequence()
+	defer putSequence(s)
 	s.AddFrame(PictureFrame{Description: "A"})
 	if s.Count() != 1 {
 		t.Errorf("Expected %v frames, got %v", 1, s.Count())
@@ -59,7 +62,8 @@ func TestSequencePictureFramesUniqueness(t *testing.T) {
 func TestSequenceUSLFsUniqueness(t *testing.T) {
 	t.Parallel()
 
-	s := newSequence()
+	s := getSequence()
+	defer putSequence(s)
 	s.AddFrame(UnsynchronisedLyricsFrame{Language: "A", ContentDescriptor: "A"})
 	if s.Count() != 1 {
 		t.Errorf("Expected %v frames, got %v", 1, s.Count())

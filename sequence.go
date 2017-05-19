@@ -4,6 +4,10 @@
 
 package id3v2
 
+import (
+	"sync"
+)
+
 // sequence is used to manipulate with frames, which can be in tag
 // more than one (e.g. APIC, COMM, USLT and etc.)
 type sequence struct {
@@ -11,14 +15,8 @@ type sequence struct {
 	framesCache []Framer
 }
 
-func newSequence() *sequence {
-	return &sequence{
-		framers: make(map[string]Framer),
-	}
-}
-
 func (s *sequence) AddFrame(f Framer) {
-	s.framesCache = nil
+	s.framesCache = s.framesCache[:0]
 
 	var id string
 	if cf, ok := f.(CommentFrame); ok {
@@ -39,13 +37,27 @@ func (s *sequence) Count() int {
 }
 
 func (s *sequence) Frames() []Framer {
-	cache := s.framesCache
-	if len(cache) == 0 {
-		cache = make([]Framer, 0, len(s.framers))
+	if len(s.framesCache) == 0 {
 		for _, f := range s.framers {
-			cache = append(cache, f)
+			s.framesCache = append(s.framesCache, f)
 		}
-		s.framesCache = cache
 	}
-	return cache
+	return s.framesCache
+}
+
+var seqPool = sync.Pool{New: func() interface{} {
+	return &sequence{framers: make(map[string]Framer)}
+}}
+
+func getSequence() *sequence {
+	s := seqPool.Get().(*sequence)
+	if s.Count() > 0 {
+		s.framers = make(map[string]Framer)
+		s.framesCache = s.framesCache[:0]
+	}
+	return s
+}
+
+func putSequence(s *sequence) {
+	seqPool.Put(s)
 }

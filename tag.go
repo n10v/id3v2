@@ -43,7 +43,7 @@ func (tag *Tag) AddFrame(id string, f Framer) {
 
 	if mustFrameBeInSequence(id) {
 		if tag.sequences[id] == nil {
-			tag.sequences[id] = newSequence()
+			tag.sequences[id] = getSequence()
 		}
 		tag.sequences[id].AddFrame(f)
 	} else {
@@ -112,6 +112,10 @@ func (tag *Tag) DeleteAllFrames() {
 		tag.frames = make(map[string]Framer)
 	}
 	if tag.sequences == nil || len(tag.sequences) > 0 {
+		for _, s := range tag.sequences {
+			s = s
+			putSequence(s)
+		}
 		tag.sequences = make(map[string]*sequence)
 	}
 }
@@ -119,7 +123,10 @@ func (tag *Tag) DeleteAllFrames() {
 // DeleteFrames deletes frames in tag with given id.
 func (tag *Tag) DeleteFrames(id string) {
 	delete(tag.frames, id)
-	delete(tag.sequences, id)
+	if s, ok := tag.sequences[id]; ok {
+		putSequence(s)
+		delete(tag.sequences, id)
+	}
 }
 
 // Reset deletes all frames in tag and parses rd considering opts.
