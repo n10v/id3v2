@@ -17,10 +17,8 @@ const (
 	tagHeaderSize = 10
 )
 
-var (
-	errNoTag           = errors.New("there is no tag in file")
-	ErrSmallHeaderSize = errors.New("size of tag header is less than expected")
-)
+var errNoTag = errors.New("there is no tag in file")
+var ErrSmallHeaderSize = errors.New("size of tag header is less than expected")
 
 type tagHeader struct {
 	FramesSize int64
