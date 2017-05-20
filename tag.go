@@ -113,7 +113,6 @@ func (tag *Tag) DeleteAllFrames() {
 	}
 	if tag.sequences == nil || len(tag.sequences) > 0 {
 		for _, s := range tag.sequences {
-			s = s
 			putSequence(s)
 		}
 		tag.sequences = make(map[string]*sequence)

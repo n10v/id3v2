@@ -458,7 +458,7 @@ func TestConcurrent(t *testing.T) {
 			}
 
 			if _, err := tag.WriteTo(ioutil.Discard); err != nil {
-				t.Fatalf("Error while writing to ioutil.Discard:", err)
+				t.Fatal("Error while writing to ioutil.Discard:", err)
 			}
 		}()
 	}
