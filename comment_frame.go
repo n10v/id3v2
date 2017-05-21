@@ -17,32 +17,6 @@ import (
 // The information about how to add comment frame to tag you can
 // see in the docs to tag.AddCommentFrame function.
 //
-// Example of reading comment frames:
-//
-//	comments := tag.GetFrames(tag.CommonID("Comments"))
-//	if comments != nil {
-//		for _, f := range comments {
-//			comment, ok := f.(id3v2.CommentFrame)
-//			if !ok {
-//				log.Fatal("Couldn't assert comment frame")
-//			}
-//
-//			// Do something with comment frame.
-//			// For example, print the text:
-//			fmt.Println(comment.Text)
-//		}
-//	}
-//
-// Example of adding comment frames to tag:
-//
-//	comment := id3v2.CommentFrame{
-//		Encoding:   id3v2.ENUTF8,
-//		Language:   "eng",
-//		Desciption: "My opinion",
-//		Text:       "Very good song",
-//	}
-//	tag.AddCommentFrame(comment)
-//
 // You must choose a three-letter language code from
 // ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
 type CommentFrame struct {

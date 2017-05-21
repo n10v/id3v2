@@ -87,17 +87,15 @@ func main() {
 ## Read multiple frames
 ```go
 pictures := tag.GetFrames(tag.CommonID("Attached picture"))
-if pictures != nil {
-  for _, f := range pictures {
-    pic, ok := f.(id3v2.PictureFrame)
-    if !ok {
-      log.Fatal("Couldn't assert picture frame")
-    }
-
-    // Do something with picture frame.
-    // For example, print the description:
-    fmt.Println(pic.Description)
+for _, f := range pictures {
+  pic, ok := f.(id3v2.PictureFrame)
+  if !ok {
+    log.Fatal("Couldn't assert picture frame")
   }
+
+  // Do something with picture frame.
+  // For example, print the description:
+  fmt.Println(pic.Description)
 }
 ```
 

@@ -17,38 +17,6 @@ import (
 // The information about how to add picture frame to tag you can
 // see in the docs to tag.AddAttachedPicture function.
 //
-// Example of reading picture frames:
-//
-//	pictures := tag.GetFrames(tag.CommonID("Attached picture"))
-//	if pictures != nil {
-//		for _, f := range pictures {
-//			pic, ok := f.(id3v2.PictureFrame)
-//			if !ok {
-//				log.Fatal("Couldn't assert picture frame")
-//			}
-//
-//			// Do something with picture frame.
-//			// For example, print the description:
-//			fmt.Println(pic.Description)
-//		}
-//	}
-//
-// Example of adding picture frames to tag:
-//
-//	artwork, err := ioutil.ReadFile("artwork.jpg")
-//	if err != nil {
-//		log.Fatal("Error while reading artwork file", err)
-//	}
-//
-//	pic := id3v2.PictureFrame{
-//		Encoding:    id3v2.ENUTF8,
-//		MimeType:    "image/jpeg",
-//		PictureType: id3v2.PTFrontCover,
-//		Description: "Front cover",
-//		Picture:     artwork,
-//	}
-//	tag.AddAttachedPicture(pic)
-//
 // Available picture types you can see in constants.
 type PictureFrame struct {
 	Encoding    util.Encoding

@@ -127,16 +127,14 @@ func ExampleTag_GetFrames() {
 	}
 
 	pictures := tag.GetFrames(tag.CommonID("Attached picture"))
-	if pictures != nil {
-		for _, f := range pictures {
-			pic, ok := f.(id3v2.PictureFrame)
-			if !ok {
-				log.Fatal("Couldn't assert picture frame")
-			}
-			// Do something with picture frame.
-			// For example, print description of picture frame:
-			fmt.Println(pic.Description)
+	for _, f := range pictures {
+		pic, ok := f.(id3v2.PictureFrame)
+		if !ok {
+			log.Fatal("Couldn't assert picture frame")
 		}
+		// Do something with picture frame.
+		// For example, print description of picture frame:
+		fmt.Println(pic.Description)
 	}
 }
 
@@ -154,4 +152,119 @@ func ExampleTag_GetLastFrame() {
 		}
 		fmt.Println(bpm.Text)
 	}
+}
+
+func ExampleCommentFrame_get() {
+	tag, err := id3v2.Open("file.mp3", id3v2.Options{Parse: true})
+	if tag == nil || err != nil {
+		log.Fatal("Error while opening mp3 file: ", err)
+	}
+
+	comments := tag.GetFrames(tag.CommonID("Comments"))
+	for _, f := range comments {
+		comment, ok := f.(id3v2.CommentFrame)
+		if !ok {
+			log.Fatal("Couldn't assert comment frame")
+		}
+
+		// Do something with comment frame.
+		// For example, print the text:
+		fmt.Println(comment.Text)
+	}
+}
+
+func ExampleCommentFrame_add() {
+	tag := id3v2.NewEmptyTag()
+	comment := id3v2.CommentFrame{
+		Encoding:    id3v2.ENUTF8,
+		Language:    "eng",
+		Description: "My opinion",
+		Text:        "Very good song",
+	}
+	tag.AddCommentFrame(comment)
+}
+
+func ExamplePictureFrame_get() {
+	tag, err := id3v2.Open("file.mp3", id3v2.Options{Parse: true})
+	if tag == nil || err != nil {
+		log.Fatal("Error while opening mp3 file: ", err)
+	}
+
+	pictures := tag.GetFrames(tag.CommonID("Attached picture"))
+	for _, f := range pictures {
+		pic, ok := f.(id3v2.PictureFrame)
+		if !ok {
+			log.Fatal("Couldn't assert picture frame")
+		}
+
+		// Do something with picture frame.
+		// For example, print the description:
+		fmt.Println(pic.Description)
+	}
+}
+
+func ExamplePictureFrame_add() {
+	tag := id3v2.NewEmptyTag()
+	artwork, err := ioutil.ReadFile("artwork.jpg")
+	if err != nil {
+		log.Fatal("Error while reading artwork file", err)
+	}
+
+	pic := id3v2.PictureFrame{
+		Encoding:    id3v2.ENUTF8,
+		MimeType:    "image/jpeg",
+		PictureType: id3v2.PTFrontCover,
+		Description: "Front cover",
+		Picture:     artwork,
+	}
+	tag.AddAttachedPicture(pic)
+}
+
+func ExampleTextFrame_get() {
+	tag, err := id3v2.Open("file.mp3", id3v2.Options{Parse: true})
+	if tag == nil || err != nil {
+		log.Fatal("Error while opening mp3 file: ", err)
+	}
+
+	tf := tag.GetTextFrame(tag.CommonID("Mood"))
+	fmt.Println(tf.Text)
+}
+
+func ExampleTextFrame_add() {
+	tag := id3v2.NewEmptyTag()
+	textFrame := id3v2.TextFrame{
+		Encoding: id3v2.ENUTF8,
+		Text:     "Happy",
+	}
+	tag.AddFrame(tag.CommonID("Mood"), textFrame)
+}
+
+func ExampleUnsynchronisedLyricsFrame_get() {
+	tag, err := id3v2.Open("file.mp3", id3v2.Options{Parse: true})
+	if tag == nil || err != nil {
+		log.Fatal("Error while opening mp3 file: ", err)
+	}
+
+	uslfs := tag.GetFrames(tag.CommonID("Unsynchronised lyrics/text transcription"))
+	for _, f := range uslfs {
+		uslf, ok := f.(id3v2.UnsynchronisedLyricsFrame)
+		if !ok {
+			log.Fatal("Couldn't assert USLT frame")
+		}
+
+		// Do something with USLT frame.
+		// For example, print the lyrics:
+		fmt.Println(uslf.Lyrics)
+	}
+}
+
+func ExampleUnsynchronisedLyricsFrame_add() {
+	tag := id3v2.NewEmptyTag()
+	uslt := id3v2.UnsynchronisedLyricsFrame{
+		Encoding:          id3v2.ENUTF8,
+		Language:          "ger",
+		ContentDescriptor: "Deutsche Nationalhymne",
+		Lyrics:            "Einigkeit und Recht und Freiheit...",
+	}
+	tag.AddUnsynchronisedLyricsFrame(uslt)
 }
