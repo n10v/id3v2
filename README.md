@@ -88,14 +88,14 @@ func main() {
 ```go
 pictures := tag.GetFrames(tag.CommonID("Attached picture"))
 for _, f := range pictures {
-  pic, ok := f.(id3v2.PictureFrame)
-  if !ok {
-    log.Fatal("Couldn't assert picture frame")
-  }
+	pic, ok := f.(id3v2.PictureFrame)
+	if !ok {
+		log.Fatal("Couldn't assert picture frame")
+	}
 
-  // Do something with picture frame.
-  // For example, print the description:
-  fmt.Println(pic.Description)
+	// Do something with picture frame.
+	// For example, print the description:
+	fmt.Println(pic.Description)
 }
 ```
 
