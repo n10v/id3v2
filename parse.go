@@ -7,7 +7,6 @@ package id3v2
 import (
 	"errors"
 	"io"
-	"io/ioutil"
 	"strconv"
 
 	"github.com/bogem/id3v2/bbpool"
@@ -92,13 +91,11 @@ func (tag *Tag) parseFrames(opts Options) error {
 		defer lrpool.Put(bodyRd)
 
 		// If user set opts.ParseFrames, take it into consideration.
-		if len(parseIDs) > 0 {
-			if !parseIDs[id] {
-				if _, err := io.Copy(ioutil.Discard, bodyRd); err != nil {
-					return err
-				}
-				continue
+		if len(parseIDs) > 0 && !parseIDs[id] {
+			if err := skipReader(bodyRd); err != nil {
+				return err
 			}
+			continue
 		}
 
 		// Parse frame body.
@@ -149,7 +146,15 @@ func parseFrameHeader(rd io.Reader) (frameHeader, error) {
 	return header, nil
 }
 
-func parseFrameBody(id string, rd io.Reader) (Framer, error) {
+// skipReader just reads the rd until io.EOF.
+func skipReader(rd io.Reader) error {
+	buf := bbpool.Get()
+	_, err := buf.ReadFrom(rd)
+	bbpool.Put(buf)
+	return err
+}
+
+func parseFrameBody(id string, rd *io.LimitedReader) (Framer, error) {
 	if id[0] == 'T' {
 		return parseTextFrame(rd)
 	}
