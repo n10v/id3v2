@@ -7,8 +7,8 @@ package util
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"io"
-	"io/ioutil"
 )
 
 // Reader is used for convenient parsing of frames.
@@ -94,7 +94,7 @@ func (r *Reader) ReadTillDelim(delim byte) ([]byte, error) {
 // delims.
 func (r *Reader) ReadTillDelims(delims []byte) ([]byte, error) {
 	if len(delims) == 0 {
-		return ioutil.ReadAll(r)
+		return nil, errors.New("delims is empty")
 	}
 	if len(delims) == 1 {
 		return r.ReadTillDelim(delims[0])
