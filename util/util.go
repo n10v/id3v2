@@ -68,6 +68,10 @@ func ParseSize(data []byte) (int64, error) {
 	return size, nil
 }
 
+// ReadAll reads from r until an error or EOF and returns the data it read.
+// A successful call returns err == nil, not err == EOF.
+// Because ReadAll is defined to read from src until EOF,
+// it does not treat an EOF from Read as an error to be reported.
 func ReadAll(rd io.Reader) ([]byte, error) {
 	if lr, ok := rd.(*io.LimitedReader); ok {
 		buf := make([]byte, lr.N)
