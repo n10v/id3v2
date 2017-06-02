@@ -4,7 +4,11 @@
 
 package util
 
-import "errors"
+import (
+	"bytes"
+	"errors"
+	"io"
+)
 
 const (
 	// ID3SizeLen is length of ID3v2 size specification format (4 * 0b0xxxxxxx).
@@ -62,4 +66,16 @@ func ParseSize(data []byte) (int64, error) {
 	}
 
 	return size, nil
+}
+
+func ReadAll(rd io.Reader) ([]byte, error) {
+	if lr, ok := rd.(*io.LimitedReader); ok {
+		buf := make([]byte, lr.N)
+		_, err := lr.R.Read(buf)
+		return buf, err
+	}
+
+	buf := bytes.NewBuffer(make([]byte, 0, bytes.MinRead))
+	_, err := buf.ReadFrom(rd)
+	return buf.Bytes(), err
 }

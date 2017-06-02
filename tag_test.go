@@ -72,9 +72,7 @@ var (
 	}
 
 	// Parse all frames
-	defaultOpts = Options{
-		Parse: true,
-	}
+	defaultOpts = Options{Parse: true}
 )
 
 func init() {
