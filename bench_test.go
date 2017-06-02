@@ -26,6 +26,23 @@ func BenchmarkParseAllFrames(b *testing.B) {
 	}
 }
 
+func BenchmarkParseArtistAndTitle(b *testing.B) {
+	if err := resetMP3Tag(); err != nil {
+		b.Fatal("Error while reseting mp3 file:", err)
+	}
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		tag, err := Open(mp3Name, Options{Parse: true, ParseFrames: []string{"Artist", "Title"}})
+		if tag == nil || err != nil {
+			b.Fatal("Error while opening mp3 file:", err)
+		}
+		if err = tag.Close(); err != nil {
+			b.Error("Error while closing a tag:", err)
+		}
+	}
+}
+
 func BenchmarkParseAndWriteCommonCase(b *testing.B) {
 	frontCover, err := ioutil.ReadFile(frontCoverName)
 	if err != nil {
