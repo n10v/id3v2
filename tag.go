@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/bogem/id3v2/bspool"
 	"github.com/bogem/id3v2/bwpool"
 	"github.com/bogem/id3v2/util"
 )
@@ -18,9 +19,6 @@ var ErrNoFile = errors.New("tag was not initialized with file")
 
 // Tag stores all information about opened tag.
 type Tag struct {
-	// buf is used for util.WriteBytesSize in tag.WriteTo().
-	buf []byte
-
 	frames    map[string]Framer
 	sequences map[string]*sequence
 
@@ -322,7 +320,9 @@ func (tag *Tag) Save() error {
 	}
 
 	// Write to new file the music part.
-	if _, err = io.Copy(newFile, originalFile); err != nil {
+	buf := bspool.Get(32 * 1024)
+	defer bspool.Put(buf)
+	if _, err = io.CopyBuffer(newFile, originalFile, buf); err != nil {
 		return err
 	}
 
@@ -358,9 +358,6 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	if w == nil {
 		return 0, errors.New("w is nil")
 	}
-	if len(tag.buf) < 4 {
-		tag.buf = make([]byte, 4)
-	}
 
 	// Count size of frames.
 	framesSize := tag.Size() - tagHeaderSize
@@ -371,14 +368,16 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	// Write tag header.
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
-	if err := writeTagHeader(bw, tag.buf, framesSize, tag.version); err != nil {
+	buf := bspool.Get(4)
+	defer bspool.Put(buf)
+	if err := writeTagHeader(bw, buf, framesSize, tag.version); err != nil {
 		return n, err
 	}
 	n += tagHeaderSize
 
 	// Write frames.
 	err = tag.iterateOverAllFrames(func(id string, f Framer) error {
-		nn, err := writeFrame(bw, tag.buf, id, f)
+		nn, err := writeFrame(bw, buf, id, f)
 		n += nn
 		return err
 	})
@@ -403,7 +402,12 @@ func writeFrame(bw *bufio.Writer, buf []byte, id string, frame Framer) (int64, e
 // writeFrameHeader writes frame header with id and frameSize to bw.
 // buf is needed for util.WriteBytesSize.
 func writeFrameHeader(bw *bufio.Writer, buf []byte, id string, frameSize int) error {
-	if err := util.WriteBytesSize(buf, frameSize); err != nil {
+	if len(buf) < util.ID3SizeLen {
+		return errors.New("writeFrameHeader: buf size is less than id3v2 size length")
+	}
+	size := buf[:util.ID3SizeLen]
+
+	if err := util.WriteBytesSize(size, frameSize); err != nil {
 		return err
 	}
 
@@ -413,7 +417,7 @@ func writeFrameHeader(bw *bufio.Writer, buf []byte, id string, frameSize int) er
 	}
 
 	// Size
-	if _, err := bw.Write(buf); err != nil {
+	if _, err := bw.Write(size); err != nil {
 		return err
 	}
 

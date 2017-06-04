@@ -9,7 +9,7 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/bogem/id3v2/bbpool"
+	"github.com/bogem/id3v2/bspool"
 	"github.com/bogem/id3v2/lrpool"
 	"github.com/bogem/id3v2/util"
 )
@@ -71,9 +71,11 @@ func (tag *Tag) parseFrames(opts Options) error {
 		parseIDs[tag.CommonID(description)] = true
 	}
 
+	buf := bspool.Get(32 * 1024)
+	defer bspool.Put(buf)
 	for framesSize > 0 {
 		// Parse frame header.
-		header, err := parseFrameHeader(tag.reader)
+		header, err := parseFrameHeader(buf, tag.reader)
 		if err == io.EOF || err == errBlankFrame || err == util.ErrInvalidSizeFormat {
 			break
 		}
@@ -92,7 +94,7 @@ func (tag *Tag) parseFrames(opts Options) error {
 
 		// If user set opts.ParseFrames, take it into consideration.
 		if len(parseIDs) > 0 && !parseIDs[id] {
-			if err := skipReader(bodyRd); err != nil {
+			if err := skipReaderBuf(bodyRd, buf); err != nil {
 				return err
 			}
 			continue
@@ -115,24 +117,20 @@ func (tag *Tag) parseFrames(opts Options) error {
 	return nil
 }
 
-func parseFrameHeader(rd io.Reader) (frameHeader, error) {
+func parseFrameHeader(buf []byte, rd io.Reader) (frameHeader, error) {
 	var header frameHeader
 
-	// Limit rd by frameHeaderSize.
-	bodyRd := lrpool.Get(rd, frameHeaderSize)
-	defer lrpool.Put(bodyRd)
+	if len(buf) < frameHeaderSize {
+		return header, errors.New("parseFrameHeader: buf is smaller than frame header size")
+	}
 
-	fhBuf := bbpool.Get()
-	defer bbpool.Put(fhBuf)
-
-	_, err := fhBuf.ReadFrom(bodyRd)
-	if err != nil {
+	fhBuf := buf[:frameHeaderSize]
+	if _, err := rd.Read(fhBuf); err != nil {
 		return header, err
 	}
-	data := fhBuf.Bytes()
 
-	id := string(data[:4])
-	bodySize, err := util.ParseSize(data[4:8])
+	id := string(fhBuf[:4])
+	bodySize, err := util.ParseSize(fhBuf[4:8])
 	if err != nil {
 		return header, err
 	}
@@ -146,12 +144,18 @@ func parseFrameHeader(rd io.Reader) (frameHeader, error) {
 	return header, nil
 }
 
-// skipReader just reads the rd until io.EOF.
-func skipReader(rd io.Reader) error {
-	buf := bbpool.Get()
-	_, err := buf.ReadFrom(rd)
-	bbpool.Put(buf)
-	return err
+// skipReaderBuf just reads the rd until io.EOF.
+func skipReaderBuf(rd io.Reader, buf []byte) error {
+	for {
+		_, err := rd.Read(buf)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func parseFrameBody(id string, rd *io.LimitedReader) (Framer, error) {
