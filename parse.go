@@ -158,7 +158,7 @@ func skipReaderBuf(rd io.Reader, buf []byte) error {
 	return nil
 }
 
-func parseFrameBody(id string, rd *io.LimitedReader) (Framer, error) {
+func parseFrameBody(id string, rd io.Reader) (Framer, error) {
 	if id[0] == 'T' {
 		return parseTextFrame(rd)
 	}
