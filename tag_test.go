@@ -359,8 +359,6 @@ func TestSaveAndCloseEmptyTag(t *testing.T) {
 	t.Parallel()
 
 	tag := NewEmptyTag()
-	tag.SetArtist("Artist")
-	tag.SetTitle("Title")
 	if err := tag.Save(); err == nil {
 		t.Error("By saving empty tag we wait for an error, but it's not returned")
 	}
@@ -395,15 +393,6 @@ func TestEmptyTagWriteTo(t *testing.T) {
 	}
 	if parsedTag.Title() != "Title" {
 		t.Error("Expected Title, got", parsedTag.Title())
-	}
-}
-
-// TestWriteTagToNil checks if tag.WriteTo() returns an error when writing to nil.
-func TestWriteTagToNil(t *testing.T) {
-	t.Parallel()
-
-	if _, err := NewEmptyTag().WriteTo(nil); err == nil {
-		t.Fatal("tag.WriteTo() should return an error when writing to nil")
 	}
 }
 
