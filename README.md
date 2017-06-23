@@ -16,16 +16,16 @@ I think, it's a good time to write an appropriate standard for it 😉
 **Fast and stable ID3 parsing and writing library for Go, based only on standard library and without any third-party dependency.**
 
 It can:
-* support ID3v2.3 and ID3v2.4 tags,
-* parse and write tags,
+* support ID3v2.3 and ID3v2.4 tags;
+* parse and write tags;
 * set artist, album, year, genre, unsynchronised lyrics/text (USLT),
-comments and attached pictures,
-* set several USLTs, comments and attached pictures,
-* work with all available encodings,
+comments and attached pictures;
+* set several USLTs, comments and attached pictures;
+* work with all available encodings;
 * be used in multiple goroutines.
 
 It can't:
-* do unsyncronization,
+* do unsyncronization;
 * work with extended header, flags, padding, footer.
 
 **id3v2 is still in beta. Until version 1.0 the API may be changed.**
