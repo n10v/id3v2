@@ -144,7 +144,7 @@ func parseFrameHeader(buf []byte, rd io.Reader) (frameHeader, error) {
 	return header, nil
 }
 
-// skipReaderBuf just reads the rd until io.EOF.
+// skipReaderBuf just reads rd until io.EOF.
 func skipReaderBuf(rd io.Reader, buf []byte) error {
 	for {
 		_, err := rd.Read(buf)
