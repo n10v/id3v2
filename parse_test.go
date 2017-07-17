@@ -269,13 +269,10 @@ func TestParseInvalidFrameSize(t *testing.T) {
 	bw := bufio.NewWriter(buf)
 
 	// Write tag header.
-	dst := make([]byte, 4)
-	if err := writeTagHeader(bw, dst, tagHeaderSize+16, 4); err != nil {
+	if err := writeTagHeader(bw, tagHeaderSize+16, 4); err != nil {
 		t.Fatal(err)
 	}
-	if err := bw.Flush(); err != nil {
-		t.Fatal(err)
-	}
+	bw.Flush()
 	// Write valid TIT2 frame.
 	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03}) // header and encoding
 	buf.WriteString("Title")

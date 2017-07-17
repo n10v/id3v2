@@ -368,16 +368,14 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	// Write tag header.
 	bw := bwpool.Get(w)
 	defer bwpool.Put(bw)
-	buf := bspool.Get(4)
-	defer bspool.Put(buf)
-	if err := writeTagHeader(bw, buf, framesSize, tag.version); err != nil {
+	if err := writeTagHeader(bw, framesSize, tag.version); err != nil {
 		return n, err
 	}
 	n += tagHeaderSize
 
 	// Write frames.
 	err = tag.iterateOverAllFrames(func(id string, f Framer) error {
-		nn, err := writeFrame(bw, buf, id, f)
+		nn, err := writeFrame(bw, id, f)
 		n += nn
 		return err
 	})
@@ -388,10 +386,8 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	return n, bw.Flush()
 }
 
-// writeFrame writes whole frame to bw.
-// buf is needed for util.WriteBytesSize in writeFrameHeader.
-func writeFrame(bw *bufio.Writer, buf []byte, id string, frame Framer) (int64, error) {
-	if err := writeFrameHeader(bw, buf, id, frame.Size()); err != nil {
+func writeFrame(bw *bufio.Writer, id string, frame Framer) (int64, error) {
+	if err := writeFrameHeader(bw, id, frame.Size()); err != nil {
 		return 0, err
 	}
 
@@ -399,25 +395,14 @@ func writeFrame(bw *bufio.Writer, buf []byte, id string, frame Framer) (int64, e
 	return frameHeaderSize + frameSize, err
 }
 
-// writeFrameHeader writes frame header with id and frameSize to bw.
-// buf is needed for util.WriteBytesSize.
-func writeFrameHeader(bw *bufio.Writer, buf []byte, id string, frameSize int) error {
-	if len(buf) < util.ID3SizeLen {
-		return errors.New("writeFrameHeader: buf size is less than id3v2 size length")
-	}
-	size := buf[:util.ID3SizeLen]
-
-	if err := util.WriteBytesSize(size, frameSize); err != nil {
-		return err
-	}
-
+func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
 	// ID
 	if _, err := bw.WriteString(id); err != nil {
 		return err
 	}
 
 	// Size
-	if _, err := bw.Write(size); err != nil {
+	if err := util.WriteBytesSize(bw, frameSize); err != nil {
 		return err
 	}
 

@@ -5,6 +5,7 @@
 package util
 
 import (
+	"bufio"
 	"bytes"
 	"testing"
 )
@@ -17,12 +18,15 @@ var (
 func TestWriteBytesSize(t *testing.T) {
 	t.Parallel()
 
-	buf := make([]byte, 4)
-	if err := WriteBytesSize(buf, sizeInt); err != nil {
+	buf := new(bytes.Buffer)
+	bw := bufio.NewWriter(buf)
+
+	if err := WriteBytesSize(bw, sizeInt); err != nil {
 		t.Error(err)
 	}
-	if !bytes.Equal(buf, sizeBytes) {
-		t.Errorf("Expected: %v, got: %v", sizeBytes, buf)
+	bw.Flush()
+	if !bytes.Equal(buf.Bytes(), sizeBytes) {
+		t.Errorf("Expected: %v, got: %v", sizeBytes, buf.Bytes())
 	}
 }
 
@@ -39,11 +43,11 @@ func TestParseSize(t *testing.T) {
 }
 
 func BenchmarkWriteBytesSize(b *testing.B) {
-	buf := make([]byte, 4)
+	bw := bufio.NewWriter(new(bytes.Buffer))
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if err := WriteBytesSize(buf, 268435454); err != nil {
+		if err := WriteBytesSize(bw, 268435454); err != nil {
 			b.Fatal(err)
 		}
 	}

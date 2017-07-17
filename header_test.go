@@ -37,9 +37,8 @@ func TestWriteTagHeader(t *testing.T) {
 
 	buf := new(bytes.Buffer)
 	bw := bufio.NewWriter(buf)
-	dst := make([]byte, 4)
 
-	if err := writeTagHeader(bw, dst, 15351, 4); err != nil {
+	if err := writeTagHeader(bw, 15351, 4); err != nil {
 		t.Fatal(err)
 	}
 	if err := bw.Flush(); err != nil {
