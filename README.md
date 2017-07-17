@@ -21,7 +21,6 @@ It can:
 * set artist, album, year, genre, unsynchronised lyrics/text (USLT),
 comments and attached pictures;
 * set several USLTs, comments and attached pictures;
-* work with all available encodings;
 * be used in multiple goroutines.
 
 It can't:
