@@ -44,10 +44,10 @@ func (tag *Tag) parse(rd io.Reader, opts Options) error {
 	}
 
 	tag.init(rd, tagHeaderSize+header.FramesSize, header.Version)
-	if opts.Parse {
-		err = tag.parseFrames(opts)
+	if !opts.Parse {
+		return nil
 	}
-	return err
+	return tag.parseFrames(opts)
 }
 
 // init initializes tag by deleting all frames in it, setting reader,
