@@ -28,39 +28,39 @@ const (
 
 var (
 	frontCover = PictureFrame{
-		Encoding:    ENUTF8,
+		Encoding:    EncodingUTF8,
 		MimeType:    "image/jpeg",
 		PictureType: PTFrontCover,
 		Description: "Front cover",
 	}
 	backCover = PictureFrame{
-		Encoding:    ENUTF8,
+		Encoding:    EncodingUTF8,
 		MimeType:    "image/jpeg",
 		PictureType: PTBackCover,
 		Description: "Back cover",
 	}
 
 	engUSLF = UnsynchronisedLyricsFrame{
-		Encoding:          ENUTF8,
+		Encoding:          EncodingUTF8,
 		Language:          "eng",
 		ContentDescriptor: "Content descriptor",
 		Lyrics:            "bogem/id3v2",
 	}
 	gerUSLF = UnsynchronisedLyricsFrame{
-		Encoding:          ENUTF8,
+		Encoding:          EncodingUTF8,
 		Language:          "ger",
 		ContentDescriptor: "Inhaltsdeskriptor",
 		Lyrics:            "Einigkeit und Recht und Freiheit",
 	}
 
 	engComm = CommentFrame{
-		Encoding:    ENUTF8,
+		Encoding:    EncodingUTF8,
 		Language:    "eng",
 		Description: "Short description",
 		Text:        "The actual text",
 	}
 	gerComm = CommentFrame{
-		Encoding:    ENUTF8,
+		Encoding:    EncodingUTF8,
 		Language:    "ger",
 		Description: "Kurze Beschreibung",
 		Text:        "Der eigentliche Text",
@@ -317,7 +317,7 @@ func TestInvalidLanguageCommentFrame(t *testing.T) {
 
 	tag := NewEmptyTag()
 	tag.AddCommentFrame(CommentFrame{
-		Encoding: ENUTF8,
+		Encoding: EncodingUTF8,
 		Language: "en", // should be "eng" according to ISO 639-2
 		Text:     "The actual text",
 	})
@@ -339,7 +339,7 @@ func TestInvalidLanguageUSLF(t *testing.T) {
 
 	tag := NewEmptyTag()
 	tag.AddUnsynchronisedLyricsFrame(UnsynchronisedLyricsFrame{
-		Encoding: ENUTF8,
+		Encoding: EncodingUTF8,
 		Language: "en", // should be "eng" according to ISO 639-2
 		Lyrics:   "Lyrics",
 	})

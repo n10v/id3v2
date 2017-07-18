@@ -11,7 +11,7 @@ package util
 // You can set encoding by yourself like this:
 //
 //	comment := id3v2.CommentFrame{
-//		Encoding:    id3v2.ENISO,
+//		Encoding:    id3v2.EncodingISO,
 //		Language:    "eng",
 //		Description: string([]byte{68, 101, 115, 99}),
 //		Text:        string([]byte{84, 101, 120, 116}),

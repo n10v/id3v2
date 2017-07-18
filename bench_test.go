@@ -72,7 +72,7 @@ func BenchmarkParseAndWrite(b *testing.B) {
 
 		// Set front cover.
 		pic := PictureFrame{
-			Encoding:    ENUTF8,
+			Encoding:    EncodingUTF8,
 			MimeType:    "image/jpeg",
 			PictureType: PTFrontCover,
 			Description: "Front cover",
@@ -82,7 +82,7 @@ func BenchmarkParseAndWrite(b *testing.B) {
 
 		// Set USLT.
 		uslt := UnsynchronisedLyricsFrame{
-			Encoding:          ENUTF8,
+			Encoding:          EncodingUTF8,
 			Language:          "eng",
 			ContentDescriptor: "Content descriptor",
 			Lyrics:            "bogem/id3v2",
@@ -91,7 +91,7 @@ func BenchmarkParseAndWrite(b *testing.B) {
 
 		// Set comment.
 		comm := CommentFrame{
-			Encoding:    ENUTF8,
+			Encoding:    EncodingUTF8,
 			Language:    "eng",
 			Description: "Short description",
 			Text:        "The actual text",
@@ -128,7 +128,7 @@ func BenchmarkReuseTag(b *testing.B) {
 
 		// Set front cover.
 		pic := PictureFrame{
-			Encoding:    ENUTF8,
+			Encoding:    EncodingUTF8,
 			MimeType:    "image/jpeg",
 			PictureType: PTFrontCover,
 			Description: "Front cover",
@@ -138,7 +138,7 @@ func BenchmarkReuseTag(b *testing.B) {
 
 		// Set USLT.
 		uslt := UnsynchronisedLyricsFrame{
-			Encoding:          ENUTF8,
+			Encoding:          EncodingUTF8,
 			Language:          "eng",
 			ContentDescriptor: "Content descriptor",
 			Lyrics:            "bogem/id3v2",
@@ -147,7 +147,7 @@ func BenchmarkReuseTag(b *testing.B) {
 
 		// Set comment.
 		comm := CommentFrame{
-			Encoding:    ENUTF8,
+			Encoding:    EncodingUTF8,
 			Language:    "eng",
 			Description: "Short description",
 			Text:        "The actual text",

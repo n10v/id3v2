@@ -191,7 +191,7 @@ func (tag *Tag) Title() string {
 }
 
 func (tag *Tag) SetTitle(title string) {
-	tag.AddFrame(tag.CommonID("Title/Songname/Content description"), TextFrame{Encoding: ENUTF8, Text: title})
+	tag.AddFrame(tag.CommonID("Title/Songname/Content description"), TextFrame{Encoding: EncodingUTF8, Text: title})
 }
 
 func (tag *Tag) Artist() string {
@@ -200,7 +200,7 @@ func (tag *Tag) Artist() string {
 }
 
 func (tag *Tag) SetArtist(artist string) {
-	tag.AddFrame(tag.CommonID("Lead artist/Lead performer/Soloist/Performing group"), TextFrame{Encoding: ENUTF8, Text: artist})
+	tag.AddFrame(tag.CommonID("Lead artist/Lead performer/Soloist/Performing group"), TextFrame{Encoding: EncodingUTF8, Text: artist})
 }
 
 func (tag *Tag) Album() string {
@@ -209,7 +209,7 @@ func (tag *Tag) Album() string {
 }
 
 func (tag *Tag) SetAlbum(album string) {
-	tag.AddFrame(tag.CommonID("Album/Movie/Show title"), TextFrame{Encoding: ENUTF8, Text: album})
+	tag.AddFrame(tag.CommonID("Album/Movie/Show title"), TextFrame{Encoding: EncodingUTF8, Text: album})
 }
 
 func (tag *Tag) Year() string {
@@ -218,7 +218,7 @@ func (tag *Tag) Year() string {
 }
 
 func (tag *Tag) SetYear(year string) {
-	tag.AddFrame(tag.CommonID("Year"), TextFrame{Encoding: ENUTF8, Text: year})
+	tag.AddFrame(tag.CommonID("Year"), TextFrame{Encoding: EncodingUTF8, Text: year})
 }
 
 func (tag *Tag) Genre() string {
@@ -227,7 +227,7 @@ func (tag *Tag) Genre() string {
 }
 
 func (tag *Tag) SetGenre(genre string) {
-	tag.AddFrame(tag.CommonID("Content type"), TextFrame{Encoding: ENUTF8, Text: genre})
+	tag.AddFrame(tag.CommonID("Content type"), TextFrame{Encoding: EncodingUTF8, Text: genre})
 }
 
 // iterateOverAllFrames iterates over every single frame in tag and calls

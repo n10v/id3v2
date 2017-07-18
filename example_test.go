@@ -28,7 +28,7 @@ func Example() {
 
 	// Set comment frame.
 	comment := id3v2.CommentFrame{
-		Encoding:    id3v2.ENUTF8,
+		Encoding:    id3v2.EncodingUTF8,
 		Language:    "eng",
 		Description: "My opinion",
 		Text:        "Very good song",
@@ -81,7 +81,7 @@ func ExampleTag_AddAttachedPicture() {
 	}
 
 	pic := id3v2.PictureFrame{
-		Encoding:    id3v2.ENUTF8,
+		Encoding:    id3v2.EncodingUTF8,
 		MimeType:    "image/jpeg",
 		PictureType: id3v2.PTFrontCover,
 		Description: "Front cover",
@@ -97,7 +97,7 @@ func ExampleTag_AddCommentFrame() {
 	}
 
 	comment := id3v2.CommentFrame{
-		Encoding:    id3v2.ENUTF8,
+		Encoding:    id3v2.EncodingUTF8,
 		Language:    "eng",
 		Description: "My opinion",
 		Text:        "Very good song",
@@ -112,7 +112,7 @@ func ExampleTag_AddUnsynchronisedLyricsFrame() {
 	}
 
 	uslt := id3v2.UnsynchronisedLyricsFrame{
-		Encoding:          id3v2.ENUTF8,
+		Encoding:          id3v2.EncodingUTF8,
 		Language:          "ger",
 		ContentDescriptor: "Deutsche Nationalhymne",
 		Lyrics:            "Einigkeit und Recht und Freiheit...",
@@ -176,7 +176,7 @@ func ExampleCommentFrame_get() {
 func ExampleCommentFrame_add() {
 	tag := id3v2.NewEmptyTag()
 	comment := id3v2.CommentFrame{
-		Encoding:    id3v2.ENUTF8,
+		Encoding:    id3v2.EncodingUTF8,
 		Language:    "eng",
 		Description: "My opinion",
 		Text:        "Very good song",
@@ -211,7 +211,7 @@ func ExamplePictureFrame_add() {
 	}
 
 	pic := id3v2.PictureFrame{
-		Encoding:    id3v2.ENUTF8,
+		Encoding:    id3v2.EncodingUTF8,
 		MimeType:    "image/jpeg",
 		PictureType: id3v2.PTFrontCover,
 		Description: "Front cover",
@@ -233,7 +233,7 @@ func ExampleTextFrame_get() {
 func ExampleTextFrame_add() {
 	tag := id3v2.NewEmptyTag()
 	textFrame := id3v2.TextFrame{
-		Encoding: id3v2.ENUTF8,
+		Encoding: id3v2.EncodingUTF8,
 		Text:     "Happy",
 	}
 	tag.AddFrame(tag.CommonID("Mood"), textFrame)
@@ -261,7 +261,7 @@ func ExampleUnsynchronisedLyricsFrame_get() {
 func ExampleUnsynchronisedLyricsFrame_add() {
 	tag := id3v2.NewEmptyTag()
 	uslt := id3v2.UnsynchronisedLyricsFrame{
-		Encoding:          id3v2.ENUTF8,
+		Encoding:          id3v2.EncodingUTF8,
 		Language:          "ger",
 		ContentDescriptor: "Deutsche Nationalhymne",
 		Lyrics:            "Einigkeit und Recht und Freiheit...",
