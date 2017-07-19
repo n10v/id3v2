@@ -13,20 +13,20 @@ import (
 // UnknownFrame is used for frames, which id3v2 so far doesn't know how to
 // parse and write it. It just contains an unparsed byte body of the frame.
 type UnknownFrame struct {
-	body []byte
+	Body []byte
 }
 
 func (uk UnknownFrame) Size() int {
-	return len(uk.body)
+	return len(uk.Body)
 }
 
 func (uk UnknownFrame) WriteTo(w io.Writer) (n int64, err error) {
 	var i int
-	i, err = w.Write(uk.body)
+	i, err = w.Write(uk.Body)
 	return int64(i), err
 }
 
 func parseUnknownFrame(rd io.Reader) (Framer, error) {
 	body, err := util.ReadAll(rd)
-	return UnknownFrame{body: body}, err
+	return UnknownFrame{Body: body}, err
 }

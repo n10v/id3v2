@@ -68,7 +68,7 @@ var (
 
 	unknownFrameID = "WPUB"
 	unknownFrame   = UnknownFrame{
-		body: []byte("https://soundcloud.com/suicidepart2"),
+		Body: []byte("https://soundcloud.com/suicidepart2"),
 	}
 
 	// Parse all frames
