@@ -16,13 +16,13 @@ type UnknownFrame struct {
 	Body []byte
 }
 
-func (uk UnknownFrame) Size() int {
-	return len(uk.Body)
+func (uf UnknownFrame) Size() int {
+	return len(uf.Body)
 }
 
-func (uk UnknownFrame) WriteTo(w io.Writer) (n int64, err error) {
+func (uf UnknownFrame) WriteTo(w io.Writer) (n int64, err error) {
 	var i int
-	i, err = w.Write(uk.Body)
+	i, err = w.Write(uf.Body)
 	return int64(i), err
 }
 
