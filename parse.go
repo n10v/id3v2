@@ -46,11 +46,13 @@ func (tag *Tag) parse(rd io.Reader, opts Options) error {
 	return tag.parseFrames(opts)
 }
 
-// init initializes tag by deleting all frames in it, setting reader,
-// originialSize and version.
-// init doesn't parse frames, it only set the fields.
 func (tag *Tag) init(rd io.Reader, originalSize int64, version byte) {
 	tag.DeleteAllFrames()
+	if version == 4 {
+		tag.defaultEncoding = EncodingUTF8
+	} else {
+		tag.defaultEncoding = EncodingISO
+	}
 	tag.reader = rd
 	tag.originalSize = originalSize
 	tag.version = version

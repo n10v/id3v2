@@ -4,9 +4,7 @@
 
 package id3v2
 
-import (
-	"io"
-)
+import "io"
 
 // PictureFrame structure is used for picture frames (APIC).
 // The information about how to add picture frame to tag you can
