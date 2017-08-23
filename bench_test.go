@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bytes"
 	"io/ioutil"
 	"testing"
 )
@@ -40,6 +41,42 @@ func BenchmarkParseArtistAndTitle(b *testing.B) {
 		if err = tag.Close(); err != nil {
 			b.Error("Error while closing a tag:", err)
 		}
+	}
+}
+
+func BenchmarkAddTextFrame(b *testing.B) {
+	tag := NewEmptyTag()
+	buf := new(bytes.Buffer)
+	text := "Héllö"
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		tag.Reset(nil, Options{Parse: false})
+
+		tag.AddFrame(tag.CommonID("Title"), TextFrame{
+			Encoding: EncodingUTF8,
+			Text:     text,
+		})
+
+		tag.WriteTo(buf)
+	}
+}
+
+func BenchmarkAddEncodedTextFrame(b *testing.B) {
+	tag := NewEmptyTag()
+	buf := new(bytes.Buffer)
+	text := "Héllö"
+
+	for i := 0; i < b.N; i++ {
+		buf.Reset()
+		tag.Reset(nil, Options{Parse: false})
+
+		tag.AddFrame(tag.CommonID("Title"), TextFrame{
+			Encoding: EncodingUTF16,
+			Text:     text,
+		})
+
+		tag.WriteTo(buf)
 	}
 }
 

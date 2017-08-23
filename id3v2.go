@@ -8,8 +8,6 @@ package id3v2
 import (
 	"io"
 	"os"
-
-	"github.com/bogem/id3v2/util"
 )
 
 // Available picture types for picture frame.
@@ -35,35 +33,6 @@ const (
 	PTIllustration
 	PTBandArtistLogotype
 	PTPublisherStudioLogotype
-)
-
-// Available encodings.
-var (
-	// ISO-8859-1.
-	EncodingISO = util.Encoding{
-		Key:              0,
-		TerminationBytes: []byte{0},
-	}
-
-	// UTF-16 encoded Unicode with BOM.
-	EncodingUTF16 = util.Encoding{
-		Key:              1,
-		TerminationBytes: []byte{0, 0},
-	}
-
-	// UTF-16BE encoded Unicode without BOM.
-	EncodingUTF16BE = util.Encoding{
-		Key:              2,
-		TerminationBytes: []byte{0, 0},
-	}
-
-	// UTF-8 encoded Unicode.
-	EncodingUTF8 = util.Encoding{
-		Key:              3,
-		TerminationBytes: []byte{0},
-	}
-
-	Encodings = []util.Encoding{EncodingISO, EncodingUTF16, EncodingUTF16BE, EncodingUTF8}
 )
 
 // Open opens file with name and passes it to OpenFile.

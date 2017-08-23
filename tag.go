@@ -10,8 +10,6 @@ import (
 	"io"
 	"os"
 
-	"github.com/bogem/id3v2/bspool"
-	"github.com/bogem/id3v2/bwpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -320,8 +318,8 @@ func (tag *Tag) Save() error {
 	}
 
 	// Write to new file the music part.
-	buf := bspool.Get(32 * 1024)
-	defer bspool.Put(buf)
+	buf := getByteSlice(32 * 1024)
+	defer putByteSlice(buf)
 	if _, err = io.CopyBuffer(newFile, originalFile, buf); err != nil {
 		return err
 	}
@@ -366,10 +364,10 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	}
 
 	// Write tag header.
-	bw := bwpool.Get(w)
-	defer bwpool.Put(bw)
+	bw := getBufioWriter(w)
+	defer putBufioWriter(bw)
 	if err := writeTagHeader(bw, framesSize, tag.version); err != nil {
-		return n, err
+		return 0, err
 	}
 	n += tagHeaderSize
 

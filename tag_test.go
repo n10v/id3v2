@@ -451,3 +451,65 @@ func TestConcurrent(t *testing.T) {
 	}
 	wg.Wait()
 }
+
+// TestEncodedText checks
+// if text of frames encoded with different encodings is correctly written.
+func TestEncodedText(t *testing.T) {
+	t.Parallel()
+
+	buf := new(bytes.Buffer)
+	encoded := "Héllö"
+
+	tag := NewEmptyTag()
+	tag.AddFrame(tag.CommonID("Title"), TextFrame{
+		Encoding: EncodingISO,
+		Text:     encoded,
+	})
+	tag.AddFrame(tag.CommonID("Attached picture"), PictureFrame{
+		Encoding:    EncodingUTF16,
+		MimeType:    "image/jpeg",
+		PictureType: PTFrontCover,
+		Description: encoded,
+	})
+	tag.AddFrame(tag.CommonID("Unsynchronised lyrics/text transcription"), UnsynchronisedLyricsFrame{
+		Encoding:          EncodingUTF16BE,
+		Language:          "ger",
+		ContentDescriptor: encoded,
+		Lyrics:            encoded,
+	})
+	tag.AddFrame(tag.CommonID("Comments"), CommentFrame{
+		Encoding:    EncodingUTF8,
+		Language:    "eng",
+		Description: encoded,
+		Text:        encoded,
+	})
+
+	if _, err := tag.WriteTo(buf); err != nil {
+		t.Fatalf("Error by writing to buf: %v", err)
+	}
+
+	tag, err := ParseReader(buf, Options{Parse: true})
+	if err != nil {
+		t.Fatalf("Error by parsing the tag: %v", err)
+	}
+
+	tf := tag.GetLastFrame(tag.CommonID("Title")).(TextFrame)
+	if !tf.Encoding.Equals(EncodingISO) && tf.Text != encoded {
+		t.Errorf("Expected %q and %q, got %q and %q", EncodingISO, encoded, tf.Encoding, tf.Text)
+	}
+
+	pf := tag.GetLastFrame(tag.CommonID("Attached picture")).(PictureFrame)
+	if !pf.Encoding.Equals(EncodingUTF16) && pf.Description != encoded {
+		t.Errorf("Expected %q and %q, got %q and %q", EncodingISO, encoded, pf.Encoding, pf.Description)
+	}
+
+	uslf := tag.GetLastFrame(tag.CommonID("Unsynchronised lyrics/text transcription")).(UnsynchronisedLyricsFrame)
+	if !uslf.Encoding.Equals(EncodingUTF16BE) && uslf.ContentDescriptor != encoded && uslf.Lyrics != encoded {
+		t.Errorf("Expected %q, %q and %q; got %q, %q and %q", EncodingISO, encoded, encoded, uslf.Encoding, uslf.ContentDescriptor, uslf.Lyrics)
+	}
+
+	cf := tag.GetLastFrame(tag.CommonID("Comments")).(CommentFrame)
+	if !cf.Encoding.Equals(EncodingUTF8) && cf.Description != encoded && cf.Text != encoded {
+		t.Errorf("Expected %q, %q and %q; got %q, %q and %q", EncodingUTF8, encoded, encoded, cf.Encoding, cf.Description, cf.Text)
+	}
+}

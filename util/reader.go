@@ -13,20 +13,12 @@ import (
 
 // Reader is used for convenient parsing of frames.
 type Reader struct {
-	buf      *bufio.Reader
-	bytesBuf *bytes.Buffer // Need for intermediate calculations
+	buf *bufio.Reader
 }
 
 // NewReader returns *Reader with specified rd.
 func NewReader(rd io.Reader) *Reader {
 	return &Reader{buf: bufio.NewReader(rd)}
-}
-
-func (r *Reader) initBytesBuf() {
-	if r.bytesBuf == nil {
-		r.bytesBuf = new(bytes.Buffer)
-	}
-	r.bytesBuf.Reset()
 }
 
 // Discard skips the next n bytes, returning the number of bytes discarded.
@@ -100,18 +92,18 @@ func (r *Reader) ReadTillDelims(delims []byte) ([]byte, error) {
 		return r.ReadTillDelim(delims[0])
 	}
 
-	r.initBytesBuf()
+	result := make([]byte, 0)
 
 	for {
 		read, err := r.ReadTillDelim(delims[0])
 		if err != nil {
-			return r.bytesBuf.Bytes(), err
+			return result, err
 		}
-		r.bytesBuf.Write(read)
+		result = append(result, read...)
 
 		peeked, err := r.buf.Peek(len(delims))
 		if err != nil {
-			return r.bytesBuf.Bytes(), err
+			return result, err
 		}
 
 		if bytes.Equal(peeked, delims) {
@@ -120,20 +112,12 @@ func (r *Reader) ReadTillDelims(delims []byte) ([]byte, error) {
 
 		b, err := r.ReadByte()
 		if err != nil {
-			return r.bytesBuf.Bytes(), err
+			return result, err
 		}
-		r.bytesBuf.WriteByte(b)
+		result = append(result, b)
 	}
 
-	return r.bytesBuf.Bytes(), nil
-}
-
-// String returns the contents of the unread portion of the buffered data
-// as a string. It returns error if there was an error during read.
-func (r *Reader) String() (string, error) {
-	r.initBytesBuf()
-	_, err := r.bytesBuf.ReadFrom(r)
-	return r.bytesBuf.String(), err
+	return result, nil
 }
 
 // Reset discards any buffered data, resets all state,

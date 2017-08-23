@@ -47,7 +47,7 @@ func WriteBytesSize(bw *bufio.Writer, size int) error {
 		// firstBits is "10100110 00000000 00000000 00000000" now.
 		// firstBits has int type, but we should have a byte.
 		// To have a byte we should move first 7 bits to the end of firstBits,
-		// because by converting int to byte only last 7 bits are taken.
+		// because by converting int to byte only last 8 bits are taken.
 		firstBits >>= (3*8 + 1)
 		// firstBits is "00000000 00000000 00000000 01010011" now.
 		bSize := byte(firstBits)
