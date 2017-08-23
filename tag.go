@@ -9,8 +9,6 @@ import (
 	"errors"
 	"io"
 	"os"
-
-	"github.com/bogem/id3v2/util"
 )
 
 var ErrNoFile = errors.New("tag was not initialized with file")
@@ -400,7 +398,7 @@ func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
 	}
 
 	// Size
-	if err := util.WriteBytesSize(bw, frameSize); err != nil {
+	if err := writeBytesSize(bw, frameSize); err != nil {
 		return err
 	}
 

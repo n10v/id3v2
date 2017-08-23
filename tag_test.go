@@ -12,8 +12,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-
-	"github.com/bogem/id3v2/util"
 )
 
 const (
@@ -155,7 +153,7 @@ func TestCountLenSize(t *testing.T) {
 		t.Error("Error while reading a tag header:", err)
 	}
 
-	size, err := util.ParseSize(tagHeader[6:10])
+	size, err := parseSize(tagHeader[6:10])
 	if err != nil {
 		t.Error("Error while parsing a tag header size:", err)
 	}

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package util
+package id3v2
 
 import (
 	"bufio"
@@ -11,19 +11,19 @@ import (
 	"io"
 )
 
-// Reader is used for convenient parsing of frames.
-type Reader struct {
+// reader is used for convenient parsing of frames.
+type reader struct {
 	buf *bufio.Reader
 }
 
 // NewReader returns *Reader with specified rd.
-func NewReader(rd io.Reader) *Reader {
-	return &Reader{buf: bufio.NewReader(rd)}
+func newReader(rd io.Reader) *reader {
+	return &reader{buf: bufio.NewReader(rd)}
 }
 
 // Discard skips the next n bytes, returning the number of bytes discarded.
 // If Discard skips fewer than n bytes, it also returns an error.
-func (r *Reader) Discard(n int) (discarded int, err error) {
+func (r *reader) Discard(n int) (discarded int, err error) {
 	return r.buf.Discard(n)
 }
 
@@ -32,13 +32,13 @@ func (r *Reader) Discard(n int) (discarded int, err error) {
 // The bytes are taken from at most one Read on the underlying Reader,
 // hence n may be less than len(p).
 // At EOF, the count will be zero and err will be io.EOF.
-func (r *Reader) Read(p []byte) (n int, err error) {
+func (r *reader) Read(p []byte) (n int, err error) {
 	return r.buf.Read(p)
 }
 
 // ReadByte reads and returns a single byte.
 // If no byte is available, returns an error.
-func (r *Reader) ReadByte() (byte, error) {
+func (r *reader) ReadByte() (byte, error) {
 	return r.buf.ReadByte()
 }
 
@@ -46,7 +46,7 @@ func (r *Reader) ReadByte() (byte, error) {
 // advancing the buffer as if the bytes had been returned by Read.
 // If there are fewer than n bytes in the buffer, Next returns the entire buffer.
 // The slice is only valid until the next call to a read or write method.
-func (r *Reader) Next(n int) ([]byte, error) {
+func (r *reader) Next(n int) ([]byte, error) {
 	if n == 0 {
 		return nil, nil
 	}
@@ -69,7 +69,7 @@ func (r *Reader) Next(n int) ([]byte, error) {
 // it returns the data read before the error and the error itself (often io.EOF).
 // ReadTillDelim returns err != nil if and only if ReadTillDelim didn't find
 // delim.
-func (r *Reader) ReadTillDelim(delim byte) ([]byte, error) {
+func (r *reader) ReadTillDelim(delim byte) ([]byte, error) {
 	read, err := r.buf.ReadBytes(delim)
 	if err != nil || len(read) == 0 {
 		return read, err
@@ -84,7 +84,7 @@ func (r *Reader) ReadTillDelim(delim byte) ([]byte, error) {
 // it returns the data read before the error and the error itself (often io.EOF).
 // ReadTillDelims returns err != nil if and only if ReadTillDelims didn't find
 // delims.
-func (r *Reader) ReadTillDelims(delims []byte) ([]byte, error) {
+func (r *reader) ReadTillDelims(delims []byte) ([]byte, error) {
 	if len(delims) == 0 {
 		return nil, errors.New("delims is empty")
 	}
@@ -122,6 +122,6 @@ func (r *Reader) ReadTillDelims(delims []byte) ([]byte, error) {
 
 // Reset discards any buffered data, resets all state,
 // and switches the buffered reader to read from r.
-func (r *Reader) Reset(rd io.Reader) {
+func (r *reader) Reset(rd io.Reader) {
 	r.buf.Reset(rd)
 }

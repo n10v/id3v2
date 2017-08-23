@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package util
+package id3v2
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ var (
 func TestReadTillDelim(t *testing.T) {
 	t.Parallel()
 
-	bsReader := NewReader(bytes.NewReader(bs))
+	bsReader := newReader(bytes.NewReader(bs))
 
 	firstIndexOf55 := bytes.Index(bs, []byte{55})
 	if firstIndexOf55 < 0 {
@@ -40,7 +40,7 @@ func TestReadTillDelim(t *testing.T) {
 func TestReadTillZero(t *testing.T) {
 	t.Parallel()
 
-	bsReader := NewReader(bytes.NewReader(bs))
+	bsReader := newReader(bytes.NewReader(bs))
 
 	read, err := bsReader.ReadTillDelim(0)
 	if err != nil {
@@ -57,7 +57,7 @@ func TestReadTillZero(t *testing.T) {
 func TestNext(t *testing.T) {
 	t.Parallel()
 
-	bsReader := NewReader(bytes.NewReader(bs))
+	bsReader := newReader(bytes.NewReader(bs))
 	n := 5 // Read 5 elements
 
 	read, err := bsReader.Next(n)
@@ -78,7 +78,7 @@ func TestNext(t *testing.T) {
 func TestReadTillDelimEOF(t *testing.T) {
 	t.Parallel()
 
-	bsReader := NewReader(bytes.NewReader(bs))
+	bsReader := newReader(bytes.NewReader(bs))
 	_, err := bsReader.ReadTillDelim(234)
 	if err != io.EOF {
 		t.Errorf("Expected io.EOF, got %v", err)
@@ -88,7 +88,7 @@ func TestReadTillDelimEOF(t *testing.T) {
 func TestReadTillDelims(t *testing.T) {
 	t.Parallel()
 
-	bsReader := NewReader(bytes.NewReader(bs))
+	bsReader := newReader(bytes.NewReader(bs))
 	delims := []byte{55, 66}
 	expectedLen := 9
 

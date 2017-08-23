@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package util
+package id3v2
 
 import (
 	"bufio"
@@ -21,7 +21,7 @@ func TestWriteBytesSize(t *testing.T) {
 	buf := new(bytes.Buffer)
 	bw := bufio.NewWriter(buf)
 
-	if err := WriteBytesSize(bw, sizeInt); err != nil {
+	if err := writeBytesSize(bw, sizeInt); err != nil {
 		t.Error(err)
 	}
 	bw.Flush()
@@ -33,7 +33,7 @@ func TestWriteBytesSize(t *testing.T) {
 func TestParseSize(t *testing.T) {
 	t.Parallel()
 
-	size, err := ParseSize(sizeBytes)
+	size, err := parseSize(sizeBytes)
 	if err != nil {
 		t.Error(err)
 	}
@@ -47,7 +47,7 @@ func BenchmarkWriteBytesSize(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if err := WriteBytesSize(bw, 268435454); err != nil {
+		if err := writeBytesSize(bw, 268435454); err != nil {
 			b.Fatal(err)
 		}
 	}
@@ -55,7 +55,7 @@ func BenchmarkWriteBytesSize(b *testing.B) {
 
 func BenchmarkParseSize(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		if _, err := ParseSize([]byte{127, 127, 127, 127}); err != nil {
+		if _, err := parseSize([]byte{127, 127, 127, 127}); err != nil {
 			b.Fatal(err)
 		}
 	}

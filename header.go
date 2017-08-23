@@ -9,8 +9,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-
-	"github.com/bogem/id3v2/util"
 )
 
 const tagHeaderSize = 10
@@ -46,7 +44,7 @@ func parseHeader(rd io.Reader) (tagHeader, error) {
 		return header, errNoTag
 	}
 
-	size, err := util.ParseSize(data[6:])
+	size, err := parseSize(data[6:])
 	if err != nil {
 		return header, err
 	}
@@ -85,7 +83,7 @@ func writeTagHeader(bw *bufio.Writer, framesSize int, version byte) error {
 	}
 
 	// Size of frames
-	if err := util.WriteBytesSize(bw, framesSize); err != nil {
+	if err := writeBytesSize(bw, framesSize); err != nil {
 		return err
 	}
 
