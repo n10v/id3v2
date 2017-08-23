@@ -7,10 +7,6 @@ package id3v2
 import (
 	"errors"
 	"io"
-
-	"github.com/bogem/id3v2/bwpool"
-	"github.com/bogem/id3v2/rdpool"
-	"github.com/bogem/id3v2/util"
 )
 
 // CommentFrame is used to work with COMM frames.
@@ -20,21 +16,21 @@ import (
 // You must choose a three-letter language code from
 // ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
 type CommentFrame struct {
-	Encoding    util.Encoding
+	Encoding    Encoding
 	Language    string
 	Description string
 	Text        string
 }
 
 func (cf CommentFrame) Size() int {
-	return 1 + len(cf.Language) + len(cf.Description) +
-		+len(cf.Encoding.TerminationBytes) + len(cf.Text)
+	return 1 + len(cf.Language) + encodedSize(cf.Description, cf.Encoding) +
+		+len(cf.Encoding.TerminationBytes) + encodedSize(cf.Text, cf.Encoding)
 }
 
 func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 	var i int
-	bw := bwpool.Get(w)
-	defer bwpool.Put(bw)
+	bw := getBufioWriter(w)
+	defer putBufioWriter(bw)
 
 	err = bw.WriteByte(cf.Encoding.Key)
 	if err != nil {
@@ -51,7 +47,7 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 	}
 	n += int64(i)
 
-	i, err = bw.WriteString(cf.Description)
+	i, err = encodeWriteText(bw, cf.Description, cf.Encoding)
 	if err != nil {
 		return
 	}
@@ -63,7 +59,7 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 	}
 	n += int64(i)
 
-	i, err = bw.WriteString(cf.Text)
+	i, err = encodeWriteText(bw, cf.Text, cf.Encoding)
 	if err != nil {
 		return
 	}
@@ -74,14 +70,14 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func parseCommentFrame(rd io.Reader) (Framer, error) {
-	bufRd := rdpool.Get(rd)
-	defer rdpool.Put(bufRd)
+	bufRd := getUtilReader(rd)
+	defer putUtilReader(bufRd)
 
-	encodingByte, err := bufRd.ReadByte()
+	encodingKey, err := bufRd.ReadByte()
 	if err != nil {
 		return nil, err
 	}
-	encoding := Encodings[encodingByte]
+	encoding := getEncoding(encodingKey)
 
 	language, err := bufRd.Next(3)
 	if err != nil {
@@ -96,16 +92,18 @@ func parseCommentFrame(rd io.Reader) (Framer, error) {
 		return nil, err
 	}
 
-	text, err := bufRd.String()
-	if err != nil {
+	text := getBytesBuffer()
+	defer putBytesBuffer(text)
+
+	if _, err := text.ReadFrom(bufRd); err != nil {
 		return nil, err
 	}
 
 	cf := CommentFrame{
 		Encoding:    encoding,
 		Language:    string(language),
-		Description: string(description),
-		Text:        text,
+		Description: decodeText(description, encoding),
+		Text:        decodeText(text.Bytes(), encoding),
 	}
 
 	return cf, nil

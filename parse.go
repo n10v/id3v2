@@ -9,8 +9,6 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/bogem/id3v2/bspool"
-	"github.com/bogem/id3v2/lrpool"
 	"github.com/bogem/id3v2/util"
 )
 
@@ -71,8 +69,8 @@ func (tag *Tag) parseFrames(opts Options) error {
 		parseIDs[tag.CommonID(description)] = true
 	}
 
-	buf := bspool.Get(32 * 1024)
-	defer bspool.Put(buf)
+	buf := getByteSlice(32 * 1024)
+	defer putByteSlice(buf)
 	for framesSize > 0 {
 		// Parse frame header.
 		header, err := parseFrameHeader(buf, tag.reader)
@@ -89,8 +87,8 @@ func (tag *Tag) parseFrames(opts Options) error {
 		framesSize -= frameHeaderSize + bodySize
 
 		// Limit tag.reader by header.BodySize.
-		bodyRd := lrpool.Get(tag.reader, bodySize)
-		defer lrpool.Put(bodyRd)
+		bodyRd := getLimitedReader(tag.reader, bodySize)
+		defer putLimitedReader(bodyRd)
 
 		// If user set opts.ParseFrames, take it into consideration.
 		if len(parseIDs) > 0 && !parseIDs[id] {

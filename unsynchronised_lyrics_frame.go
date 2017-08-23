@@ -7,10 +7,6 @@ package id3v2
 import (
 	"errors"
 	"io"
-
-	"github.com/bogem/id3v2/bwpool"
-	"github.com/bogem/id3v2/rdpool"
-	"github.com/bogem/id3v2/util"
 )
 
 // UnsynchronisedLyricsFrame is used to work with USLT frames.
@@ -20,21 +16,21 @@ import (
 // You must choose a three-letter language code from
 // ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
 type UnsynchronisedLyricsFrame struct {
-	Encoding          util.Encoding
+	Encoding          Encoding
 	Language          string
 	ContentDescriptor string
 	Lyrics            string
 }
 
 func (uslf UnsynchronisedLyricsFrame) Size() int {
-	return 1 + len(uslf.Language) + len(uslf.ContentDescriptor) +
-		+len(uslf.Encoding.TerminationBytes) + len(uslf.Lyrics)
+	return 1 + len(uslf.Language) + encodedSize(uslf.ContentDescriptor, uslf.Encoding) +
+		+len(uslf.Encoding.TerminationBytes) + encodedSize(uslf.Lyrics, uslf.Encoding)
 }
 
 func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) {
 	var i int
-	bw := bwpool.Get(w)
-	defer bwpool.Put(bw)
+	bw := getBufioWriter(w)
+	defer putBufioWriter(bw)
 
 	err = bw.WriteByte(uslf.Encoding.Key)
 	if err != nil {
@@ -51,7 +47,7 @@ func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) 
 	}
 	n += int64(i)
 
-	i, err = bw.WriteString(uslf.ContentDescriptor)
+	i, err = encodeWriteText(bw, uslf.ContentDescriptor, uslf.Encoding)
 	if err != nil {
 		return
 	}
@@ -63,7 +59,7 @@ func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) 
 	}
 	n += int64(i)
 
-	i, err = bw.WriteString(uslf.Lyrics)
+	i, err = encodeWriteText(bw, uslf.Lyrics, uslf.Encoding)
 	if err != nil {
 		return
 	}
@@ -74,14 +70,14 @@ func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) 
 }
 
 func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
-	bufRd := rdpool.Get(rd)
-	defer rdpool.Put(bufRd)
+	bufRd := getUtilReader(rd)
+	defer putUtilReader(bufRd)
 
-	encodingByte, err := bufRd.ReadByte()
+	encodingKey, err := bufRd.ReadByte()
 	if err != nil {
 		return nil, err
 	}
-	encoding := Encodings[encodingByte]
+	encoding := getEncoding(encodingKey)
 
 	language, err := bufRd.Next(3)
 	if err != nil {
@@ -96,16 +92,18 @@ func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
 		return nil, err
 	}
 
-	lyrics, err := bufRd.String()
-	if err != nil {
+	lyrics := getBytesBuffer()
+	defer putBytesBuffer(lyrics)
+
+	if _, err := lyrics.ReadFrom(bufRd); err != nil {
 		return nil, err
 	}
 
 	uslf := UnsynchronisedLyricsFrame{
 		Encoding:          encoding,
 		Language:          string(language),
-		ContentDescriptor: string(contentDescriptor),
-		Lyrics:            lyrics,
+		ContentDescriptor: decodeText(contentDescriptor, encoding),
+		Lyrics:            decodeText(lyrics.Bytes(), encoding),
 	}
 
 	return uslf, nil

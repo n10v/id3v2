@@ -6,27 +6,23 @@ package id3v2
 
 import (
 	"io"
-
-	"github.com/bogem/id3v2/bwpool"
-	"github.com/bogem/id3v2/rdpool"
-	"github.com/bogem/id3v2/util"
 )
 
 // TextFrame is used to work with all text frames
 // (all T*** frames like TIT2 (title), TALB (album) and so on).
 type TextFrame struct {
-	Encoding util.Encoding
+	Encoding Encoding
 	Text     string
 }
 
 func (tf TextFrame) Size() int {
-	return 1 + len(tf.Text)
+	return 1 + encodedSize(tf.Text, tf.Encoding)
 }
 
 func (tf TextFrame) WriteTo(w io.Writer) (n int64, err error) {
 	var i int
-	bw := bwpool.Get(w)
-	defer bwpool.Put(bw)
+	bw := getBufioWriter(w)
+	defer putBufioWriter(bw)
 
 	err = bw.WriteByte(tf.Encoding.Key)
 	if err != nil {
@@ -34,7 +30,7 @@ func (tf TextFrame) WriteTo(w io.Writer) (n int64, err error) {
 	}
 	n++
 
-	i, err = bw.WriteString(tf.Text)
+	i, err = encodeWriteText(bw, tf.Text, tf.Encoding)
 	if err != nil {
 		return
 	}
@@ -45,22 +41,25 @@ func (tf TextFrame) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func parseTextFrame(rd io.Reader) (Framer, error) {
-	tfRd := rdpool.Get(rd)
-	defer rdpool.Put(tfRd)
+	bufRd := getUtilReader(rd)
+	defer putUtilReader(bufRd)
 
-	encoding, err := tfRd.ReadByte()
+	encodingKey, err := bufRd.ReadByte()
 	if err != nil {
 		return nil, err
 	}
+	encoding := getEncoding(encodingKey)
 
-	text, err := tfRd.String()
-	if err != nil {
+	buf := getBytesBuffer()
+	defer putBytesBuffer(buf)
+
+	if _, err := buf.ReadFrom(bufRd); err != nil {
 		return nil, err
 	}
 
 	tf := TextFrame{
-		Encoding: Encodings[encoding],
-		Text:     text,
+		Encoding: encoding,
+		Text:     decodeText(buf.Bytes(), encoding),
 	}
 
 	return tf, nil
