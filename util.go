@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT-style
 // license that can be found in the LICENSE file.
 
-package util
+package id3v2
 
 import (
 	"bufio"
@@ -12,11 +12,11 @@ import (
 )
 
 const (
-	// ID3SizeLen is length of ID3v2 size format (4 * 0b0xxxxxxx).
-	ID3SizeLen = 4
+	// id3SizeLen is length of ID3v2 size format (4 * 0b0xxxxxxx).
+	id3SizeLen = 4
 
 	maxSize  = 268435455 // == 0b00001111 11111111 11111111 11111111
-	sizeBase = 7
+	sizeBase = 7         // == 0b01111111
 )
 
 var (
@@ -24,10 +24,10 @@ var (
 	ErrInvalidSizeFormat = errors.New("invalid format of tag's/frame's size")
 )
 
-// WriteBytesSize writes size to bw in form of ID3v2 size format (4 * 0b0xxxxxxx).
+// writeBytesSize writes size to bw in form of ID3v2 size format (4 * 0b0xxxxxxx).
 //
 // If size is greater than allowed (256MB), then it returns ErrSizeOverflow.
-func WriteBytesSize(bw *bufio.Writer, size int) error {
+func writeBytesSize(bw *bufio.Writer, size int) error {
 	if size > maxSize {
 		return ErrSizeOverflow
 	}
@@ -41,7 +41,7 @@ func WriteBytesSize(bw *bufio.Writer, size int) error {
 	// its value is "10100111 01110101 01010010 11110000".
 	// In loop we should write every first 7 bits to bw.
 	mask := 254 << (3 * 8) // 11111110 000000000 000000000 000000000
-	for i := 0; i < ID3SizeLen; i++ {
+	for i := 0; i < id3SizeLen; i++ {
 		// To take first 7 bits we should do `size&mask`.
 		firstBits := size & mask
 		// firstBits is "10100110 00000000 00000000 00000000" now.
@@ -62,13 +62,13 @@ func WriteBytesSize(bw *bufio.Writer, size int) error {
 	return nil
 }
 
-// ParseSize parses data in form of ID3v2 size specification format (4 * 0b0xxxxxxx)
+// parseSize parses data in form of ID3v2 size specification format (4 * 0b0xxxxxxx)
 // and returns parsed int64 number.
 //
 // If length of data is greater than 4 or if there is invalid size format (e.g.
 // one byte in data is like 0b1xxxxxxx), then it returns ErrInvalidSizeFormat.
-func ParseSize(data []byte) (int64, error) {
-	if len(data) > ID3SizeLen {
+func parseSize(data []byte) (int64, error) {
+	if len(data) > id3SizeLen {
 		return 0, ErrInvalidSizeFormat
 	}
 
@@ -84,11 +84,11 @@ func ParseSize(data []byte) (int64, error) {
 	return size, nil
 }
 
-// ReadAll reads from r until an error or EOF and returns the data it read.
+// readAll reads from r until an error or EOF and returns the data it read.
 // A successful call returns err == nil, not err == EOF.
 // Because ReadAll is defined to read from src until EOF,
 // it does not treat an EOF from Read as an error to be reported.
-func ReadAll(rd io.Reader) ([]byte, error) {
+func readAll(rd io.Reader) ([]byte, error) {
 	if lr, ok := rd.(*io.LimitedReader); ok {
 		buf := make([]byte, lr.N)
 		_, err := lr.R.Read(buf)

@@ -8,8 +8,6 @@ import (
 	"errors"
 	"io"
 	"strconv"
-
-	"github.com/bogem/id3v2/util"
 )
 
 const frameHeaderSize = 10
@@ -74,7 +72,7 @@ func (tag *Tag) parseFrames(opts Options) error {
 	for framesSize > 0 {
 		// Parse frame header.
 		header, err := parseFrameHeader(buf, tag.reader)
-		if err == io.EOF || err == errBlankFrame || err == util.ErrInvalidSizeFormat {
+		if err == io.EOF || err == errBlankFrame || err == ErrInvalidSizeFormat {
 			break
 		}
 		if err != nil {
@@ -128,7 +126,7 @@ func parseFrameHeader(buf []byte, rd io.Reader) (frameHeader, error) {
 	}
 
 	id := string(fhBuf[:4])
-	bodySize, err := util.ParseSize(fhBuf[4:8])
+	bodySize, err := parseSize(fhBuf[4:8])
 	if err != nil {
 		return header, err
 	}

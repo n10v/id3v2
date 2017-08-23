@@ -6,8 +6,6 @@ package id3v2
 
 import (
 	"io"
-
-	"github.com/bogem/id3v2/util"
 )
 
 // PictureFrame structure is used for picture frames (APIC).
@@ -110,7 +108,7 @@ func parsePictureFrame(rd io.Reader) (Framer, error) {
 		return nil, err
 	}
 
-	picture, err := util.ReadAll(bufRd)
+	picture, err := readAll(bufRd)
 	if err != nil {
 		return nil, err
 	}

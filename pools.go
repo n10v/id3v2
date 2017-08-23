@@ -9,8 +9,6 @@ import (
 	"bytes"
 	"io"
 	"sync"
-
-	"github.com/bogem/id3v2/util"
 )
 
 // bsPool is a pool of byte slices.
@@ -73,20 +71,20 @@ func putLimitedReader(r *io.LimitedReader) {
 	lrPool.Put(r)
 }
 
-// rdPool is a pool of *util.Reader.
+// rdPool is a pool of *reader.
 var rdPool = sync.Pool{
-	New: func() interface{} { return util.NewReader(nil) },
+	New: func() interface{} { return newReader(nil) },
 }
 
-// getUtilReader returns *util.Reader with specified rd.
-func getUtilReader(rd io.Reader) *util.Reader {
-	reader := rdPool.Get().(*util.Reader)
+// getUtilReader returns *reader with specified rd.
+func getUtilReader(rd io.Reader) *reader {
+	reader := rdPool.Get().(*reader)
 	reader.Reset(rd)
 	return reader
 }
 
 // putUtilReader puts rd back to pool.
-func putUtilReader(rd *util.Reader) {
+func putUtilReader(rd *reader) {
 	rdPool.Put(rd)
 }
 
