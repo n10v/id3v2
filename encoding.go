@@ -8,17 +8,7 @@ import (
 	"golang.org/x/text/encoding/unicode"
 )
 
-// Encoding is a primitive for encodings.
-//
-// You can set encoding by yourself like this:
-//
-//	comment := id3v2.CommentFrame{
-//		Encoding:    id3v2.EncodingISO,
-//		Language:    "eng",
-//		Description: string([]byte{68, 101, 115, 99}),
-//		Text:        string([]byte{84, 101, 120, 116}),
-//	}
-//	tag.AddCommentFrame(comment)
+// Encoding is a struct for encodings.
 type Encoding struct {
 	Name             string
 	Key              byte
@@ -68,7 +58,7 @@ var (
 
 // getEncoding returns Encoding in accordance with ID3v2 key.
 func getEncoding(key byte) Encoding {
-	if key < 0 || key > 3 {
+	if key > 3 {
 		return EncodingUTF8
 	}
 	return encodings[key]
@@ -127,9 +117,8 @@ func resolveXEncoding(src []byte, encoding Encoding) xencoding.Encoding {
 			return unicode.UTF16(unicode.BigEndian, unicode.ExpectBOM)
 		} else if src[0] == 0xFF && src[1] == 0xFE {
 			return unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM)
-		} else {
-			return unicode.UTF16(unicode.BigEndian, unicode.ExpectBOM)
 		}
+		return unicode.UTF16(unicode.BigEndian, unicode.ExpectBOM)
 	case 2: // UTF-16BE without BOM
 		return unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM)
 	case 3: // UTF-8
