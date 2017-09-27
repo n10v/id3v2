@@ -455,9 +455,7 @@ func TestConcurrent(t *testing.T) {
 func TestEncodedText(t *testing.T) {
 	t.Parallel()
 
-	buf := new(bytes.Buffer)
 	encoded := "Héllö"
-
 	tag := NewEmptyTag()
 	tag.AddFrame(tag.CommonID("Title"), TextFrame{
 		Encoding: EncodingISO,
@@ -482,6 +480,7 @@ func TestEncodedText(t *testing.T) {
 		Text:        encoded,
 	})
 
+	buf := new(bytes.Buffer)
 	if _, err := tag.WriteTo(buf); err != nil {
 		t.Fatalf("Error by writing to buf: %v", err)
 	}
