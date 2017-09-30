@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	sizeInt   = 15351
-	sizeBytes = []byte{0, 0, 0x77, 0x77}
+	sizeInt   uint = 15351
+	sizeBytes      = []byte{0, 0, 0x77, 0x77}
 )
 
 func TestWriteBytesSize(t *testing.T) {

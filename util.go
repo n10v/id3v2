@@ -27,7 +27,7 @@ var (
 // writeBytesSize writes size to bw in form of ID3v2 size format (4 * 0b0xxxxxxx).
 //
 // If size is greater than allowed (256MB), then it returns ErrSizeOverflow.
-func writeBytesSize(bw *bufio.Writer, size int) error {
+func writeBytesSize(bw *bufio.Writer, size uint) error {
 	if size > maxSize {
 		return ErrSizeOverflow
 	}
@@ -40,7 +40,7 @@ func writeBytesSize(bw *bufio.Writer, size int) error {
 	// E.g. size is 32-bit integer and after the skip of first 4 bits
 	// its value is "10100111 01110101 01010010 11110000".
 	// In loop we should write every first 7 bits to bw.
-	mask := 254 << (3 * 8) // 11111110 000000000 000000000 000000000
+	mask := uint(254 << (3 * 8)) // 11111110 000000000 000000000 000000000
 	for i := 0; i < id3SizeLen; i++ {
 		// To take first 7 bits we should do `size&mask`.
 		firstBits := size & mask

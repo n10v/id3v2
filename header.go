@@ -61,7 +61,7 @@ func isID3Tag(data []byte) bool {
 	return bytes.Equal(data, id3Identifier)
 }
 
-func writeTagHeader(bw *bufio.Writer, framesSize int, version byte) error {
+func writeTagHeader(bw *bufio.Writer, framesSize uint, version byte) error {
 	// Identifier
 	if _, err := bw.Write(id3Identifier); err != nil {
 		return err

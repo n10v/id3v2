@@ -364,7 +364,7 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	// Write tag header.
 	bw := getBufioWriter(w)
 	defer putBufioWriter(bw)
-	if err := writeTagHeader(bw, framesSize, tag.version); err != nil {
+	if err := writeTagHeader(bw, uint(framesSize), tag.version); err != nil {
 		return 0, err
 	}
 	n += tagHeaderSize
@@ -383,7 +383,7 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func writeFrame(bw *bufio.Writer, id string, frame Framer) (int64, error) {
-	if err := writeFrameHeader(bw, id, frame.Size()); err != nil {
+	if err := writeFrameHeader(bw, id, uint(frame.Size())); err != nil {
 		return 0, err
 	}
 
@@ -391,7 +391,7 @@ func writeFrame(bw *bufio.Writer, id string, frame Framer) (int64, error) {
 	return frameHeaderSize + frameSize, err
 }
 
-func writeFrameHeader(bw *bufio.Writer, id string, frameSize int) error {
+func writeFrameHeader(bw *bufio.Writer, id string, frameSize uint) error {
 	// ID
 	if _, err := bw.WriteString(id); err != nil {
 		return err
