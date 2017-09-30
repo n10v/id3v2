@@ -1,16 +1,18 @@
 language: go
 go:
-  - 1.5.4
-  - 1.6.4
   - 1.7.5
   - 1.8.1
+  - 1.9
 
-os:
-  - osx
-  - linux
+env:
+  matrix:
+    - GOOS=darwin
+    - GOOS=linux
+    - GOOS=windows
+    - GOARCH=arm GOARM=6
 
 script:
-  - go build && go test -v ./...
+  - go build && go test -race -v
 
 notifications:
   email: false
