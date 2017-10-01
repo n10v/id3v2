@@ -4,10 +4,7 @@
 
 package id3v2
 
-import (
-	"errors"
-	"io"
-)
+import "io"
 
 // CommentFrame is used to work with COMM frames.
 // The information about how to add comment frame to tag you can
@@ -28,45 +25,26 @@ func (cf CommentFrame) Size() int {
 }
 
 func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
-	var i int
+	if len(cf.Language) != 3 {
+		return n, ErrInvalidLanguageLength
+	}
+
 	bw := getBufioWriter(w)
 	defer putBufioWriter(bw)
 
-	err = bw.WriteByte(cf.Encoding.Key)
+	bw.WriteByte(cf.Encoding.Key)
+	bw.WriteString(cf.Language)
+	_, err = encodeWriteText(bw, cf.Description, cf.Encoding)
 	if err != nil {
 		return
 	}
-	n++
-
-	if len(cf.Language) != 3 {
-		return n, errors.New("language code must consist of three letters according to ISO 639-2")
-	}
-	i, err = bw.WriteString(cf.Language)
+	bw.Write(cf.Encoding.TerminationBytes)
+	_, err = encodeWriteText(bw, cf.Text, cf.Encoding)
 	if err != nil {
 		return
 	}
-	n += int64(i)
 
-	i, err = encodeWriteText(bw, cf.Description, cf.Encoding)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	i, err = bw.Write(cf.Encoding.TerminationBytes)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	i, err = encodeWriteText(bw, cf.Text, cf.Encoding)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	err = bw.Flush()
-	return
+	return int64(bw.Buffered()), bw.Flush()
 }
 
 func parseCommentFrame(rd io.Reader) (Framer, error) {

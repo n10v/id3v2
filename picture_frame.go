@@ -25,54 +25,21 @@ func (pf PictureFrame) Size() int {
 }
 
 func (pf PictureFrame) WriteTo(w io.Writer) (n int64, err error) {
-	var i int
 	bw := getBufioWriter(w)
 	defer putBufioWriter(bw)
 
-	err = bw.WriteByte(pf.Encoding.Key)
+	bw.WriteByte(pf.Encoding.Key)
+	bw.WriteString(pf.MimeType)
+	bw.WriteByte(0)
+	bw.WriteByte(pf.PictureType)
+	_, err = encodeWriteText(bw, pf.Description, pf.Encoding)
 	if err != nil {
 		return
 	}
-	n++
+	bw.Write(pf.Encoding.TerminationBytes)
+	bw.Write(pf.Picture)
 
-	i, err = bw.WriteString(pf.MimeType)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	err = bw.WriteByte(0)
-	if err != nil {
-		return
-	}
-	n++
-
-	err = bw.WriteByte(pf.PictureType)
-	if err != nil {
-		return
-	}
-	n++
-
-	i, err = encodeWriteText(bw, pf.Description, pf.Encoding)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	i, err = bw.Write(pf.Encoding.TerminationBytes)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	i, err = bw.Write(pf.Picture)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	err = bw.Flush()
-	return
+	return int64(bw.Buffered()), bw.Flush()
 }
 
 func parsePictureFrame(rd io.Reader) (Framer, error) {

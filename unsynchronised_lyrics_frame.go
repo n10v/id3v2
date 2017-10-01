@@ -4,10 +4,7 @@
 
 package id3v2
 
-import (
-	"errors"
-	"io"
-)
+import "io"
 
 // UnsynchronisedLyricsFrame is used to work with USLT frames.
 // The information about how to add unsynchronised lyrics/text frame to tag
@@ -28,45 +25,26 @@ func (uslf UnsynchronisedLyricsFrame) Size() int {
 }
 
 func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) {
-	var i int
+	if len(uslf.Language) != 3 {
+		return n, ErrInvalidLanguageLength
+	}
+
 	bw := getBufioWriter(w)
 	defer putBufioWriter(bw)
 
-	err = bw.WriteByte(uslf.Encoding.Key)
+	bw.WriteByte(uslf.Encoding.Key)
+	bw.WriteString(uslf.Language)
+	_, err = encodeWriteText(bw, uslf.ContentDescriptor, uslf.Encoding)
 	if err != nil {
 		return
 	}
-	n++
-
-	if len(uslf.Language) != 3 {
-		return n, errors.New("language code must consist of three letters according to ISO 639-2")
-	}
-	i, err = bw.WriteString(uslf.Language)
+	bw.Write(uslf.Encoding.TerminationBytes)
+	_, err = encodeWriteText(bw, uslf.Lyrics, uslf.Encoding)
 	if err != nil {
 		return
 	}
-	n += int64(i)
 
-	i, err = encodeWriteText(bw, uslf.ContentDescriptor, uslf.Encoding)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	i, err = bw.Write(uslf.Encoding.TerminationBytes)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	i, err = encodeWriteText(bw, uslf.Lyrics, uslf.Encoding)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	err = bw.Flush()
-	return
+	return int64(bw.Buffered()), bw.Flush()
 }
 
 func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {

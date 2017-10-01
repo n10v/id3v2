@@ -19,8 +19,7 @@ func (uf UnknownFrame) Size() int {
 }
 
 func (uf UnknownFrame) WriteTo(w io.Writer) (n int64, err error) {
-	var i int
-	i, err = w.Write(uf.Body)
+	i, err := w.Write(uf.Body)
 	return int64(i), err
 }
 

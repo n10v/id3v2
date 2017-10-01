@@ -4,9 +4,7 @@
 
 package id3v2
 
-import (
-	"io"
-)
+import "io"
 
 // TextFrame is used to work with all text frames
 // (all T*** frames like TIT2 (title), TALB (album) and so on).
@@ -20,24 +18,16 @@ func (tf TextFrame) Size() int {
 }
 
 func (tf TextFrame) WriteTo(w io.Writer) (n int64, err error) {
-	var i int
 	bw := getBufioWriter(w)
 	defer putBufioWriter(bw)
 
-	err = bw.WriteByte(tf.Encoding.Key)
+	bw.WriteByte(tf.Encoding.Key)
+	_, err = encodeWriteText(bw, tf.Text, tf.Encoding)
 	if err != nil {
 		return
 	}
-	n++
 
-	i, err = encodeWriteText(bw, tf.Text, tf.Encoding)
-	if err != nil {
-		return
-	}
-	n += int64(i)
-
-	err = bw.Flush()
-	return
+	return int64(bw.Buffered()), bw.Flush()
 }
 
 func parseTextFrame(rd io.Reader) (Framer, error) {

@@ -4,7 +4,12 @@
 
 package id3v2
 
-import "io"
+import (
+	"errors"
+	"io"
+)
+
+var ErrInvalidLanguageLength = errors.New("language code must consist of three letters according to ISO 639-2")
 
 // Framer provides a generic interface for frames.
 // You can create your own frames. They must implement only this interface.
