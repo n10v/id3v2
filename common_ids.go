@@ -6,7 +6,7 @@ package id3v2
 
 import "io"
 
-// Common IDs for ID3v2.3 and ID3v2.4
+// Common IDs for ID3v2.3 and ID3v2.4.
 var (
 	V23CommonIDs = map[string]string{
 		"Attached picture":       "APIC",
@@ -52,7 +52,7 @@ var (
 		"User defined text information frame":      "TXXX",
 		"Unsynchronised lyrics/text transcription": "USLT",
 
-		// Just for convenience
+		// Just for convenience.
 		"Artist": "TPE1",
 		"Title":  "TIT2",
 		"Genre":  "TCON",
@@ -109,7 +109,7 @@ var (
 		"User defined text information frame":              "TXXX",
 		"Unsynchronised lyrics/text transcription":         "USLT",
 
-		// Deprecated ID3v2 frames
+		// Deprecated frames of ID3v2.3.
 		"Date":                  "TDRC",
 		"Time":                  "TDRC",
 		"Original release year": "TDOR",
@@ -117,7 +117,7 @@ var (
 		"Size":                  "",
 		"Year":                  "TDRC",
 
-		// Just for convenience
+		// Just for convenience.
 		"Artist": "TPE1",
 		"Title":  "TIT2",
 		"Genre":  "TCON",
