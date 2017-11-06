@@ -90,7 +90,8 @@ func (tag *Tag) parseFrames(opts Options) error {
 		bodyRd := getLimitedReader(tag.reader, bodySize)
 		defer putLimitedReader(bodyRd)
 
-		// If user set opts.ParseFrames, take it into consideration.
+		// If user set opts.ParseFrames and frame ID is not there,
+		// skip this frame.
 		if len(parseIDs) > 0 && !parseIDs[id] {
 			if err := skipReaderBuf(bodyRd, buf); err != nil {
 				return err
@@ -98,14 +99,26 @@ func (tag *Tag) parseFrames(opts Options) error {
 			continue
 		}
 
-		// Parse frame body.
 		frame, err := parseFrameBody(id, bodyRd)
 		if err != nil && err != io.EOF {
 			return err
 		}
 
-		// Add frame to tag.
 		tag.AddFrame(id, frame)
+
+		if len(parseIDs) > 0 {
+			// If the frame can be only one in tag,
+			// don't take into consideration more frames with id.
+			if !mustFrameBeInSequence(id) {
+				delete(parseIDs, id)
+
+				// And if it was last ID in parseIDs, we don't need to parse
+				// other frames, so break the parsing.
+				if len(parseIDs) == 0 {
+					break
+				}
+			}
+		}
 
 		if err == io.EOF {
 			break
