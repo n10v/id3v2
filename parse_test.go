@@ -334,6 +334,11 @@ func TestParseOptionsParseFramesWithSequenceFrames(t *testing.T) {
 	if tag.Artist() != "Artist" {
 		t.Errorf("Expected artist: %q, got %q", "Artist", tag.Artist())
 	}
+
+	usltFramesLen := len(tag.GetFrames("USLT"))
+	if usltFramesLen > 0 {
+		t.Errorf("Expected USLT frames: %v, got %v", 0, usltFramesLen)
+	}
 }
 
 // TestParseInvalidFrameSize creates an empty tag, writes tag header,
