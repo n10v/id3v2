@@ -259,6 +259,83 @@ func TestParseOptionsParseFrames(t *testing.T) {
 	}
 }
 
+// TestParseOptionsParseFramesWithSequenceFrames checks,
+// if tag.parseAllFrames() will correctly parse frames, that set in Options.ParseFrames
+// and may be more than one in tag.
+func TestParseOptionsParseFramesWithSequenceFrames(t *testing.T) {
+	tag := NewEmptyTag()
+
+	tag.AddCommentFrame(CommentFrame{
+		Encoding:    EncodingUTF8,
+		Language:    "eng",
+		Description: "",
+		Text:        "",
+	})
+	tag.AddCommentFrame(CommentFrame{
+		Encoding:    EncodingUTF8,
+		Language:    "ger",
+		Description: "",
+		Text:        "",
+	})
+
+	tag.SetArtist("Artist")
+
+	tag.AddUnsynchronisedLyricsFrame(UnsynchronisedLyricsFrame{
+		Encoding:          EncodingUTF8,
+		Language:          "eng",
+		ContentDescriptor: "",
+		Lyrics:            "",
+	})
+	tag.AddUnsynchronisedLyricsFrame(UnsynchronisedLyricsFrame{
+		Encoding:          EncodingUTF8,
+		Language:          "ger",
+		ContentDescriptor: "",
+		Lyrics:            "",
+	})
+
+	buf := new(bytes.Buffer)
+	if _, err := tag.WriteTo(buf); err != nil {
+		t.Fatal("Error by writing tag to buf:", err)
+	}
+
+	tag, err := ParseReader(buf, Options{Parse: true, ParseFrames: []string{"Artist", "Comments"}})
+	if err != nil {
+		t.Fatal("Error by parsing tag:", err)
+	}
+	if tag.Count() != 3 {
+		t.Errorf("Expected 3 frames in tag, got %v", tag.Count())
+	}
+
+	commentFrames := tag.GetFrames(tag.CommonID("Comments"))
+	if len(commentFrames) != 2 {
+		t.Errorf("Expected 2 comment frames, got %v", len(commentFrames))
+	}
+
+	var isEngCommentInFrame, isGerCommentInFrame bool
+	for _, f := range commentFrames {
+		commentFrame := f.(CommentFrame)
+
+		if commentFrame.Language == "eng" {
+			isEngCommentInFrame = true
+		} else if commentFrame.Language == "ger" {
+			isGerCommentInFrame = true
+		} else {
+			t.Error("Got unknown comment frame: %v", commentFrame)
+		}
+	}
+
+	if !isEngCommentInFrame {
+		t.Error("Eng comment frame is not in tag")
+	}
+	if !isGerCommentInFrame {
+		t.Error("Get comment frame is not in tag")
+	}
+
+	if tag.Artist() != "Artist" {
+		t.Errorf("Expected artist: %q, got %q", "Artist", tag.Artist())
+	}
+}
+
 // TestParseInvalidFrameSize creates an empty tag, writes tag header,
 // valid TIT2 frame and frame with invalid size, then checks
 // if valid frame is parsed and there is only this frame in tag.
