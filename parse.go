@@ -7,11 +7,11 @@ package id3v2
 import (
 	"errors"
 	"io"
-	"strconv"
 )
 
 const frameHeaderSize = 10
 
+var ErrUnsupportedVersion = errors.New("unsupported version of ID3 tag")
 var errBlankFrame = errors.New("id or size of frame are blank")
 
 type frameHeader struct {
@@ -35,8 +35,7 @@ func (tag *Tag) parse(rd io.Reader, opts Options) error {
 		return errors.New("error by parsing tag header: " + err.Error())
 	}
 	if header.Version < 3 {
-		err = errors.New("unsupported version of ID3 tag: " + strconv.Itoa(int(header.Version)))
-		return err
+		return ErrUnsupportedVersion
 	}
 
 	tag.init(rd, tagHeaderSize+header.FramesSize, header.Version)
