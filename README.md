@@ -21,10 +21,8 @@ It can't:
 
 **id3v2 is still in beta. Until version 1.0 the API may be changed.**
 
-If you want some **functionality, that library can't do**,
-or you have some **questions**, just write an issue.
-
-**And of course, pull requests are welcome!**
+If you want some functionality, that library can't do,
+or you have some questions, just write an issue. **And of course, pull requests are welcome!**
 
 ## Installation
   	$ go get -u github.com/bogem/id3v2
