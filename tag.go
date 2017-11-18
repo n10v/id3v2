@@ -302,7 +302,15 @@ func (tag *Tag) Save() error {
 	}
 
 	// Make sure we clean up the temp file if it's still around.
-	defer os.Remove(newFile.Name())
+	// tempfileShouldBeRemoved created only for performance
+	// improvement to prevent calling redundant Remove syscalls if file is moved
+	// and is not need to be removed.
+	tempfileShouldBeRemoved := true
+	defer func() {
+		if tempfileShouldBeRemoved {
+			os.Remove(newFile.Name())
+		}
+	}()
 
 	// Write tag in new file.
 	tagSize, err := tag.WriteTo(newFile)
@@ -330,6 +338,7 @@ func (tag *Tag) Save() error {
 	if err = os.Rename(newFile.Name(), originalFile.Name()); err != nil {
 		return err
 	}
+	tempfileShouldBeRemoved = false
 
 	// Set tag.reader to new file with original name.
 	tag.reader, err = os.Open(originalFile.Name())
