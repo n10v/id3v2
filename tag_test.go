@@ -481,11 +481,15 @@ func TestEncodedText(t *testing.T) {
 	})
 
 	buf := new(bytes.Buffer)
-	if _, err := tag.WriteTo(buf); err != nil {
+	n, err := tag.WriteTo(buf)
+	if err != nil {
 		t.Fatalf("Error by writing to buf: %v", err)
 	}
+	if n != int64(tag.Size()) {
+		t.Errorf("Expected WriteTo n %v, got %v", tag.Size(), n)
+	}
 
-	tag, err := ParseReader(buf, Options{Parse: true})
+	tag, err = ParseReader(buf, Options{Parse: true})
 	if err != nil {
 		t.Fatalf("Error by parsing the tag: %v", err)
 	}
@@ -508,5 +512,27 @@ func TestEncodedText(t *testing.T) {
 	cf := tag.GetLastFrame(tag.CommonID("Comments")).(CommentFrame)
 	if !cf.Encoding.Equals(EncodingUTF8) && cf.Description != encoded && cf.Text != encoded {
 		t.Errorf("Expected %q, %q and %q; got %q, %q and %q", EncodingUTF8, encoded, encoded, cf.Encoding, cf.Description, cf.Text)
+	}
+}
+
+func TestWriteToN(t *testing.T) {
+	tag := NewEmptyTag()
+
+	tag.SetTitle("Title")
+	tag.AddAttachedPicture(frontCover)
+	tag.AddUnsynchronisedLyricsFrame(engUSLF)
+	tag.AddCommentFrame(engComm)
+	tag.AddFrame(unknownFrameID, unknownFrame)
+
+	buf := new(bytes.Buffer)
+	n, err := tag.WriteTo(buf)
+	if err != nil {
+		t.Fatalf("Error by writing: %v", err)
+	}
+	if n != int64(tag.Size()) {
+		t.Errorf("Expected WriteTo n %v, got %v", tag.Size(), n)
+	}
+	if int64(buf.Len()) != n {
+		t.Errorf("buf.Len() and n are not equal: %v != %v ", buf.Len(), n)
 	}
 }
