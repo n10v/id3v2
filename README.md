@@ -128,6 +128,10 @@ it will be automatically encoded with UTF-16BE with BOM and written to w.
 By default, if version of tag is 4 then UTF-8 is used for methods like
 `SetArtist`, `SetTitle`, `SetGenre` and etc, otherwise ISO-8859-1.
 
-## Documentation
+## Benchmarks
+
+See benchmarks in the description of [last release](https://github.com/bogem/id3v2/releases).
+
+## Reference
 
 https://godoc.org/github.com/bogem/id3v2
