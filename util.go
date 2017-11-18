@@ -97,3 +97,11 @@ func readAll(rd io.Reader) ([]byte, error) {
 	_, err := buf.ReadFrom(rd)
 	return buf.Bytes(), err
 }
+
+func resolveBufioWriter(w io.Writer) (bw *bufio.Writer, ok bool) {
+	bw, ok = w.(*bufio.Writer)
+	if !ok {
+		bw = getBufioWriter(w)
+	}
+	return
+}
