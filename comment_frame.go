@@ -29,22 +29,35 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 		return n, ErrInvalidLanguageLength
 	}
 
-	bw := getBufioWriter(w)
-	defer putBufioWriter(bw)
+	bw, ok := resolveBufioWriter(w)
+	if !ok {
+		defer putBufioWriter(bw)
+	}
+
+	var nn int
 
 	bw.WriteByte(cf.Encoding.Key)
-	bw.WriteString(cf.Language)
-	_, err = encodeWriteText(bw, cf.Description, cf.Encoding)
-	if err != nil {
-		return
-	}
-	bw.Write(cf.Encoding.TerminationBytes)
-	_, err = encodeWriteText(bw, cf.Text, cf.Encoding)
+	n += 1
+
+	nn, _ = bw.WriteString(cf.Language)
+	n += int64(nn)
+
+	nn, err = encodeWriteText(bw, cf.Description, cf.Encoding)
+	n += int64(nn)
 	if err != nil {
 		return
 	}
 
-	return int64(bw.Buffered()), bw.Flush()
+	nn, _ = bw.Write(cf.Encoding.TerminationBytes)
+	n += int64(nn)
+
+	nn, err = encodeWriteText(bw, cf.Text, cf.Encoding)
+	n += int64(nn)
+	if err != nil {
+		return
+	}
+
+	return n, bw.Flush()
 }
 
 func parseCommentFrame(rd io.Reader) (Framer, error) {

@@ -29,22 +29,35 @@ func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) 
 		return n, ErrInvalidLanguageLength
 	}
 
-	bw := getBufioWriter(w)
-	defer putBufioWriter(bw)
+	bw, ok := resolveBufioWriter(w)
+	if !ok {
+		defer putBufioWriter(bw)
+	}
+
+	var nn int
 
 	bw.WriteByte(uslf.Encoding.Key)
-	bw.WriteString(uslf.Language)
-	_, err = encodeWriteText(bw, uslf.ContentDescriptor, uslf.Encoding)
-	if err != nil {
-		return
-	}
-	bw.Write(uslf.Encoding.TerminationBytes)
-	_, err = encodeWriteText(bw, uslf.Lyrics, uslf.Encoding)
+	n += 1
+
+	nn, _ = bw.WriteString(uslf.Language)
+	n += int64(nn)
+
+	nn, err = encodeWriteText(bw, uslf.ContentDescriptor, uslf.Encoding)
+	n += int64(nn)
 	if err != nil {
 		return
 	}
 
-	return int64(bw.Buffered()), bw.Flush()
+	nn, _ = bw.Write(uslf.Encoding.TerminationBytes)
+	n += int64(nn)
+
+	nn, err = encodeWriteText(bw, uslf.Lyrics, uslf.Encoding)
+	n += int64(nn)
+	if err != nil {
+		return
+	}
+
+	return n, bw.Flush()
 }
 
 func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
