@@ -347,11 +347,7 @@ func (tag *Tag) Save() error {
 	}
 
 	// Set tag.originalSize to new frames size.
-	if tagSize > tagHeaderSize {
-		tag.originalSize = tagSize - tagHeaderSize
-	} else {
-		tag.originalSize = 0
-	}
+	tag.originalSize = tagSize
 
 	return nil
 }
