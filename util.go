@@ -52,9 +52,7 @@ func writeBytesSize(bw *bufio.Writer, size uint) error {
 		// firstBits is "00000000 00000000 00000000 01010011" now.
 		bSize := byte(firstBits)
 		// Now in bSize we have only "01010011". We can write it to bw.
-		if err := bw.WriteByte(bSize); err != nil {
-			return err
-		}
+		bw.WriteByte(bSize)
 		// Do the same with next 7 bits.
 		size <<= sizeBase
 	}
