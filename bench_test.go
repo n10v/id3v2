@@ -44,7 +44,7 @@ func BenchmarkParseArtistAndTitle(b *testing.B) {
 	}
 }
 
-func BenchmarkAddTextFrame(b *testing.B) {
+func BenchmarkUTF8TextFrame(b *testing.B) {
 	tag := NewEmptyTag()
 	buf := new(bytes.Buffer)
 	text := "Héllö"
@@ -62,7 +62,7 @@ func BenchmarkAddTextFrame(b *testing.B) {
 	}
 }
 
-func BenchmarkAddEncodedTextFrame(b *testing.B) {
+func BenchmarkUTF16TextFrame(b *testing.B) {
 	tag := NewEmptyTag()
 	buf := new(bytes.Buffer)
 	text := "Héllö"
