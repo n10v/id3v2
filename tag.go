@@ -182,21 +182,21 @@ func (tag *Tag) HasFrames() bool {
 }
 
 func (tag *Tag) Title() string {
-	f := tag.GetTextFrame(tag.CommonID("Title/Songname/Content description"))
+	f := tag.GetTextFrame(tag.CommonID("Title"))
 	return f.Text
 }
 
 func (tag *Tag) SetTitle(title string) {
-	tag.AddFrame(tag.CommonID("Title/Songname/Content description"), TextFrame{Encoding: tag.defaultEncoding, Text: title})
+	tag.AddFrame(tag.CommonID("Title"), TextFrame{Encoding: tag.defaultEncoding, Text: title})
 }
 
 func (tag *Tag) Artist() string {
-	f := tag.GetTextFrame(tag.CommonID("Lead artist/Lead performer/Soloist/Performing group"))
+	f := tag.GetTextFrame(tag.CommonID("Artist"))
 	return f.Text
 }
 
 func (tag *Tag) SetArtist(artist string) {
-	tag.AddFrame(tag.CommonID("Lead artist/Lead performer/Soloist/Performing group"), TextFrame{Encoding: tag.defaultEncoding, Text: artist})
+	tag.AddFrame(tag.CommonID("Artist"), TextFrame{Encoding: tag.defaultEncoding, Text: artist})
 }
 
 func (tag *Tag) Album() string {
