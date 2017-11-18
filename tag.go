@@ -245,7 +245,7 @@ func (tag *Tag) iterateOverAllFrames(f func(id string, frame Framer) error) erro
 	return nil
 }
 
-// Size returns the size of all frames in bytes.
+// Size returns the size of tag (tag header + size of all frames) in bytes.
 func (tag *Tag) Size() int {
 	if !tag.HasFrames() {
 		return 0
