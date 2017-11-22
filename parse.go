@@ -47,14 +47,19 @@ func (tag *Tag) parse(rd io.Reader, opts Options) error {
 
 func (tag *Tag) init(rd io.Reader, originalSize int64, version byte) {
 	tag.DeleteAllFrames()
+
+	tag.reader = rd
+	tag.originalSize = originalSize
+	tag.version = version
+	tag.setDefaultEncoding(version)
+}
+
+func (tag *Tag) setDefaultEncoding(version byte) {
 	if version == 4 {
 		tag.defaultEncoding = EncodingUTF8
 	} else {
 		tag.defaultEncoding = EncodingISO
 	}
-	tag.reader = rd
-	tag.originalSize = originalSize
-	tag.version = version
 }
 
 func (tag *Tag) parseFrames(opts Options) error {

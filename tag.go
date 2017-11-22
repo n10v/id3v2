@@ -275,6 +275,7 @@ func (tag *Tag) SetVersion(version byte) {
 		return
 	}
 	tag.version = version
+	tag.setDefaultEncoding(version)
 }
 
 // Save writes tag to the file, if tag was opened with a file.
