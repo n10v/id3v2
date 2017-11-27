@@ -36,8 +36,9 @@ func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) 
 
 	var nn int
 
-	bw.WriteByte(uslf.Encoding.Key)
-	n += 1
+	if err = bw.WriteByte(uslf.Encoding.Key); err == nil {
+		n += 1
+	}
 
 	nn, _ = bw.WriteString(uslf.Language)
 	n += int64(nn)
@@ -54,6 +55,7 @@ func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) 
 	nn, err = encodeWriteText(bw, uslf.Lyrics, uslf.Encoding)
 	n += int64(nn)
 	if err != nil {
+		bw.Flush()
 		return
 	}
 

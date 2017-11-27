@@ -32,21 +32,25 @@ func (pf PictureFrame) WriteTo(w io.Writer) (n int64, err error) {
 
 	var nn int
 
-	bw.WriteByte(pf.Encoding.Key)
-	n += 1
+	if err = bw.WriteByte(pf.Encoding.Key); err == nil {
+		n += 1
+	}
 
 	nn, _ = bw.WriteString(pf.MimeType)
 	n += int64(nn)
 
-	bw.WriteByte(0)
-	n += 1
+	if err = bw.WriteByte(0); err == nil {
+		n += 1
+	}
 
-	bw.WriteByte(pf.PictureType)
-	n += 1
+	if err = bw.WriteByte(pf.PictureType); err == nil {
+		n += 1
+	}
 
 	nn, err = encodeWriteText(bw, pf.Description, pf.Encoding)
 	n += int64(nn)
 	if err != nil {
+		bw.Flush()
 		return
 	}
 

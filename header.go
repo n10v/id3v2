@@ -55,10 +55,7 @@ func parseHeader(rd io.Reader) (tagHeader, error) {
 }
 
 func isID3Tag(data []byte) bool {
-	if len(data) != len(id3Identifier) {
-		return false
-	}
-	return bytes.Equal(data, id3Identifier)
+	return len(data) == len(id3Identifier) && bytes.Equal(data, id3Identifier)
 }
 
 func writeTagHeader(bw *bufio.Writer, framesSize uint, version byte) error {

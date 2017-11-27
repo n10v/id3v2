@@ -36,8 +36,9 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 
 	var nn int
 
-	bw.WriteByte(cf.Encoding.Key)
-	n += 1
+	if err = bw.WriteByte(cf.Encoding.Key); err == nil {
+		n += 1
+	}
 
 	nn, _ = bw.WriteString(cf.Language)
 	n += int64(nn)
@@ -45,6 +46,7 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 	nn, err = encodeWriteText(bw, cf.Description, cf.Encoding)
 	n += int64(nn)
 	if err != nil {
+		bw.Flush()
 		return
 	}
 
@@ -54,6 +56,7 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 	nn, err = encodeWriteText(bw, cf.Text, cf.Encoding)
 	n += int64(nn)
 	if err != nil {
+		bw.Flush()
 		return
 	}
 

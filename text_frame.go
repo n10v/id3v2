@@ -25,12 +25,14 @@ func (tf TextFrame) WriteTo(w io.Writer) (n int64, err error) {
 
 	var nn int
 
-	bw.WriteByte(tf.Encoding.Key)
-	n += 1
+	if err = bw.WriteByte(tf.Encoding.Key); err == nil {
+		n += 1
+	}
 
 	nn, err = encodeWriteText(bw, tf.Text, tf.Encoding)
 	n += int64(nn)
 	if err != nil {
+		bw.Flush()
 		return
 	}
 
