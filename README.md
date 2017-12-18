@@ -3,16 +3,24 @@
 **Fast and stable ID3 parsing and writing library for Go, based only on standard library.**
 
 id3v2 can:
+
 ✅ Support of ID3v2.3 and ID3v2.4 tags
+
 ✅ Parse and write tags
+
 ✅ work with all available encodings
+
 ✅ set and read artist, album, year, genre, other text frames, unsynchronised lyrics/text (USLT),
 comments and attached pictures
+
 ✅ set and read several USLTs, comments and attached pictures
+
 ✅ be used in multiple goroutines
 
 id3v2 can't:
+
 ❌ do unsyncronization
+
 ❌ work with extended header, flags, padding, footer
 
 **id3v2 is still in beta. Until version 1.0 the API may be changed.**
