@@ -103,9 +103,7 @@ type Options struct {
 
 ## Work with encodings
 id3v2 can encode and decode text of avaialble encodings (ISO-8859-1,
-UTF-16 with BOM, UTF-16BE without BOM, UTF-8). 
-
-To work with other encodings, just set [the desired encoding](https://github.com/bogem/id3v2/blob/master/encoding.go#L27) in `Encoding` field of frame and set UTF-8 encoded text to corresponding text fields.
+UTF-16 with BOM, UTF-16BE without BOM, UTF-8). Just set [the desired encoding](https://github.com/bogem/id3v2/blob/master/encoding.go#L27) in `Encoding` field of frame and set UTF-8 encoded text to corresponding text fields.
 
 For example, if you set comment frame with custom encoding and write it:
 ```go
@@ -123,7 +121,7 @@ if err != nil {
 	log.Fatal(err)
 }
 ```
-the `Text` field will be automatically encoded with UTF-16BE with BOM and written to w.
+`Text` field will be automatically encoded with UTF-16BE with BOM and written to w.
 
 By default, if version of tag is 4 then UTF-8 is used for methods like
 `SetArtist`, `SetTitle`, `SetGenre` and etc, otherwise ISO-8859-1.
