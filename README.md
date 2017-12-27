@@ -1,6 +1,6 @@
 # id3v2 [![GoDoc](https://godoc.org/github.com/bogem/id3v2?status.svg)](https://godoc.org/github.com/bogem/id3v2) [![Build Status](https://travis-ci.org/bogem/id3v2.svg?branch=master)](https://travis-ci.org/bogem/id3v2)
 
-**Fast and stable ID3 parsing and writing library for Go, based only on standard library.**
+**Fast, simple and powerful ID3 parsing and writing library for Go, based only on standard library.**
 
 id3v2 can:
 * ✅ support of ID3v2.3 and ID3v2.4 tags;
