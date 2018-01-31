@@ -63,11 +63,9 @@ func (tag *Tag) setDefaultEncoding(version byte) {
 }
 
 func (tag *Tag) parseFrames(opts Options) error {
-	// Size of frames in tag = size of whole tag - size of tag header.
 	framesSize := tag.originalSize - tagHeaderSize
 
 	// Convert descriptions, specified by user in opts.ParseFrames, to IDs.
-	// Use map for speed.
 	parseIDs := make(map[string]bool, len(opts.ParseFrames))
 	for _, description := range opts.ParseFrames {
 		parseIDs[tag.CommonID(description)] = true
@@ -76,7 +74,6 @@ func (tag *Tag) parseFrames(opts Options) error {
 	buf := getByteSlice(32 * 1024)
 	defer putByteSlice(buf)
 	for framesSize > 0 {
-		// Parse frame header.
 		header, err := parseFrameHeader(buf, tag.reader)
 		if err == io.EOF || err == errBlankFrame || err == ErrInvalidSizeFormat {
 			break
@@ -87,10 +84,8 @@ func (tag *Tag) parseFrames(opts Options) error {
 		id := header.ID
 		bodySize := header.BodySize
 
-		// Substitute the size of the whole frame from framesSize.
 		framesSize -= frameHeaderSize + bodySize
 
-		// Limit tag.reader by header.BodySize.
 		bodyRd := getLimitedReader(tag.reader, bodySize)
 		defer putLimitedReader(bodyRd)
 
