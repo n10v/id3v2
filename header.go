@@ -16,9 +16,9 @@ const tagHeaderSize = 10
 var (
 	id3Identifier = []byte("ID3")
 	errNoTag      = errors.New("there is no tag in file")
-
-	ErrSmallHeaderSize = errors.New("size of tag header is less than expected")
 )
+
+var ErrSmallHeaderSize = errors.New("size of tag header is less than expected")
 
 type tagHeader struct {
 	FramesSize int64

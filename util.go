@@ -19,10 +19,8 @@ const (
 	sizeBase = 7         // == 0b01111111
 )
 
-var (
-	ErrSizeOverflow      = errors.New("size of tag/frame is greater than allowed in id3 tag")
-	ErrInvalidSizeFormat = errors.New("invalid format of tag's/frame's size")
-)
+var ErrInvalidSizeFormat = errors.New("invalid format of tag's/frame's size")
+var ErrSizeOverflow = errors.New("size of tag/frame is greater than allowed in id3 tag")
 
 // writeBytesSize writes size to bw in form of ID3v2 size format (4 * 0b0xxxxxxx).
 //
