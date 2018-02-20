@@ -36,10 +36,12 @@ func (tag *Tag) AddFrame(id string, f Framer) {
 	}
 
 	if mustFrameBeInSequence(id) {
-		if tag.sequences[id] == nil {
-			tag.sequences[id] = getSequence()
+		sequence := tag.sequences[id]
+		if sequence == nil {
+			sequence = getSequence()
 		}
-		tag.sequences[id].AddFrame(f)
+		sequence.AddFrame(f)
+		tag.sequences[id] = sequence
 	} else {
 		tag.frames[id] = f
 	}
