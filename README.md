@@ -22,8 +22,6 @@ or you have some questions, just write an issue. **And of course, pull requests 
 
 ## Installation
   	$ go get -u github.com/bogem/id3v2
-	
-or download the latest binary from [releases](https://github.com/bogem/id3v2/releases).
 
 ## Example of usage
 ```go
