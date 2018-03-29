@@ -18,10 +18,11 @@ const (
 	mp3Name        = "testdata/test.mp3"
 	frontCoverName = "testdata/front_cover.jpg"
 	backCoverName  = "testdata/back_cover.jpg"
-	framesSize     = 222524
-	tagSize        = tagHeaderSize + framesSize
-	musicSize      = 4557843
-	countOfFrames  = 12
+
+	framesSize    = 211805
+	tagSize       = tagHeaderSize + framesSize
+	musicSize     = 3840834
+	countOfFrames = 12
 )
 
 var (
@@ -70,7 +71,7 @@ var (
 	}
 
 	// Parse all frames
-	defaultOpts = Options{Parse: true}
+	parseOpts = Options{Parse: true}
 )
 
 func init() {
@@ -92,7 +93,7 @@ func init() {
 
 // resetMP3Tag sets the default frames to mp3Name.
 func resetMP3Tag() error {
-	tag, err := Open(mp3Name, defaultOpts)
+	tag, err := Open(mp3Name, Options{Parse: false})
 	if tag == nil || err != nil {
 		return err
 	}
@@ -123,7 +124,7 @@ func resetMP3Tag() error {
 }
 
 func TestCountLenSize(t *testing.T) {
-	tag, err := Open(mp3Name, defaultOpts)
+	tag, err := Open(mp3Name, parseOpts)
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -163,7 +164,6 @@ func TestCountLenSize(t *testing.T) {
 	}
 
 	// Check tag.Size().
-	tagSize := tagHeaderSize + framesSize
 	if tag.Size() != tagSize {
 		t.Errorf("Expected tag.Size(): %v, got: %v", tagSize, tag.Size())
 	}
@@ -188,7 +188,7 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 		t.Fatal("Error while reading mp3 file:", err)
 	}
 
-	expected := []byte{255, 251, 144, 68, 0, 0, 0}
+	expected := []byte{255, 251, 80, 0, 0, 0, 0}
 	got := make([]byte, len(expected))
 	n, err = rd.Read(got)
 	if n != len(expected) {
@@ -252,7 +252,7 @@ func TestCheckPermissions(t *testing.T) {
 	originalMode := originalStat.Mode()
 	originalFile.Close()
 
-	tag, err := Open(mp3Name, defaultOpts)
+	tag, err := Open(mp3Name, parseOpts)
 	if err != nil {
 		t.Fatal("Error while parsing a tag:", err)
 	}
@@ -403,7 +403,7 @@ func TestResetTag(t *testing.T) {
 	defer mp3.Close()
 
 	tag := NewEmptyTag()
-	if err := tag.Reset(mp3, defaultOpts); err != nil {
+	if err := tag.Reset(mp3, parseOpts); err != nil {
 		t.Fatal("Error while reseting tag:", err)
 	}
 
@@ -433,7 +433,7 @@ func TestConcurrent(t *testing.T) {
 			}
 			defer file.Close()
 
-			if err := tag.Reset(file, defaultOpts); err != nil {
+			if err := tag.Reset(file, parseOpts); err != nil {
 				t.Fatal("Error while reseting tag to file:", err)
 			}
 
