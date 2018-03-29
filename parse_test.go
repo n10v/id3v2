@@ -18,7 +18,7 @@ func TestParse(t *testing.T) {
 		t.Fatal("Error while reseting mp3 file:", err)
 	}
 
-	tag, err := Open(mp3Name, defaultOpts)
+	tag, err := Open(mp3Name, parseOpts)
 	if tag == nil || err != nil {
 		t.Error("Error while opening mp3 file:", err)
 	}
@@ -360,7 +360,7 @@ func TestParseInvalidFrameSize(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	tag, err := ParseReader(buf, defaultOpts)
+	tag, err := ParseReader(buf, parseOpts)
 	if tag == nil || err != nil {
 		t.Fatal("Error while parsing mp3 file:", err)
 	}

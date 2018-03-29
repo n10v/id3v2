@@ -5,19 +5,41 @@
 package id3v2
 
 import (
-	"bytes"
 	"io/ioutil"
 	"testing"
 )
 
-func BenchmarkParseAllFrames(b *testing.B) {
-	if err := resetMP3Tag(); err != nil {
-		b.Fatal("Error while reseting mp3 file:", err)
+var frontCoverPicture []byte
+
+func init() {
+	var err error
+	frontCoverPicture, err = ioutil.ReadFile(frontCoverName)
+	if err != nil {
+		panic("Error while reading front cover file")
 	}
+}
+
+func BenchmarkParseAllFrames(b *testing.B) {
+	writeTag(b, EncodingUTF8)
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
-		tag, err := Open(mp3Name, defaultOpts)
+		tag, err := Open(mp3Name, parseOpts)
+		if tag == nil || err != nil {
+			b.Fatal("Error while opening mp3 file:", err)
+		}
+		if err = tag.Close(); err != nil {
+			b.Error("Error while closing a tag:", err)
+		}
+	}
+}
+
+func BenchmarkParseAllFramesISO(b *testing.B) {
+	writeTag(b, EncodingISO)
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		tag, err := Open(mp3Name, parseOpts)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
 		}
@@ -28,9 +50,7 @@ func BenchmarkParseAllFrames(b *testing.B) {
 }
 
 func BenchmarkParseArtistAndTitle(b *testing.B) {
-	if err := resetMP3Tag(); err != nil {
-		b.Fatal("Error while reseting mp3 file:", err)
-	}
+	writeTag(b, EncodingUTF8)
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
@@ -44,151 +64,57 @@ func BenchmarkParseArtistAndTitle(b *testing.B) {
 	}
 }
 
-func BenchmarkUTF8TextFrame(b *testing.B) {
-	tag := NewEmptyTag()
-	buf := new(bytes.Buffer)
-	text := "Héllö"
-
-	for i := 0; i < b.N; i++ {
-		buf.Reset()
-		tag.Reset(nil, Options{Parse: false})
-
-		tag.AddFrame(tag.CommonID("Title"), TextFrame{
-			Encoding: EncodingUTF8,
-			Text:     text,
-		})
-
-		tag.WriteTo(buf)
+func BenchmarkWrite(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		writeTag(b, EncodingUTF8)
 	}
 }
 
-func BenchmarkUTF16TextFrame(b *testing.B) {
-	tag := NewEmptyTag()
-	buf := new(bytes.Buffer)
-	text := "Héllö"
-
-	for i := 0; i < b.N; i++ {
-		buf.Reset()
-		tag.Reset(nil, Options{Parse: false})
-
-		tag.AddFrame(tag.CommonID("Title"), TextFrame{
-			Encoding: EncodingUTF16,
-			Text:     text,
-		})
-
-		tag.WriteTo(buf)
+func BenchmarkWriteISO(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		writeTag(b, EncodingISO)
 	}
 }
 
-func BenchmarkParseAndWrite(b *testing.B) {
-	frontCover, err := ioutil.ReadFile(frontCoverName)
-	if err != nil {
-		b.Error("Error while reading front cover file")
+func writeTag(b *testing.B, encoding Encoding) {
+	tag, err := Open(mp3Name, Options{Parse: false})
+	if tag == nil || err != nil {
+		b.Fatal("Error while opening mp3 file:", err)
 	}
-	b.ResetTimer()
+	defer tag.Close()
 
-	// We use b.N+1, because in first iteration we just reset tag
-	// and set many frames. Also timer will be resetted.
-	for n := 0; n < b.N+1; n++ {
-		tag, err := Open(mp3Name, defaultOpts)
-		if tag == nil || err != nil {
-			b.Fatal("Error while opening mp3 file:", err)
-		}
-		defer tag.Close()
+	tag.SetTitle("Title")
+	tag.SetArtist("Artist")
+	tag.SetAlbum("Album")
+	tag.SetYear("2016")
+	tag.SetGenre("Genre")
 
-		// Delete all frames in first iteration.
-		if n == 0 {
-			tag.DeleteAllFrames()
-		}
-
-		tag.SetTitle("Title")
-		tag.SetArtist("Artist")
-		tag.SetAlbum("Album")
-		tag.SetYear("2016")
-		tag.SetGenre("Genre")
-
-		// Set front cover.
-		pic := PictureFrame{
-			Encoding:    EncodingUTF8,
-			MimeType:    "image/jpeg",
-			PictureType: PTFrontCover,
-			Description: "Front cover",
-			Picture:     frontCover,
-		}
-		tag.AddAttachedPicture(pic)
-
-		// Set USLT.
-		uslt := UnsynchronisedLyricsFrame{
-			Encoding:          EncodingUTF8,
-			Language:          "eng",
-			ContentDescriptor: "Content descriptor",
-			Lyrics:            "bogem/id3v2",
-		}
-		tag.AddUnsynchronisedLyricsFrame(uslt)
-
-		// Set comment.
-		comm := CommentFrame{
-			Encoding:    EncodingUTF8,
-			Language:    "eng",
-			Description: "Short description",
-			Text:        "The actual text",
-		}
-		tag.AddCommentFrame(comm)
-
-		if err = tag.Save(); err != nil {
-			b.Error("Error while saving a tag:", err)
-		}
-
-		// Reset timer because we just reset file in first iteration.
-		if n == 0 {
-			b.ResetTimer()
-		}
+	pic := PictureFrame{
+		Encoding:    encoding,
+		MimeType:    "image/jpeg",
+		PictureType: PTFrontCover,
+		Description: "Front cover",
+		Picture:     frontCoverPicture,
 	}
-}
+	tag.AddAttachedPicture(pic)
 
-func BenchmarkReuseTag(b *testing.B) {
-	frontCover, err := ioutil.ReadFile(frontCoverName)
-	if err != nil {
-		b.Error("Error while reading front cover file")
+	uslt := UnsynchronisedLyricsFrame{
+		Encoding:          encoding,
+		Language:          "eng",
+		ContentDescriptor: "Content descriptor",
+		Lyrics:            "bogem/id3v2",
 	}
-	tag := NewEmptyTag()
-	b.ResetTimer()
+	tag.AddUnsynchronisedLyricsFrame(uslt)
 
-	for i := 0; i < b.N; i++ {
-		tag.DeleteAllFrames()
+	comm := CommentFrame{
+		Encoding:    encoding,
+		Language:    "eng",
+		Description: "Short description",
+		Text:        "The actual text",
+	}
+	tag.AddCommentFrame(comm)
 
-		tag.SetTitle("Title")
-		tag.SetArtist("Artist")
-		tag.SetAlbum("Album")
-		tag.SetYear("2016")
-		tag.SetGenre("Genre")
-
-		// Set front cover.
-		pic := PictureFrame{
-			Encoding:    EncodingUTF8,
-			MimeType:    "image/jpeg",
-			PictureType: PTFrontCover,
-			Description: "Front cover",
-			Picture:     frontCover,
-		}
-		tag.AddAttachedPicture(pic)
-
-		// Set USLT.
-		uslt := UnsynchronisedLyricsFrame{
-			Encoding:          EncodingUTF8,
-			Language:          "eng",
-			ContentDescriptor: "Content descriptor",
-			Lyrics:            "bogem/id3v2",
-		}
-		tag.AddUnsynchronisedLyricsFrame(uslt)
-
-		// Set comment.
-		comm := CommentFrame{
-			Encoding:    EncodingUTF8,
-			Language:    "eng",
-			Description: "Short description",
-			Text:        "The actual text",
-		}
-		tag.AddCommentFrame(comm)
+	if err = tag.Save(); err != nil {
+		b.Error("Error while saving a tag:", err)
 	}
 }

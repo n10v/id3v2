@@ -6,12 +6,11 @@ package id3v2
 
 import (
 	"bytes"
-	"io/ioutil"
 	"testing"
 )
 
 var (
-	sizeInt   uint = 15351
+	sizeUint  uint = 15351
 	sizeBytes      = []byte{0, 0, 0x77, 0x77}
 )
 
@@ -21,10 +20,10 @@ func TestWriteBytesSize(t *testing.T) {
 	buf := new(bytes.Buffer)
 	bw := newBufWriter(buf)
 
-	if err := writeBytesSize(bw, sizeInt); err != nil {
-		t.Error(err)
+	bw.WriteBytesSize(sizeUint)
+	if err := bw.Flush(); err != nil {
+		t.Fatal(err)
 	}
-	bw.Flush()
 	if !bytes.Equal(buf.Bytes(), sizeBytes) {
 		t.Errorf("Expected: %v, got: %v", sizeBytes, buf.Bytes())
 	}
@@ -37,26 +36,7 @@ func TestParseSize(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if size != int64(sizeInt) {
-		t.Errorf("Expected: %v, got: %v", sizeInt, size)
-	}
-}
-
-func BenchmarkWriteBytesSize(b *testing.B) {
-	bw := newBufWriter(ioutil.Discard)
-
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		if err := writeBytesSize(bw, 268435454); err != nil {
-			b.Fatal(err)
-		}
-	}
-}
-
-func BenchmarkParseSize(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		if _, err := parseSize([]byte{127, 127, 127, 127}); err != nil {
-			b.Fatal(err)
-		}
+	if size != int64(sizeUint) {
+		t.Errorf("Expected: %v, got: %v", sizeUint, size)
 	}
 }
