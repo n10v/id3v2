@@ -5,26 +5,17 @@
 package id3v2
 
 import (
-	"io/ioutil"
 	"testing"
 )
 
-var frontCoverPicture []byte
-
-func init() {
-	var err error
-	frontCoverPicture, err = ioutil.ReadFile(frontCoverName)
-	if err != nil {
-		panic("Error while reading front cover file")
-	}
-}
+var frontCoverPicture = mustReadFile(frontCoverPath)
 
 func BenchmarkParseAllFrames(b *testing.B) {
 	writeTag(b, EncodingUTF8)
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
-		tag, err := Open(mp3Name, parseOpts)
+		tag, err := Open(mp3Path, parseOpts)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
 		}
@@ -39,7 +30,7 @@ func BenchmarkParseAllFramesISO(b *testing.B) {
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
-		tag, err := Open(mp3Name, parseOpts)
+		tag, err := Open(mp3Path, parseOpts)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
 		}
@@ -54,7 +45,7 @@ func BenchmarkParseArtistAndTitle(b *testing.B) {
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
-		tag, err := Open(mp3Name, Options{Parse: true, ParseFrames: []string{"Artist", "Title"}})
+		tag, err := Open(mp3Path, Options{Parse: true, ParseFrames: []string{"Artist", "Title"}})
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
 		}
@@ -77,7 +68,7 @@ func BenchmarkWriteISO(b *testing.B) {
 }
 
 func writeTag(b *testing.B, encoding Encoding) {
-	tag, err := Open(mp3Name, Options{Parse: false})
+	tag, err := Open(mp3Path, Options{Parse: false})
 	if tag == nil || err != nil {
 		b.Fatal("Error while opening mp3 file:", err)
 	}

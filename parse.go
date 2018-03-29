@@ -6,6 +6,7 @@ package id3v2
 
 import (
 	"errors"
+	"fmt"
 	"io"
 )
 
@@ -32,7 +33,7 @@ func (tag *Tag) parse(rd io.Reader, opts Options) error {
 		return nil
 	}
 	if err != nil {
-		return errors.New("error by parsing tag header: " + err.Error())
+		return fmt.Errorf("error by parsing tag header: %v", err)
 	}
 	if header.Version < 3 {
 		return ErrUnsupportedVersion

@@ -7,6 +7,7 @@ package id3v2
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -15,9 +16,9 @@ import (
 )
 
 const (
-	mp3Name        = "testdata/test.mp3"
-	frontCoverName = "testdata/front_cover.jpg"
-	backCoverName  = "testdata/back_cover.jpg"
+	mp3Path        = "testdata/test.mp3"
+	frontCoverPath = "testdata/front_cover.jpg"
+	backCoverPath  = "testdata/back_cover.jpg"
 
 	framesSize    = 211805
 	tagSize       = tagHeaderSize + framesSize
@@ -31,12 +32,14 @@ var (
 		MimeType:    "image/jpeg",
 		PictureType: PTFrontCover,
 		Description: "Front cover",
+		Picture:     mustReadFile(frontCoverPath),
 	}
 	backCover = PictureFrame{
 		Encoding:    EncodingUTF8,
 		MimeType:    "image/jpeg",
 		PictureType: PTBackCover,
 		Description: "Back cover",
+		Picture:     mustReadFile(backCoverPath),
 	}
 
 	engUSLF = UnsynchronisedLyricsFrame{
@@ -75,25 +78,14 @@ var (
 )
 
 func init() {
-	var err error
-
-	// Set covers' picture.
-	frontCover.Picture, err = ioutil.ReadFile(frontCoverName)
-	if err != nil {
-		panic("Error while reading front cover file: " + err.Error())
-	}
-	backCover.Picture, err = ioutil.ReadFile(backCoverName)
-	if err != nil {
-		panic("Error while reading back cover file: " + err.Error())
-	}
 	if err := resetMP3Tag(); err != nil {
-		panic("Error while reseting mp3 file: " + err.Error())
+		panic(fmt.Sprintf("Error while reseting mp3 file: %v", err))
 	}
 }
 
-// resetMP3Tag sets the default frames to mp3Name.
+// resetMP3Tag sets default tag in file located by mp3Path.
 func resetMP3Tag() error {
-	tag, err := Open(mp3Name, Options{Parse: false})
+	tag, err := Open(mp3Path, Options{Parse: false})
 	if tag == nil || err != nil {
 		return err
 	}
@@ -105,26 +97,22 @@ func resetMP3Tag() error {
 	tag.SetYear("2016")
 	tag.SetGenre("Genre")
 
-	// Set picture frames
 	tag.AddAttachedPicture(frontCover)
 	tag.AddAttachedPicture(backCover)
 
-	// Set USLTs
 	tag.AddUnsynchronisedLyricsFrame(engUSLF)
 	tag.AddUnsynchronisedLyricsFrame(gerUSLF)
 
-	// Set comments
 	tag.AddCommentFrame(engComm)
 	tag.AddCommentFrame(gerComm)
 
-	// Set unknown frame
 	tag.AddFrame(unknownFrameID, unknownFrame)
 
 	return tag.Save()
 }
 
 func TestCountLenSize(t *testing.T) {
-	tag, err := Open(mp3Name, parseOpts)
+	tag, err := Open(mp3Path, parseOpts)
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -141,7 +129,7 @@ func TestCountLenSize(t *testing.T) {
 	}
 
 	// Check saved tag size by reading the 6:10 bytes of mp3 file.
-	mp3, err := os.Open(mp3Name)
+	mp3, err := os.Open(mp3Path)
 	if err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -173,7 +161,7 @@ func TestCountLenSize(t *testing.T) {
 // if tag.Save() doesn't truncate or add some extra bytes at the beginning
 // of music part.
 func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
-	mp3, err := os.Open(mp3Name)
+	mp3, err := os.Open(mp3Path)
 	if err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -207,7 +195,7 @@ func TestIntegrityOfMusicAtTheBeginning(t *testing.T) {
 // if tag.Save() doesn't truncate music part or add some extra bytes at the end
 // of music part.
 func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
-	mp3, err := os.Open(mp3Name)
+	mp3, err := os.Open(mp3Path)
 	if err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -241,7 +229,7 @@ func TestIntegrityOfMusicAtTheEnd(t *testing.T) {
 // TestCheckPermissions checks
 // if tag.Save() creates file with the same permissions of original file.
 func TestCheckPermissions(t *testing.T) {
-	originalFile, err := os.Open(mp3Name)
+	originalFile, err := os.Open(mp3Path)
 	if err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -252,7 +240,7 @@ func TestCheckPermissions(t *testing.T) {
 	originalMode := originalStat.Mode()
 	originalFile.Close()
 
-	tag, err := Open(mp3Name, parseOpts)
+	tag, err := Open(mp3Path, parseOpts)
 	if err != nil {
 		t.Fatal("Error while parsing a tag:", err)
 	}
@@ -261,7 +249,7 @@ func TestCheckPermissions(t *testing.T) {
 	}
 	tag.Close()
 
-	newFile, err := os.Open(mp3Name)
+	newFile, err := os.Open(mp3Path)
 	if err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -396,7 +384,7 @@ func TestEmptyTagWriteTo(t *testing.T) {
 
 // TestResetTag checks if tag.Reset() correctly parses mp3.
 func TestResetTag(t *testing.T) {
-	mp3, err := os.Open(mp3Name)
+	mp3, err := os.Open(mp3Path)
 	if err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -427,7 +415,7 @@ func TestConcurrent(t *testing.T) {
 			tag := tagPool.Get().(*Tag)
 			defer tagPool.Put(tag)
 
-			file, err := os.Open(mp3Name)
+			file, err := os.Open(mp3Path)
 			if err != nil {
 				t.Fatal("Error while opening mp3:", err)
 			}

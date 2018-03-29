@@ -7,7 +7,9 @@ package id3v2
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
+	"io/ioutil"
 )
 
 const (
@@ -93,4 +95,12 @@ func readAll(rd io.Reader) ([]byte, error) {
 	buf := bytes.NewBuffer(make([]byte, 0, bytes.MinRead))
 	_, err := buf.ReadFrom(rd)
 	return buf.Bytes(), err
+}
+
+func mustReadFile(path string) []byte {
+	contents, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic(fmt.Sprintf("can't read %q: %v", path, err))
+	}
+	return contents
 }

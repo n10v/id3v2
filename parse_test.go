@@ -18,7 +18,7 @@ func TestParse(t *testing.T) {
 		t.Fatal("Error while reseting mp3 file:", err)
 	}
 
-	tag, err := Open(mp3Name, parseOpts)
+	tag, err := Open(mp3Path, parseOpts)
 	if tag == nil || err != nil {
 		t.Error("Error while opening mp3 file:", err)
 	}
@@ -231,7 +231,7 @@ func compareTwoBytes(actual, expected byte) error {
 // TestParseOptionsParseFalse checks,
 // if parseTag() will not parse the tag, if Options{Parse: false} is set.
 func TestParseOptionsParseFalse(t *testing.T) {
-	tag, err := Open(mp3Name, Options{Parse: false})
+	tag, err := Open(mp3Path, Options{Parse: false})
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
@@ -243,7 +243,7 @@ func TestParseOptionsParseFalse(t *testing.T) {
 // TestParseOptionsParseFrames checks,
 // if tag.parseAllFrames() will parse only frames, that set in Options.ParseFrames.
 func TestParseOptionsParseFrames(t *testing.T) {
-	tag, err := Open(mp3Name, Options{Parse: true, ParseFrames: []string{"Artist", "Title"}})
+	tag, err := Open(mp3Path, Options{Parse: true, ParseFrames: []string{"Artist", "Title"}})
 	if tag == nil || err != nil {
 		t.Fatal("Error while opening mp3 file:", err)
 	}
