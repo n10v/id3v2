@@ -17,26 +17,11 @@ func (tf TextFrame) Size() int {
 	return 1 + encodedSize(tf.Text, tf.Encoding)
 }
 
-func (tf TextFrame) WriteTo(w io.Writer) (n int64, err error) {
-	bw, ok := resolveBufioWriter(w)
-	if !ok {
-		defer putBufioWriter(bw)
-	}
-
-	var nn int
-
-	if err = bw.WriteByte(tf.Encoding.Key); err == nil {
-		n += 1
-	}
-
-	nn, err = encodeWriteText(bw, tf.Text, tf.Encoding)
-	n += int64(nn)
-	if err != nil {
-		bw.Flush()
-		return
-	}
-
-	return n, bw.Flush()
+func (tf TextFrame) WriteTo(w io.Writer) (int64, error) {
+	return useBufWriter(w, func(bw *bufWriter) {
+		bw.WriteByte(tf.Encoding.Key)
+		bw.EncodeAndWriteText(tf.Text, tf.Encoding)
+	})
 }
 
 func parseTextFrame(rd io.Reader) (Framer, error) {

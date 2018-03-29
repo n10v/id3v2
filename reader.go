@@ -7,7 +7,6 @@ package id3v2
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"io"
 )
 
@@ -86,7 +85,7 @@ func (r *reader) ReadTillDelim(delim byte) ([]byte, error) {
 // delims.
 func (r *reader) ReadTillDelims(delims []byte) ([]byte, error) {
 	if len(delims) == 0 {
-		return nil, errors.New("delims is empty")
+		return nil, nil
 	}
 	if len(delims) == 1 {
 		return r.ReadTillDelim(delims[0])

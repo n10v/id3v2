@@ -25,42 +25,15 @@ func (pf PictureFrame) Size() int {
 }
 
 func (pf PictureFrame) WriteTo(w io.Writer) (n int64, err error) {
-	bw, ok := resolveBufioWriter(w)
-	if !ok {
-		defer putBufioWriter(bw)
-	}
-
-	var nn int
-
-	if err = bw.WriteByte(pf.Encoding.Key); err == nil {
-		n += 1
-	}
-
-	nn, _ = bw.WriteString(pf.MimeType)
-	n += int64(nn)
-
-	if err = bw.WriteByte(0); err == nil {
-		n += 1
-	}
-
-	if err = bw.WriteByte(pf.PictureType); err == nil {
-		n += 1
-	}
-
-	nn, err = encodeWriteText(bw, pf.Description, pf.Encoding)
-	n += int64(nn)
-	if err != nil {
-		bw.Flush()
-		return
-	}
-
-	nn, _ = bw.Write(pf.Encoding.TerminationBytes)
-	n += int64(nn)
-
-	nn, _ = bw.Write(pf.Picture)
-	n += int64(nn)
-
-	return n, bw.Flush()
+	return useBufWriter(w, func(bw *bufWriter) {
+		bw.WriteByte(pf.Encoding.Key)
+		bw.WriteString(pf.MimeType)
+		bw.WriteByte(0)
+		bw.WriteByte(pf.PictureType)
+		bw.EncodeAndWriteText(pf.Description, pf.Encoding)
+		bw.Write(pf.Encoding.TerminationBytes)
+		bw.Write(pf.Picture)
+	})
 }
 
 func parsePictureFrame(rd io.Reader) (Framer, error) {

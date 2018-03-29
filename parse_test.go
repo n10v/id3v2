@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -320,7 +319,7 @@ func TestParseOptionsParseFramesWithSequenceFrames(t *testing.T) {
 		} else if commentFrame.Language == "ger" {
 			isGerCommentInFrame = true
 		} else {
-			t.Error("Got unknown comment frame: %v", commentFrame)
+			t.Errorf("Got unknown comment frame: %v", commentFrame)
 		}
 	}
 
@@ -348,18 +347,18 @@ func TestParseInvalidFrameSize(t *testing.T) {
 	t.Parallel()
 
 	buf := new(bytes.Buffer)
-	bw := bufio.NewWriter(buf)
+	bw := newBufWriter(buf)
 
 	// Write tag header.
-	if err := writeTagHeader(bw, tagHeaderSize+16, 4); err != nil {
+	writeTagHeader(bw, tagHeaderSize+16, 4)
+	// Write valid TIT2 frame.
+	bw.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03}) // header and encoding
+	bw.WriteString("Title")
+	// Write invalid frame (size byte can't be greater than 127).
+	bw.Write([]byte{0x54, 0x49, 0x54, 0x32, 255, 255, 255, 255, 00, 00})
+	if err := bw.Flush(); err != nil {
 		t.Fatal(err)
 	}
-	bw.Flush()
-	// Write valid TIT2 frame.
-	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 00, 00, 00, 06, 00, 00, 03}) // header and encoding
-	buf.WriteString("Title")
-	// Write invalid frame (size byte can't be greater than 127).
-	buf.Write([]byte{0x54, 0x49, 0x54, 0x32, 255, 255, 255, 255, 00, 00})
 
 	tag, err := ParseReader(buf, defaultOpts)
 	if tag == nil || err != nil {

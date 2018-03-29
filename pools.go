@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"bufio"
 	"bytes"
 	"io"
 	"sync"
@@ -34,20 +33,20 @@ func putByteSlice(b []byte) {
 	bsPool.Put(b)
 }
 
-// bwPool is a pool of *bufio.Writer.
+// bwPool is a pool of *bufWriter.
 var bwPool = sync.Pool{
-	New: func() interface{} { return bufio.NewWriter(nil) },
+	New: func() interface{} { return newBufWriter(nil) },
 }
 
-// getBufioWriter returns *bufio.Writer with specified w.
-func getBufioWriter(w io.Writer) *bufio.Writer {
-	bw := bwPool.Get().(*bufio.Writer)
+// getBufWriter returns *bufWriter with specified w.
+func getBufWriter(w io.Writer) *bufWriter {
+	bw := bwPool.Get().(*bufWriter)
 	bw.Reset(w)
 	return bw
 }
 
-// putBufioWriter puts bw back to pool.
-func putBufioWriter(bw *bufio.Writer) {
+// putBufWriter puts bw back to pool.
+func putBufWriter(bw *bufWriter) {
 	bwPool.Put(bw)
 }
 

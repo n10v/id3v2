@@ -1,8 +1,6 @@
 package id3v2
 
 import (
-	"bufio"
-
 	xencoding "golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/encoding/unicode"
@@ -91,17 +89,19 @@ func decodeText(src []byte, from Encoding) string {
 }
 
 // encodeWriteText encodes src from UTF-8 to "to" encoding and writes to bw.
-func encodeWriteText(bw *bufio.Writer, src string, to Encoding) (n int, err error) {
+func encodeWriteText(bw *bufWriter, src string, to Encoding) error {
 	if to.Equals(EncodingUTF8) {
-		return bw.WriteString(src)
+		bw.WriteString(src)
+		return nil
 	}
 
 	toXEncoding := resolveXEncoding(nil, to)
 	encoded, err := toXEncoding.NewEncoder().String(src)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	return bw.WriteString(encoded)
+	bw.WriteString(encoded)
+	return nil
 }
 
 // resolveXEncoding returns golang.org/x/text/encoding encoding

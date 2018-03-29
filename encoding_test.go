@@ -1,7 +1,6 @@
 package id3v2
 
 import (
-	"bufio"
 	"bytes"
 	"testing"
 )
@@ -38,22 +37,22 @@ func TestEncodeWriteText(t *testing.T) {
 	}
 
 	buf := new(bytes.Buffer)
-	bw := bufio.NewWriter(buf)
+	bw := newBufWriter(buf)
 
 	for _, tc := range testCases {
 		buf.Reset()
-		n, err := encodeWriteText(bw, tc.src, tc.to)
-		if err != nil {
-			t.Errorf("Error by encoding and writing text: %v", err)
-		}
+		bw.Reset(buf)
 
-		bw.Flush()
+		bw.EncodeAndWriteText(tc.src, tc.to)
+		if err := bw.Flush(); err != nil {
+			t.Fatal(err)
+		}
 		got := buf.Bytes()
 		if !bytes.Equal(got, tc.expected) {
 			t.Errorf("Expected %q from %q encoding, got %q", tc.expected, tc.to, got)
 		}
-		if n != tc.size {
-			t.Errorf("Expected %v size, got %v", tc.size, n)
+		if bw.Written() != int64(tc.size) {
+			t.Errorf("Expected %v size, got %v", tc.size, bw.Written())
 		}
 	}
 }

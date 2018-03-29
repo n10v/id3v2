@@ -5,8 +5,8 @@
 package id3v2
 
 import (
-	"bufio"
 	"bytes"
+	"io/ioutil"
 	"testing"
 )
 
@@ -19,7 +19,7 @@ func TestWriteBytesSize(t *testing.T) {
 	t.Parallel()
 
 	buf := new(bytes.Buffer)
-	bw := bufio.NewWriter(buf)
+	bw := newBufWriter(buf)
 
 	if err := writeBytesSize(bw, sizeInt); err != nil {
 		t.Error(err)
@@ -43,7 +43,7 @@ func TestParseSize(t *testing.T) {
 }
 
 func BenchmarkWriteBytesSize(b *testing.B) {
-	bw := bufio.NewWriter(new(bytes.Buffer))
+	bw := newBufWriter(ioutil.Discard)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"bufio"
 	"bytes"
 	"testing"
 )
@@ -36,11 +35,9 @@ func TestWriteTagHeader(t *testing.T) {
 	t.Parallel()
 
 	buf := new(bytes.Buffer)
-	bw := bufio.NewWriter(buf)
+	bw := newBufWriter(buf)
 
-	if err := writeTagHeader(bw, 15351, 4); err != nil {
-		t.Fatal(err)
-	}
+	writeTagHeader(bw, 15351, 4)
 	if err := bw.Flush(); err != nil {
 		t.Fatal(err)
 	}

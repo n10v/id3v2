@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"io"
@@ -56,33 +55,4 @@ func parseHeader(rd io.Reader) (tagHeader, error) {
 
 func isID3Tag(data []byte) bool {
 	return len(data) == len(id3Identifier) && bytes.Equal(data, id3Identifier)
-}
-
-func writeTagHeader(bw *bufio.Writer, framesSize uint, version byte) error {
-	// Identifier
-	if _, err := bw.Write(id3Identifier); err != nil {
-		return err
-	}
-
-	// Version
-	if err := bw.WriteByte(version); err != nil {
-		return err
-	}
-
-	// Revision
-	if err := bw.WriteByte(0); err != nil {
-		return err
-	}
-
-	// Flags
-	if err := bw.WriteByte(0); err != nil {
-		return err
-	}
-
-	// Size of frames
-	if err := writeBytesSize(bw, framesSize); err != nil {
-		return err
-	}
-
-	return nil
 }

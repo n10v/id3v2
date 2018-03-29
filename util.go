@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"io"
@@ -25,7 +24,7 @@ var ErrSizeOverflow = errors.New("size of tag/frame is greater than allowed in i
 // writeBytesSize writes size to bw in form of ID3v2 size format (4 * 0b0xxxxxxx).
 //
 // If size is greater than allowed (256MB), then it returns ErrSizeOverflow.
-func writeBytesSize(bw *bufio.Writer, size uint) error {
+func writeBytesSize(bw *bufWriter, size uint) error {
 	if size > maxSize {
 		return ErrSizeOverflow
 	}
@@ -94,12 +93,4 @@ func readAll(rd io.Reader) ([]byte, error) {
 	buf := bytes.NewBuffer(make([]byte, 0, bytes.MinRead))
 	_, err := buf.ReadFrom(rd)
 	return buf.Bytes(), err
-}
-
-func resolveBufioWriter(w io.Writer) (bw *bufio.Writer, ok bool) {
-	bw, ok = w.(*bufio.Writer)
-	if !ok {
-		bw = getBufioWriter(w)
-	}
-	return
 }

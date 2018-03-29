@@ -5,7 +5,6 @@
 package id3v2
 
 import (
-	"bufio"
 	"errors"
 	"io"
 	"os"
@@ -370,51 +369,40 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	}
 
 	// Write tag header.
-	bw := getBufioWriter(w)
-	defer putBufioWriter(bw)
-	if err := writeTagHeader(bw, uint(framesSize), tag.version); err != nil {
-		return 0, err
-	}
-	n += tagHeaderSize
+	bw := getBufWriter(w)
+	defer putBufWriter(bw)
+	writeTagHeader(bw, uint(framesSize), tag.version)
 
 	// Write frames.
 	err = tag.iterateOverAllFrames(func(id string, f Framer) error {
-		nn, err := writeFrame(bw, id, f)
-		n += nn
-		return err
+		return writeFrame(bw, id, f)
 	})
 	if err != nil {
-		return n, err
+		bw.Flush()
+		return bw.Written(), err
 	}
 
-	return n, bw.Flush()
+	return bw.Written(), bw.Flush()
 }
 
-func writeFrame(bw *bufio.Writer, id string, frame Framer) (int64, error) {
-	if err := writeFrameHeader(bw, id, uint(frame.Size())); err != nil {
-		return 0, err
-	}
-
-	frameSize, err := frame.WriteTo(bw)
-	return frameHeaderSize + frameSize, err
+func writeTagHeader(bw *bufWriter, framesSize uint, version byte) {
+	bw.Write(id3Identifier)
+	bw.WriteByte(version)
+	bw.WriteByte(0) // Revision
+	bw.WriteByte(0) // Flags
+	bw.WriteBytesSize(framesSize)
 }
 
-func writeFrameHeader(bw *bufio.Writer, id string, frameSize uint) error {
-	// ID
-	if _, err := bw.WriteString(id); err != nil {
-		return err
-	}
+func writeFrame(bw *bufWriter, id string, frame Framer) error {
+	writeFrameHeader(bw, id, uint(frame.Size()))
+	_, err := frame.WriteTo(bw)
+	return err
+}
 
-	// Size
-	if err := writeBytesSize(bw, frameSize); err != nil {
-		return err
-	}
-
-	// Flags
-	if _, err := bw.Write([]byte{0, 0}); err != nil {
-		return err
-	}
-	return nil
+func writeFrameHeader(bw *bufWriter, id string, frameSize uint) {
+	bw.WriteString(id)
+	bw.WriteBytesSize(frameSize)
+	bw.Write([]byte{0, 0}) // Flags
 }
 
 // Close closes tag's file, if tag was opened with a file.

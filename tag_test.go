@@ -486,7 +486,7 @@ func TestEncodedText(t *testing.T) {
 		t.Fatalf("Error by writing to buf: %v", err)
 	}
 	if n != int64(tag.Size()) {
-		t.Errorf("Expected WriteTo n %v, got %v", tag.Size(), n)
+		t.Errorf("Expected WriteTo n==%v, got %v", tag.Size(), n)
 	}
 
 	tag, err = ParseReader(buf, Options{Parse: true})
@@ -530,7 +530,7 @@ func TestWriteToN(t *testing.T) {
 		t.Fatalf("Error by writing: %v", err)
 	}
 	if n != int64(tag.Size()) {
-		t.Errorf("Expected WriteTo n %v, got %v", tag.Size(), n)
+		t.Errorf("Expected WriteTo n==%v, got %v", tag.Size(), n)
 	}
 	if int64(buf.Len()) != n {
 		t.Errorf("buf.Len() and n are not equal: %v != %v ", buf.Len(), n)
