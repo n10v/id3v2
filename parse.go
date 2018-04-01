@@ -166,13 +166,16 @@ func skipReaderBuf(rd io.Reader, buf []byte) error {
 }
 
 func parseFrameBody(id string, rd io.Reader) (Framer, error) {
+	br := getBufReader(rd)
+	defer putBufReader(br)
+
 	if id[0] == 'T' {
-		return parseTextFrame(rd)
+		return parseTextFrame(br)
 	}
 
 	if parseFunc, exists := parsers[id]; exists {
-		return parseFunc(rd)
+		return parseFunc(br)
 	}
 
-	return parseUnknownFrame(rd)
+	return parseUnknownFrame(br)
 }

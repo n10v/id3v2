@@ -23,7 +23,7 @@ func (uf UnknownFrame) WriteTo(w io.Writer) (n int64, err error) {
 	return int64(i), err
 }
 
-func parseUnknownFrame(rd io.Reader) (Framer, error) {
-	body, err := readAll(rd)
-	return UnknownFrame{Body: body}, err
+func parseUnknownFrame(br *bufReader) (Framer, error) {
+	body := br.ReadAll()
+	return UnknownFrame{Body: body}, br.Err()
 }

@@ -38,33 +38,22 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 	})
 }
 
-func parseCommentFrame(rd io.Reader) (Framer, error) {
-	bufRd := getUtilReader(rd)
-	defer putUtilReader(bufRd)
-
-	encodingKey, err := bufRd.ReadByte()
-	if err != nil {
-		return nil, err
-	}
+func parseCommentFrame(br *bufReader) (Framer, error) {
+	encodingKey := br.ReadByte()
 	encoding := getEncoding(encodingKey)
 
-	language, err := bufRd.Next(3)
-	if err != nil {
-		return nil, err
-	}
+	language := br.Next(3)
 
-	description, err := bufRd.ReadTillDelims(encoding.TerminationBytes)
-	if err != nil {
-		return nil, err
-	}
-	if _, err = bufRd.Discard(len(encoding.TerminationBytes)); err != nil {
-		return nil, err
+	description := br.ReadTillDelims(encoding.TerminationBytes)
+	br.Discard(len(encoding.TerminationBytes))
+
+	if br.Err() != nil {
+		return nil, br.Err()
 	}
 
 	text := getBytesBuffer()
 	defer putBytesBuffer(text)
-
-	if _, err := text.ReadFrom(bufRd); err != nil {
+	if _, err := text.ReadFrom(br); err != nil {
 		return nil, err
 	}
 

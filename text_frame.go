@@ -24,20 +24,17 @@ func (tf TextFrame) WriteTo(w io.Writer) (int64, error) {
 	})
 }
 
-func parseTextFrame(rd io.Reader) (Framer, error) {
-	bufRd := getUtilReader(rd)
-	defer putUtilReader(bufRd)
-
-	encodingKey, err := bufRd.ReadByte()
-	if err != nil {
-		return nil, err
-	}
+func parseTextFrame(br *bufReader) (Framer, error) {
+	encodingKey := br.ReadByte()
 	encoding := getEncoding(encodingKey)
+
+	if br.Err() != nil {
+		return nil, br.Err()
+	}
 
 	buf := getBytesBuffer()
 	defer putBytesBuffer(buf)
-
-	if _, err := buf.ReadFrom(bufRd); err != nil {
+	if _, err := buf.ReadFrom(br); err != nil {
 		return nil, err
 	}
 

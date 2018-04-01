@@ -33,29 +33,24 @@ func putByteSlice(b []byte) {
 	bsPool.Put(b)
 }
 
-// bwPool is a pool of *bufWriter.
 var bwPool = sync.Pool{
 	New: func() interface{} { return newBufWriter(nil) },
 }
 
-// getBufWriter returns *bufWriter with specified w.
 func getBufWriter(w io.Writer) *bufWriter {
 	bw := bwPool.Get().(*bufWriter)
 	bw.Reset(w)
 	return bw
 }
 
-// putBufWriter puts bw back to pool.
 func putBufWriter(bw *bufWriter) {
 	bwPool.Put(bw)
 }
 
-// lrPool is a pool of *io.LimitedReader.
 var lrPool = sync.Pool{
 	New: func() interface{} { return new(io.LimitedReader) },
 }
 
-// getLimitedReader returns *io.LimitedReader with specified rd and n from pool.
 func getLimitedReader(rd io.Reader, n int64) *io.LimitedReader {
 	r := lrPool.Get().(*io.LimitedReader)
 	r.R = rd
@@ -63,41 +58,34 @@ func getLimitedReader(rd io.Reader, n int64) *io.LimitedReader {
 	return r
 }
 
-// putLimitedReader puts r back to pool.
 func putLimitedReader(r *io.LimitedReader) {
 	r.N = 0
 	r.R = nil
 	lrPool.Put(r)
 }
 
-// rdPool is a pool of *reader.
 var rdPool = sync.Pool{
-	New: func() interface{} { return newReader(nil) },
+	New: func() interface{} { return newBufReader(nil) },
 }
 
-// getUtilReader returns *reader with specified rd.
-func getUtilReader(rd io.Reader) *reader {
-	reader := rdPool.Get().(*reader)
+func getBufReader(rd io.Reader) *bufReader {
+	reader := rdPool.Get().(*bufReader)
 	reader.Reset(rd)
 	return reader
 }
 
-// putUtilReader puts rd back to pool.
-func putUtilReader(rd *reader) {
+func putBufReader(rd *bufReader) {
 	rdPool.Put(rd)
 }
 
-// bbPool is a pool of *bytes.Buffer.
 var bbPool = sync.Pool{
 	New: func() interface{} { return new(bytes.Buffer) },
 }
 
-// getBytesBuffer returns empty *bytes.Buffer.
 func getBytesBuffer() *bytes.Buffer {
 	return bbPool.Get().(*bytes.Buffer)
 }
 
-// putBytesBuffer resets buf and puts to pool.
 func putBytesBuffer(buf *bytes.Buffer) {
 	buf.Reset()
 	bbPool.Put(buf)

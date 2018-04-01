@@ -38,33 +38,23 @@ func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) 
 	})
 }
 
-func parseUnsynchronisedLyricsFrame(rd io.Reader) (Framer, error) {
-	bufRd := getUtilReader(rd)
-	defer putUtilReader(bufRd)
-
-	encodingKey, err := bufRd.ReadByte()
-	if err != nil {
-		return nil, err
-	}
+func parseUnsynchronisedLyricsFrame(br *bufReader) (Framer, error) {
+	encodingKey := br.ReadByte()
 	encoding := getEncoding(encodingKey)
 
-	language, err := bufRd.Next(3)
-	if err != nil {
-		return nil, err
-	}
+	language := br.Next(3)
 
-	contentDescriptor, err := bufRd.ReadTillDelims(encoding.TerminationBytes)
-	if err != nil {
-		return nil, err
-	}
-	if _, err = bufRd.Discard(len(encoding.TerminationBytes)); err != nil {
-		return nil, err
+	contentDescriptor := br.ReadTillDelims(encoding.TerminationBytes)
+	br.Discard(len(encoding.TerminationBytes))
+
+	if br.Err() != nil {
+		return nil, br.Err()
 	}
 
 	lyrics := getBytesBuffer()
 	defer putBytesBuffer(lyrics)
 
-	if _, err := lyrics.ReadFrom(bufRd); err != nil {
+	if _, err := lyrics.ReadFrom(br); err != nil {
 		return nil, err
 	}
 

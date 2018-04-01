@@ -17,7 +17,7 @@ var (
 func TestReadTillDelim(t *testing.T) {
 	t.Parallel()
 
-	bsReader := newReader(bytes.NewReader(bs))
+	bsReader := newBufReader(bytes.NewReader(bs))
 
 	firstIndexOf55 := bytes.Index(bs, []byte{55})
 	if firstIndexOf55 < 0 {
@@ -25,7 +25,7 @@ func TestReadTillDelim(t *testing.T) {
 	}
 	expected := bs[:firstIndexOf55]
 
-	read, err := bsReader.ReadTillDelim(55)
+	read, err := bsReader.readTillDelim(55)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -40,9 +40,9 @@ func TestReadTillDelim(t *testing.T) {
 func TestReadTillZero(t *testing.T) {
 	t.Parallel()
 
-	bsReader := newReader(bytes.NewReader(bs))
+	bsReader := newBufReader(bytes.NewReader(bs))
 
-	read, err := bsReader.ReadTillDelim(0)
+	read, err := bsReader.readTillDelim(0)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,10 +57,10 @@ func TestReadTillZero(t *testing.T) {
 func TestNext(t *testing.T) {
 	t.Parallel()
 
-	bsReader := newReader(bytes.NewReader(bs))
+	bsReader := newBufReader(bytes.NewReader(bs))
 	n := 5 // Read 5 elements
 
-	read, err := bsReader.Next(n)
+	read, err := bsReader.next(n)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,8 +78,8 @@ func TestNext(t *testing.T) {
 func TestReadTillDelimEOF(t *testing.T) {
 	t.Parallel()
 
-	bsReader := newReader(bytes.NewReader(bs))
-	_, err := bsReader.ReadTillDelim(234)
+	bsReader := newBufReader(bytes.NewReader(bs))
+	_, err := bsReader.readTillDelim(234)
 	if err != io.EOF {
 		t.Errorf("Expected io.EOF, got %v", err)
 	}
@@ -88,11 +88,11 @@ func TestReadTillDelimEOF(t *testing.T) {
 func TestReadTillDelims(t *testing.T) {
 	t.Parallel()
 
-	bsReader := newReader(bytes.NewReader(bs))
+	bsReader := newBufReader(bytes.NewReader(bs))
 	delims := []byte{55, 66}
 	expectedLen := 9
 
-	read, err := bsReader.ReadTillDelims(delims)
+	read, err := bsReader.readTillDelims(delims)
 	if err != nil {
 		t.Fatal(err)
 	}

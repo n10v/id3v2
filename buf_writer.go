@@ -56,7 +56,6 @@ func (bw *bufWriter) WriteString(s string) {
 	if bw.err != nil {
 		return
 	}
-
 	var n int
 	n, bw.err = bw.w.WriteString(s)
 	bw.written += int64(n)

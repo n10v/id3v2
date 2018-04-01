@@ -4,7 +4,9 @@
 
 package id3v2
 
-import "io"
+import (
+	"io"
+)
 
 // PictureFrame structure is used for picture frames (APIC).
 // The information about how to add picture frame to tag you can
@@ -36,40 +38,22 @@ func (pf PictureFrame) WriteTo(w io.Writer) (n int64, err error) {
 	})
 }
 
-func parsePictureFrame(rd io.Reader) (Framer, error) {
-	bufRd := getUtilReader(rd)
-	defer putUtilReader(bufRd)
-
-	encodingKey, err := bufRd.ReadByte()
-	if err != nil {
-		return nil, err
-	}
+func parsePictureFrame(br *bufReader) (Framer, error) {
+	encodingKey := br.ReadByte()
 	encoding := getEncoding(encodingKey)
 
-	mimeType, err := bufRd.ReadTillDelim(0)
-	if err != nil {
-		return nil, err
-	}
-	if _, err = bufRd.Discard(1); err != nil {
-		return nil, err
-	}
+	mimeType := br.ReadTillDelim(0)
+	br.Discard(1)
 
-	pictureType, err := bufRd.ReadByte()
-	if err != nil {
-		return nil, err
-	}
+	pictureType := br.ReadByte()
 
-	description, err := bufRd.ReadTillDelims(encoding.TerminationBytes)
-	if err != nil {
-		return nil, err
-	}
-	if _, err = bufRd.Discard(len(encoding.TerminationBytes)); err != nil {
-		return nil, err
-	}
+	description := br.ReadTillDelims(encoding.TerminationBytes)
+	br.Discard(len(encoding.TerminationBytes))
 
-	picture, err := readAll(bufRd)
-	if err != nil {
-		return nil, err
+	picture := br.ReadAll()
+
+	if br.Err() != nil {
+		return nil, br.Err()
 	}
 
 	pf := PictureFrame{
