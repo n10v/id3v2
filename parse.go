@@ -72,8 +72,12 @@ func (tag *Tag) parseFrames(opts Options) error {
 		parseIDs[tag.CommonID(description)] = true
 	}
 
+	br := getBufReader(nil)
+	defer putBufReader(br)
+
 	buf := getByteSlice(32 * 1024)
 	defer putByteSlice(buf)
+
 	for framesSize > 0 {
 		header, err := parseFrameHeader(buf, tag.reader)
 		if err == io.EOF || err == errBlankFrame || err == ErrInvalidSizeFormat {
@@ -97,7 +101,8 @@ func (tag *Tag) parseFrames(opts Options) error {
 			continue
 		}
 
-		frame, err := parseFrameBody(id, bodyRd)
+		br.Reset(bodyRd)
+		frame, err := parseFrameBody(id, br)
 		if err != nil && err != io.EOF {
 			return err
 		}
@@ -165,10 +170,7 @@ func skipReaderBuf(rd io.Reader, buf []byte) error {
 	return nil
 }
 
-func parseFrameBody(id string, rd io.Reader) (Framer, error) {
-	br := getBufReader(rd)
-	defer putBufReader(br)
-
+func parseFrameBody(id string, br *bufReader) (Framer, error) {
 	if id[0] == 'T' {
 		return parseTextFrame(br)
 	}
