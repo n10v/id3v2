@@ -326,7 +326,7 @@ func (tag *Tag) Save() error {
 	}
 
 	// Write to new file the music part.
-	buf := getByteSlice(96 * 1024)
+	buf := getByteSlice(128 * 1024)
 	defer putByteSlice(buf)
 	if _, err = io.CopyBuffer(newFile, originalFile, buf); err != nil {
 		return err
