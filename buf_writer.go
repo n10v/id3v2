@@ -5,6 +5,7 @@ import (
 	"io"
 )
 
+// bufWriter is used for convenient writing of frames.
 type bufWriter struct {
 	err     error
 	w       *bufio.Writer

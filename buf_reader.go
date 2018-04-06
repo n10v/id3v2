@@ -35,7 +35,7 @@ func (br *bufReader) Err() error {
 // Read calls br.buf.Read(p) and returns the results of it.
 // It does nothing, if br.err != nil.
 //
-// NOTE: if br.buf.Read(p) returns the error, it doesn't store it in
+// NOTE: if br.buf.Read(p) returns the error, it doesn't save it in
 // br.err and it's not returned from br.Err().
 func (br *bufReader) Read(p []byte) (n int, err error) {
 	if br.err != nil {
