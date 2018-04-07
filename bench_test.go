@@ -5,6 +5,8 @@
 package id3v2
 
 import (
+	"bytes"
+	"io/ioutil"
 	"testing"
 )
 
@@ -12,58 +14,61 @@ var frontCoverPicture = mustReadFile(frontCoverPath)
 
 func BenchmarkParseAllFrames(b *testing.B) {
 	writeTag(b, EncodingUTF8)
+	musicContent := mustReadFile(mp3Path)
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
-		tag, err := Open(mp3Path, parseOpts)
+		tag, err := ParseReader(bytes.NewReader(musicContent), parseOpts)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
-		}
-		if err = tag.Close(); err != nil {
-			b.Error("Error while closing a tag:", err)
 		}
 	}
 }
 
 func BenchmarkParseAllFramesISO(b *testing.B) {
 	writeTag(b, EncodingISO)
+	musicContent := mustReadFile(mp3Path)
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
-		tag, err := Open(mp3Path, parseOpts)
+		tag, err := ParseReader(bytes.NewReader(musicContent), parseOpts)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
-		}
-		if err = tag.Close(); err != nil {
-			b.Error("Error while closing a tag:", err)
 		}
 	}
 }
 
 func BenchmarkParseArtistAndTitle(b *testing.B) {
 	writeTag(b, EncodingUTF8)
+	musicContent := mustReadFile(mp3Path)
 	b.ResetTimer()
 
 	for n := 0; n < b.N; n++ {
-		tag, err := Open(mp3Path, Options{Parse: true, ParseFrames: []string{"Artist", "Title"}})
+		opts := Options{Parse: true, ParseFrames: []string{"Artist", "Title"}}
+		tag, err := ParseReader(bytes.NewReader(musicContent), opts)
 		if tag == nil || err != nil {
 			b.Fatal("Error while opening mp3 file:", err)
-		}
-		if err = tag.Close(); err != nil {
-			b.Error("Error while closing a tag:", err)
 		}
 	}
 }
 
 func BenchmarkWrite(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		writeTag(b, EncodingUTF8)
+		benchWrite(b, EncodingUTF8)
 	}
 }
 
 func BenchmarkWriteISO(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		writeTag(b, EncodingISO)
+		benchWrite(b, EncodingISO)
+	}
+}
+
+func benchWrite(b *testing.B, encoding Encoding) {
+	tag := NewEmptyTag()
+	setFrames(tag, encoding)
+	if _, err := tag.WriteTo(ioutil.Discard); err != nil {
+		b.Error("Error while writing a tag:", err)
 	}
 }
 
@@ -74,6 +79,14 @@ func writeTag(b *testing.B, encoding Encoding) {
 	}
 	defer tag.Close()
 
+	setFrames(tag, encoding)
+
+	if err = tag.Save(); err != nil {
+		b.Error("Error while saving a tag:", err)
+	}
+}
+
+func setFrames(tag *Tag, encoding Encoding) {
 	tag.SetTitle("Title")
 	tag.SetArtist("Artist")
 	tag.SetAlbum("Album")
@@ -104,8 +117,4 @@ func writeTag(b *testing.B, encoding Encoding) {
 		Text:        "The actual text",
 	}
 	tag.AddCommentFrame(comm)
-
-	if err = tag.Save(); err != nil {
-		b.Error("Error while saving a tag:", err)
-	}
 }
