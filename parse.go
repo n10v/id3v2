@@ -109,15 +109,13 @@ func (tag *Tag) parseFrames(opts Options) error {
 
 		tag.AddFrame(id, frame)
 
-		if len(parseIDs) > 0 {
-			if !mustFrameBeInSequence(id) {
-				delete(parseIDs, id)
+		if len(parseIDs) > 0 && !mustFrameBeInSequence(id) {
+			delete(parseIDs, id)
 
-				// If it was last ID in parseIDs, we don't need to parse
-				// other frames, so end the parsing.
-				if len(parseIDs) == 0 {
-					break
-				}
+			// If it was last ID in parseIDs, we don't need to parse
+			// other frames, so end the parsing.
+			if len(parseIDs) == 0 {
+				break
 			}
 		}
 

@@ -42,7 +42,7 @@ func (bw *bufWriter) WriteByte(c byte) {
 	}
 	bw.err = bw.w.WriteByte(c)
 	if bw.err == nil {
-		bw.written += 1
+		bw.written++
 	}
 }
 

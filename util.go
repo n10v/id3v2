@@ -4,11 +4,7 @@
 
 package id3v2
 
-import (
-	"errors"
-	"fmt"
-	"io/ioutil"
-)
+import "errors"
 
 const (
 	// id3SizeLen is length of ID3v2 size format (4 * 0b0xxxxxxx).
@@ -77,12 +73,4 @@ func parseSize(data []byte) (int64, error) {
 	}
 
 	return size, nil
-}
-
-func mustReadFile(path string) []byte {
-	contents, err := ioutil.ReadFile(path)
-	if err != nil {
-		panic(fmt.Sprintf("can't read %q: %v", path, err))
-	}
-	return contents
 }

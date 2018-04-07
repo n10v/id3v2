@@ -111,6 +111,14 @@ func resetMP3Tag() error {
 	return tag.Save()
 }
 
+func mustReadFile(path string) []byte {
+	contents, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic(fmt.Sprintf("can't read %q: %v", path, err))
+	}
+	return contents
+}
+
 func TestCountLenSize(t *testing.T) {
 	tag, err := Open(mp3Path, parseOpts)
 	if tag == nil || err != nil {
@@ -406,6 +414,8 @@ func TestResetTag(t *testing.T) {
 func TestConcurrent(t *testing.T) {
 	tagPool := sync.Pool{New: func() interface{} { return NewEmptyTag() }}
 
+	ec := make(chan error, 100)
+
 	var wg sync.WaitGroup
 	wg.Add(100)
 	for i := 0; i < 100; i++ {
@@ -417,25 +427,35 @@ func TestConcurrent(t *testing.T) {
 
 			file, err := os.Open(mp3Path)
 			if err != nil {
-				t.Fatal("Error while opening mp3:", err)
+				ec <- fmt.Errorf("Error while opening mp3: %v", err)
+				return
 			}
 			defer file.Close()
 
 			if err := tag.Reset(file, parseOpts); err != nil {
-				t.Fatal("Error while reseting tag to file:", err)
+				ec <- fmt.Errorf("Error while reseting tag to file: %v", err)
+				return
 			}
 
 			// Just check if it's correctly parsed.
 			if tag.Count() != countOfFrames {
-				t.Fatalf("Expected frames: %v, got: %v", countOfFrames, tag.Count())
+				ec <- fmt.Errorf("Expected frames: %v, got: %v", countOfFrames, tag.Count())
+				return
 			}
 
 			if _, err := tag.WriteTo(ioutil.Discard); err != nil {
-				t.Fatal("Error while writing to ioutil.Discard:", err)
+				ec <- fmt.Errorf("Error while writing to ioutil.Discard: %v", err)
+				return
 			}
 		}()
 	}
 	wg.Wait()
+	close(ec)
+
+	err := <-ec
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // TestEncodedText checks
