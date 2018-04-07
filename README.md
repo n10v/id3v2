@@ -15,8 +15,6 @@ id3v2 can't:
 * ❌ do unsyncronization;
 * ❌ work with extended header, flags, padding, footer.
 
-**id3v2 is still in beta. Until version 1.0 the API may be changed.**
-
 If you want some functionality, that library can't do,
 or you have some questions, just write an issue. **And of course, pull requests are welcome!**
 
