@@ -15,17 +15,17 @@ var bsPool = sync.Pool{
 	New: func() interface{} { return nil },
 }
 
-// getByteSlice returns []byte with len >= minSize.
-func getByteSlice(minSize int) []byte {
+// getByteSlice returns []byte with len == size.
+func getByteSlice(size int) []byte {
 	fromPool := bsPool.Get()
 	if fromPool == nil {
-		return make([]byte, minSize)
+		return make([]byte, size)
 	}
 	bs := fromPool.([]byte)
-	if len(bs) < minSize {
-		bs = make([]byte, minSize)
+	if cap(bs) < size {
+		bs = make([]byte, size)
 	}
-	return bs
+	return bs[0:size]
 }
 
 // putByteSlice puts b to pool.
