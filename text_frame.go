@@ -14,13 +14,14 @@ type TextFrame struct {
 }
 
 func (tf TextFrame) Size() int {
-	return 1 + encodedSize(tf.Text, tf.Encoding)
+	return 1 + encodedSize(tf.Text, tf.Encoding) + len(tf.Encoding.TerminationBytes)
 }
 
 func (tf TextFrame) WriteTo(w io.Writer) (int64, error) {
 	return useBufWriter(w, func(bw *bufWriter) {
 		bw.WriteByte(tf.Encoding.Key)
 		bw.EncodeAndWriteText(tf.Text, tf.Encoding)
+		bw.Write(tf.Encoding.TerminationBytes)
 	})
 }
 
