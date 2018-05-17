@@ -21,16 +21,16 @@ func (e Encoding) String() string {
 	return e.Name
 }
 
-// xencodingWrapper is a convient wrapper for xencoding.Encoding.
+// xencodingWrapper is a struct that stores decoder and encoder for
+// appropriate x/text/encoding. It's used to reduce allocations
+// through creating decoder and encoder only one time and storing it.
 type xencodingWrapper struct {
-	e       xencoding.Encoding
 	decoder *xencoding.Decoder
 	encoder *xencoding.Encoder
 }
 
 func newXEncodingWrapper(e xencoding.Encoding) xencodingWrapper {
 	return xencodingWrapper{
-		e:       e,
 		decoder: e.NewDecoder(),
 		encoder: e.NewEncoder(),
 	}
