@@ -43,7 +43,7 @@ func (tag *Tag) parse(rd io.Reader, opts Options) error {
 	if !opts.Parse {
 		return nil
 	}
-	return tag.parseFrames(opts)
+	return tag.parseFrames(opts, header.Version == 4)
 }
 
 func (tag *Tag) init(rd io.Reader, originalSize int64, version byte) {
@@ -63,7 +63,7 @@ func (tag *Tag) setDefaultEncoding(version byte) {
 	}
 }
 
-func (tag *Tag) parseFrames(opts Options) error {
+func (tag *Tag) parseFrames(opts Options, synchSafe bool) error {
 	framesSize := tag.originalSize - tagHeaderSize
 
 	// Convert descriptions, specified by user in opts.ParseFrames, to IDs.
@@ -79,7 +79,7 @@ func (tag *Tag) parseFrames(opts Options) error {
 	defer putByteSlice(buf)
 
 	for framesSize > 0 {
-		header, err := parseFrameHeader(buf, tag.reader)
+		header, err := parseFrameHeader(buf, tag.reader, synchSafe)
 		if err == io.EOF || err == errBlankFrame || err == ErrInvalidSizeFormat {
 			break
 		}
@@ -127,7 +127,7 @@ func (tag *Tag) parseFrames(opts Options) error {
 	return nil
 }
 
-func parseFrameHeader(buf []byte, rd io.Reader) (frameHeader, error) {
+func parseFrameHeader(buf []byte, rd io.Reader, synchSafe bool) (frameHeader, error) {
 	var header frameHeader
 
 	if len(buf) < frameHeaderSize {
@@ -140,7 +140,7 @@ func parseFrameHeader(buf []byte, rd io.Reader) (frameHeader, error) {
 	}
 
 	id := string(fhBuf[:4])
-	bodySize, err := parseSize(fhBuf[4:8])
+	bodySize, err := parseSize(fhBuf[4:8], synchSafe)
 	if err != nil {
 		return header, err
 	}

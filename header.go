@@ -43,12 +43,13 @@ func parseHeader(rd io.Reader) (tagHeader, error) {
 		return header, errNoTag
 	}
 
-	size, err := parseSize(data[6:])
+	header.Version = data[3]
+
+	size, err := parseSize(data[6:], header.Version == 4)
 	if err != nil {
 		return header, err
 	}
 
-	header.Version = data[3]
 	header.FramesSize = size
 	return header, nil
 }

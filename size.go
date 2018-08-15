@@ -7,21 +7,30 @@ package id3v2
 import "errors"
 
 const (
-	// id3SizeLen is length of ID3v2 size format (4 * 0b0xxxxxxx).
+	// id3SizeLen is length of ID3v2 size format (4 * 0bxxxxxxxx).
 	id3SizeLen = 4
 
-	maxSize  = 268435455 // == 0b00001111 11111111 11111111 11111111
-	sizeBase = 7         // == 0b01111111
+	synchSafeMaxSize  = 268435455            // == 0b00001111 11111111 11111111 11111111
+	synchSafeSizeBase = 7                    // == 0b01111111
+	synchSafeMask     = uint(254 << (3 * 8)) // 11111110 000000000 000000000 000000000
+
+	synchUnsafeMaxSize  = 4294967295           // == 0b11111111 11111111 11111111 11111111
+	synchUnsafeSizeBase = 8                    // == 0b11111111
+	synchUnsafeMask     = uint(255 << (3 * 8)) // 11111111 000000000 000000000 000000000
 )
 
 var ErrInvalidSizeFormat = errors.New("invalid format of tag's/frame's size")
 var ErrSizeOverflow = errors.New("size of tag/frame is greater than allowed in id3 tag")
 
-// writeBytesSize writes size to bw in form of ID3v2 size format (4 * 0b0xxxxxxx).
-//
-// If size is greater than allowed (256MB), then it returns ErrSizeOverflow.
-func writeBytesSize(bw *bufWriter, size uint) error {
-	if size > maxSize {
+func writeBytesSize(bw *bufWriter, size uint, synchSafe bool) error {
+	if synchSafe {
+		return writeSynchSafeBytesSize(bw, size)
+	}
+	return writeSynchUnsafeBytesSize(bw, size)
+}
+
+func writeSynchSafeBytesSize(bw *bufWriter, size uint) error {
+	if size > synchSafeMaxSize {
 		return ErrSizeOverflow
 	}
 
@@ -33,10 +42,9 @@ func writeBytesSize(bw *bufWriter, size uint) error {
 	// E.g. size is 32-bit integer and after the skip of first 4 bits
 	// its value is "10100111 01110101 01010010 11110000".
 	// In loop we should write every first 7 bits to bw.
-	mask := uint(254 << (3 * 8)) // 11111110 000000000 000000000 000000000
 	for i := 0; i < id3SizeLen; i++ {
 		// To take first 7 bits we should do `size&mask`.
-		firstBits := size & mask
+		firstBits := size & synchSafeMask
 		// firstBits is "10100110 00000000 00000000 00000000" now.
 		// firstBits has int type, but we should have a byte.
 		// To have a byte we should move first 7 bits to the end of firstBits,
@@ -47,25 +55,43 @@ func writeBytesSize(bw *bufWriter, size uint) error {
 		// Now in bSize we have only "01010011". We can write it to bw.
 		bw.WriteByte(bSize)
 		// Do the same with next 7 bits.
-		size <<= sizeBase
+		size <<= synchSafeSizeBase
 	}
 
 	return nil
 }
 
-// parseSize parses data in form of ID3v2 size specification format (4 * 0b0xxxxxxx)
-// and returns parsed int64 number.
-//
-// If length of data is greater than 4 or if there is invalid size format (e.g.
-// one byte in data is like 0b1xxxxxxx), then it returns ErrInvalidSizeFormat.
-func parseSize(data []byte) (int64, error) {
+func writeSynchUnsafeBytesSize(bw *bufWriter, size uint) error {
+	if size > synchUnsafeMaxSize {
+		return ErrSizeOverflow
+	}
+
+	// See the explanation of algorithm in writeSynchSafeBytesSize.
+	for i := 0; i < id3SizeLen; i++ {
+		firstBits := size & synchUnsafeMask
+		firstBits >>= (3 * 8)
+		bw.WriteByte(byte(firstBits))
+		size <<= synchUnsafeSizeBase
+	}
+
+	return nil
+}
+
+func parseSize(data []byte, synchSafe bool) (int64, error) {
 	if len(data) > id3SizeLen {
 		return 0, ErrInvalidSizeFormat
 	}
 
+	var sizeBase uint
+	if synchSafe {
+		sizeBase = synchSafeSizeBase
+	} else {
+		sizeBase = synchUnsafeSizeBase
+	}
+
 	var size int64
 	for _, b := range data {
-		if b&128 > 0 { // 128 = 0b1000_0000
+		if synchSafe && b&128 > 0 { // 128 = 0b1000_0000
 			return 0, ErrInvalidSizeFormat
 		}
 

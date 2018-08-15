@@ -46,11 +46,11 @@ func (bw *bufWriter) WriteByte(c byte) {
 	}
 }
 
-func (bw *bufWriter) WriteBytesSize(size uint) {
+func (bw *bufWriter) WriteBytesSize(size uint, synchSafe bool) {
 	if bw.err != nil {
 		return
 	}
-	bw.err = writeBytesSize(bw, size)
+	bw.err = writeBytesSize(bw, size, synchSafe)
 }
 
 func (bw *bufWriter) WriteString(s string) {

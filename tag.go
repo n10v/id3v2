@@ -374,8 +374,9 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	writeTagHeader(bw, uint(framesSize), tag.version)
 
 	// Write frames.
+	synchSafe := tag.Version() == 4
 	err = tag.iterateOverAllFrames(func(id string, f Framer) error {
-		return writeFrame(bw, id, f)
+		return writeFrame(bw, id, f, synchSafe)
 	})
 	if err != nil {
 		bw.Flush()
@@ -390,18 +391,18 @@ func writeTagHeader(bw *bufWriter, framesSize uint, version byte) {
 	bw.WriteByte(version)
 	bw.WriteByte(0) // Revision
 	bw.WriteByte(0) // Flags
-	bw.WriteBytesSize(framesSize)
+	bw.WriteBytesSize(framesSize, true)
 }
 
-func writeFrame(bw *bufWriter, id string, frame Framer) error {
-	writeFrameHeader(bw, id, uint(frame.Size()))
+func writeFrame(bw *bufWriter, id string, frame Framer, synchSafe bool) error {
+	writeFrameHeader(bw, id, uint(frame.Size()), synchSafe)
 	_, err := frame.WriteTo(bw)
 	return err
 }
 
-func writeFrameHeader(bw *bufWriter, id string, frameSize uint) {
+func writeFrameHeader(bw *bufWriter, id string, frameSize uint, synchSafe bool) {
 	bw.WriteString(id)
-	bw.WriteBytesSize(frameSize)
+	bw.WriteBytesSize(frameSize, synchSafe)
 	bw.Write([]byte{0, 0}) // Flags
 }
 

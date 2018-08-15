@@ -10,17 +10,20 @@ import (
 )
 
 var (
-	sizeUint  uint = 15351
-	sizeBytes      = []byte{0, 0, 0x77, 0x77}
+	synchSafeSizeUint  uint = 15351
+	synchSafeSizeBytes      = []byte{0, 0, 119, 119}
+
+	synchUnsafeSizeUint  uint = 255
+	synchUnsafeSizeBytes      = []byte{0, 0, 0, 255}
 )
 
-func TestWriteBytesSize(t *testing.T) {
+func testWriteSize(sizeUint uint, sizeBytes []byte, synchSafe bool, t *testing.T) {
 	t.Parallel()
 
 	buf := new(bytes.Buffer)
 	bw := newBufWriter(buf)
 
-	bw.WriteBytesSize(sizeUint)
+	bw.WriteBytesSize(sizeUint, synchSafe)
 	if err := bw.Flush(); err != nil {
 		t.Fatal(err)
 	}
@@ -29,14 +32,30 @@ func TestWriteBytesSize(t *testing.T) {
 	}
 }
 
-func TestParseSize(t *testing.T) {
+func testParseSize(sizeUint uint, sizeBytes []byte, synchSafe bool, t *testing.T) {
 	t.Parallel()
 
-	size, err := parseSize(sizeBytes)
+	size, err := parseSize(sizeBytes, synchSafe)
 	if err != nil {
 		t.Error(err)
 	}
 	if size != int64(sizeUint) {
 		t.Errorf("Expected: %v, got: %v", sizeUint, size)
 	}
+}
+
+func TestWriteSynchSafeSize(t *testing.T) {
+	testWriteSize(synchSafeSizeUint, synchSafeSizeBytes, true, t)
+}
+
+func TestParseSynchSafeSize(t *testing.T) {
+	testParseSize(synchSafeSizeUint, synchSafeSizeBytes, true, t)
+}
+
+func TestWriteSynchUnsafeBytesSize(t *testing.T) {
+	testWriteSize(synchUnsafeSizeUint, synchUnsafeSizeBytes, false, t)
+}
+
+func TestParseSynchUnsafeSize(t *testing.T) {
+	testParseSize(synchUnsafeSizeUint, synchUnsafeSizeBytes, false, t)
 }

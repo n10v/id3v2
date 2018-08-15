@@ -150,7 +150,7 @@ func TestCountLenSize(t *testing.T) {
 		t.Error("Error while reading a tag header:", err)
 	}
 
-	size, err := parseSize(tagHeader[6:10])
+	size, err := parseSize(tagHeader[6:10], true)
 	if err != nil {
 		t.Error("Error while parsing a tag header size:", err)
 	}
