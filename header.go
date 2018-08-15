@@ -45,7 +45,8 @@ func parseHeader(rd io.Reader) (tagHeader, error) {
 
 	header.Version = data[3]
 
-	size, err := parseSize(data[6:], header.Version == 4)
+	// Tag header size is always synchsafe.
+	size, err := parseSize(data[6:], true)
 	if err != nil {
 		return header, err
 	}
