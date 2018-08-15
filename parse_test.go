@@ -397,5 +397,30 @@ func TestParseReaderNil(t *testing.T) {
 	if !strings.Contains(err.Error(), "rd is nil") {
 		t.Fatalf("Expected err contains %q, got %q", "rd is nil", err)
 	}
+}
 
+func TestParseV3UnsafeSize(t *testing.T) {
+	buf := new(bytes.Buffer)
+	title := strings.Repeat("A", 254)
+
+	tag := NewEmptyTag()
+	tag.SetVersion(3)
+	tag.SetTitle(title)
+	if _, err := tag.WriteTo(buf); err != nil {
+		t.Fatalf("Error while writing tag: %v", err)
+	}
+
+	titleFrameHeader := buf.Bytes()[tagHeaderSize : tagHeaderSize+frameHeaderSize]
+	bytesSize := titleFrameHeader[4:8]
+	if !bytes.Equal(bytesSize, []byte{0, 0, 0, 255}) {
+		t.Fatalf("bytesSize should be equal to [0 0 0 255], but it's %v", bytesSize)
+	}
+
+	parsedTag, err := ParseReader(buf, Options{Parse: true})
+	if err != nil {
+		t.Fatalf("Error while parsing tag: %v", err)
+	}
+	if parsedTag.Title() != title {
+		t.Fatalf("Titles are not equal: len(parsedTag.Title()) == %v, len(title) == %v", len(parsedTag.Title()), len(title))
+	}
 }
