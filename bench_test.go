@@ -117,6 +117,12 @@ func setFrames(tag *Tag, encoding Encoding) {
 	}
 	tag.AddUserDefinedTextFrame(uf)
 
+	ufid := UFIDFrame{
+		OwnerIdentifier: "https://musicbrainz.org",
+		Identifier:      []byte("fbd94fb6-2a74-42d0-acbc-81caf8b84984"),
+	}
+	tag.AddUFIDFrame(ufid)
+
 	comm := CommentFrame{
 		Encoding:    encoding,
 		Language:    "eng",
