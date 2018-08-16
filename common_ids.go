@@ -133,6 +133,7 @@ var parsers = map[string]func(*bufReader) (Framer, error){
 	"APIC": parsePictureFrame,
 	"COMM": parseCommentFrame,
 	"USLT": parseUnsynchronisedLyricsFrame,
+	"TXXX": parseUserDefinedTextFrame,
 }
 
 // mustFrameBeInSequence checks if frame with corresponding ID must

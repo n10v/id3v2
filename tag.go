@@ -65,6 +65,12 @@ func (tag *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
 	tag.AddFrame(id, uslf)
 }
 
+// AddUserDefinedTextFrame adds a custom frame (TXXX) to tag.
+func (tag *Tag) AddUserDefinedTextFrame(uf UserDefinedTextFrame) {
+	id := tag.CommonID("User defined text information frame")
+	tag.AddFrame(id, uf)
+}
+
 // CommonID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
 // from given description.
 // For example, CommonID("Language") will return "TLAN".
