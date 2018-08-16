@@ -71,6 +71,11 @@ func (tag *Tag) AddUserDefinedTextFrame(uf UserDefinedTextFrame) {
 	tag.AddFrame(id, uf)
 }
 
+// AddUFIDFrame adds a unique file identifier frame (UFID) to tag.
+func (tag *Tag) AddUFIDFrame(uf UFIDFrame) {
+	tag.AddFrame("UFID", uf)
+}
+
 // CommonID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
 // from given description.
 // For example, CommonID("Language") will return "TLAN".

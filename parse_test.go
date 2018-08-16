@@ -28,6 +28,7 @@ func TestParse(t *testing.T) {
 	testPictureFrames(t, tag)
 	testUSLTFrames(t, tag)
 	testTXXXFrames(t, tag)
+	testUFIDFrames(t, tag)
 	testCommentFrames(t, tag)
 	testUnknownFrames(t, tag)
 }
@@ -180,6 +181,37 @@ func compareTXXXFrames(actual, expected UserDefinedTextFrame) error {
 	}
 	if err := compareTwoStrings(actual.Value, expected.Value); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func testUFIDFrames(t *testing.T, tag *Tag) {
+	ufidFrames := tag.GetFrames("UFID")
+	if len(ufidFrames) != 1 {
+		t.Fatalf("Expected UFID frames: %v, got %v", 1, len(ufidFrames))
+	}
+
+	var parsedUFIDFrame UFIDFrame
+	for _, f := range ufidFrames {
+		ufid, ok := f.(UFIDFrame)
+		if !ok {
+			t.Fatal("Couldn't assert UFID frame")
+		}
+		parsedUFIDFrame = ufid
+	}
+
+	if err := compareUFIDFrames(parsedUFIDFrame, musicBrainzUF); err != nil {
+		t.Error(err)
+	}
+}
+
+func compareUFIDFrames(actual, expected UFIDFrame) error {
+	if err := compareTwoStrings(actual.OwnerIdentifier, expected.OwnerIdentifier); err != nil {
+		return err
+	}
+	if !bytes.Equal(actual.Identifier, expected.Identifier) {
+		return fmt.Errorf("Expected %q, got %q", expected.Identifier, actual.Identifier)
 	}
 
 	return nil
