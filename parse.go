@@ -172,7 +172,7 @@ func skipReaderBuf(rd io.Reader, buf []byte) error {
 }
 
 func parseFrameBody(id string, br *bufReader) (Framer, error) {
-	if id[0] == 'T' {
+	if id[0] == 'T' && id != "TXXX" {
 		return parseTextFrame(br)
 	}
 

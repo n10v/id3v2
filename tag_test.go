@@ -20,10 +20,10 @@ const (
 	frontCoverPath = "testdata/front_cover.jpg"
 	backCoverPath  = "testdata/back_cover.jpg"
 
-	framesSize    = 211805
+	framesSize    = 211873
 	tagSize       = tagHeaderSize + framesSize
 	musicSize     = 3840834
-	countOfFrames = 12
+	countOfFrames = 13
 )
 
 var (
@@ -53,6 +53,12 @@ var (
 		Language:          "ger",
 		ContentDescriptor: "Inhaltsdeskriptor",
 		Lyrics:            "Einigkeit und Recht und Freiheit",
+	}
+
+	musicBrainzUDTF = UserDefinedTextFrame{
+		Encoding:    EncodingUTF8,
+		Description: "MusicBrainz Album Id",
+		Value:       "fbd94fb6-2a74-42d0-acbc-81caf8b84984",
 	}
 
 	engComm = CommentFrame{
@@ -103,6 +109,8 @@ func resetMP3Tag() error {
 	tag.AddUnsynchronisedLyricsFrame(engUSLF)
 	tag.AddUnsynchronisedLyricsFrame(gerUSLF)
 
+	tag.AddUserDefinedTextFrame(musicBrainzUDTF)
+
 	tag.AddCommentFrame(engComm)
 	tag.AddCommentFrame(gerComm)
 
@@ -132,8 +140,8 @@ func TestCountLenSize(t *testing.T) {
 	}
 
 	// Check len of tag.AllFrames().
-	if len(tag.AllFrames()) != 9 { // 9 - count of all ids
-		t.Errorf("Expected: %v, got: %v", 9, len(tag.AllFrames()))
+	if len(tag.AllFrames()) != 10 { // 10 - count of all ids
+		t.Errorf("Expected: %v, got: %v", 10, len(tag.AllFrames()))
 	}
 
 	// Check saved tag size by reading the 6:10 bytes of mp3 file.

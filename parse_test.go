@@ -27,6 +27,7 @@ func TestParse(t *testing.T) {
 	testTextFrames(t, tag)
 	testPictureFrames(t, tag)
 	testUSLTFrames(t, tag)
+	testTXXXFrames(t, tag)
 	testCommentFrames(t, tag)
 	testUnknownFrames(t, tag)
 }
@@ -144,6 +145,40 @@ func compareUSLTFrames(actual, expected UnsynchronisedLyricsFrame) error {
 		return err
 	}
 	if err := compareTwoStrings(actual.Lyrics, expected.Lyrics); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func testTXXXFrames(t *testing.T, tag *Tag) {
+	customFrames := tag.GetFrames(tag.CommonID("User defined text information frame"))
+	if len(customFrames) != 1 {
+		t.Fatalf("Expected TXXX frames: %v, got %v", 1, len(customFrames))
+	}
+
+	var parsedUserDefinedTextFrame UserDefinedTextFrame
+	for _, f := range customFrames {
+		txxx, ok := f.(UserDefinedTextFrame)
+		if !ok {
+			t.Fatal("Couldn't assert TXXX frame")
+		}
+		parsedUserDefinedTextFrame = txxx
+	}
+
+	if err := compareTXXXFrames(parsedUserDefinedTextFrame, musicBrainzUDTF); err != nil {
+		t.Error(err)
+	}
+}
+
+func compareTXXXFrames(actual, expected UserDefinedTextFrame) error {
+	if err := compareTwoBytes(actual.Encoding.Key, expected.Encoding.Key); err != nil {
+		return err
+	}
+	if err := compareTwoStrings(actual.Description, expected.Description); err != nil {
+		return err
+	}
+	if err := compareTwoStrings(actual.Value, expected.Value); err != nil {
 		return err
 	}
 
