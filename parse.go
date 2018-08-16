@@ -67,9 +67,13 @@ func (tag *Tag) parseFrames(opts Options, synchSafe bool) error {
 	framesSize := tag.originalSize - tagHeaderSize
 
 	// Convert descriptions, specified by user in opts.ParseFrames, to IDs.
-	parseIDs := make(map[string]bool, len(opts.ParseFrames))
-	for _, description := range opts.ParseFrames {
-		parseIDs[tag.CommonID(description)] = true
+	var parseIDs map[string]bool
+	isParseFramesProvided := len(opts.ParseFrames) > 0
+	if isParseFramesProvided {
+		parseIDs = make(map[string]bool, len(opts.ParseFrames))
+		for _, description := range opts.ParseFrames {
+			parseIDs[tag.CommonID(description)] = true
+		}
 	}
 
 	br := getBufReader(nil)
@@ -86,15 +90,14 @@ func (tag *Tag) parseFrames(opts Options, synchSafe bool) error {
 		if err != nil {
 			return err
 		}
-		id := header.ID
-		bodySize := header.BodySize
+		id, bodySize := header.ID, header.BodySize
 
 		framesSize -= frameHeaderSize + bodySize
 
 		bodyRd := getLimitedReader(tag.reader, bodySize)
 		defer putLimitedReader(bodyRd)
 
-		if len(parseIDs) > 0 && !parseIDs[id] {
+		if isParseFramesProvided && !parseIDs[id] {
 			if err := skipReaderBuf(bodyRd, buf); err != nil {
 				return err
 			}
@@ -109,7 +112,7 @@ func (tag *Tag) parseFrames(opts Options, synchSafe bool) error {
 
 		tag.AddFrame(id, frame)
 
-		if len(parseIDs) > 0 && !mustFrameBeInSequence(id) {
+		if isParseFramesProvided && !mustFrameBeInSequence(id) {
 			delete(parseIDs, id)
 
 			// If it was last ID in parseIDs, we don't need to parse
