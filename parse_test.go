@@ -467,6 +467,8 @@ func TestParseReaderNil(t *testing.T) {
 }
 
 func TestParseV3UnsafeSize(t *testing.T) {
+	t.Parallel()
+
 	buf := new(bytes.Buffer)
 	title := strings.Repeat("A", 254)
 

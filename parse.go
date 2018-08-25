@@ -43,7 +43,7 @@ func (tag *Tag) parse(rd io.Reader, opts Options) error {
 	if !opts.Parse {
 		return nil
 	}
-	return tag.parseFrames(opts, header.Version == 4)
+	return tag.parseFrames(opts)
 }
 
 func (tag *Tag) init(rd io.Reader, originalSize int64, version byte) {
@@ -63,7 +63,7 @@ func (tag *Tag) setDefaultEncoding(version byte) {
 	}
 }
 
-func (tag *Tag) parseFrames(opts Options, synchSafe bool) error {
+func (tag *Tag) parseFrames(opts Options) error {
 	framesSize := tag.originalSize - tagHeaderSize
 
 	// Convert descriptions, specified by user in opts.ParseFrames, to IDs.
@@ -75,6 +75,8 @@ func (tag *Tag) parseFrames(opts Options, synchSafe bool) error {
 			parseIDs[tag.CommonID(description)] = true
 		}
 	}
+
+	synchSafe := tag.Version() == 4
 
 	br := getBufReader(nil)
 	defer putBufReader(br)
