@@ -3,15 +3,17 @@
 **Fast, simple and powerful ID3 parsing and writing library for Go, based only on standard library.**
 
 id3v2 can:
+
 * ✅ support of ID3v2.3 and ID3v2.4 tags;
 * ✅ parse and write tags;
 * ✅ work with all available encodings;
-* ✅ set and read artist, album, year, genre, other text frames, unsynchronised lyrics/text (USLT),
-comments and attached pictures;
-* ✅ set and read several USLTs, comments and attached pictures;
+* ✅ set and read all text frames, unsynchronised lyrics/text (USLT),
+  comments, attached pictures, UFID and TXXX frames;
+* ✅ set and read frames, that can be used multiple times in tag;
 * ✅ be used in multiple goroutines.
 
 id3v2 can't:
+
 * ❌ do unsyncronization;
 * ❌ work with extended header, flags, padding, footer.
 
@@ -19,9 +21,11 @@ If you want some functionality, that library can't do,
 or you have some questions, just write an issue. **And of course, pull requests are welcome!**
 
 ## Installation
-  	$ go get -u github.com/bogem/id3v2
+
+$ go get -u github.com/bogem/id3v2
 
 ## Example of usage
+
 ```go
 package main
 
@@ -65,6 +69,7 @@ func main() {
 ```
 
 ## Read multiple frames
+
 ```go
 pictures := tag.GetFrames(tag.CommonID("Attached picture"))
 for _, f := range pictures {
@@ -80,6 +85,7 @@ for _, f := range pictures {
 ```
 
 ## Options
+
 ```go
 // Options influence on processing the tag.
 type Options struct {
@@ -100,10 +106,12 @@ type Options struct {
 ```
 
 ## Work with encodings
+
 id3v2 can encode and decode text of avaialble encodings (ISO-8859-1,
 UTF-16 with BOM, UTF-16BE without BOM, UTF-8). Just set [the desired encoding](https://github.com/bogem/id3v2/blob/master/encoding.go#L27) in `Encoding` field of frame and set UTF-8 encoded text to corresponding text fields.
 
 For example, if you set comment frame with custom encoding and write it:
+
 ```go
 tag := id3v2.NewEmptyTag()
 comment := id3v2.CommentFrame{
@@ -119,6 +127,7 @@ if err != nil {
 	log.Fatal(err)
 }
 ```
+
 `Text` field will be automatically encoded with UTF-16BE with BOM and written to w.
 
 By default, if version of tag is 4 then UTF-8 is used for methods like
