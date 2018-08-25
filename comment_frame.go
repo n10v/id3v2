@@ -39,8 +39,7 @@ func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func parseCommentFrame(br *bufReader) (Framer, error) {
-	encodingKey := br.ReadByte()
-	encoding := getEncoding(encodingKey)
+	encoding := getEncoding(br.ReadByte())
 	language := br.Next(3)
 	description := br.ReadText(encoding)
 

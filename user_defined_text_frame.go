@@ -24,8 +24,7 @@ func (udtf UserDefinedTextFrame) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func parseUserDefinedTextFrame(br *bufReader) (Framer, error) {
-	encodingKey := br.ReadByte()
-	encoding := getEncoding(encodingKey)
+	encoding := getEncoding(br.ReadByte())
 	description := br.ReadText(encoding)
 
 	if br.Err() != nil {

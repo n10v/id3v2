@@ -25,8 +25,7 @@ func (tf TextFrame) WriteTo(w io.Writer) (int64, error) {
 }
 
 func parseTextFrame(br *bufReader) (Framer, error) {
-	encodingKey := br.ReadByte()
-	encoding := getEncoding(encodingKey)
+	encoding := getEncoding(br.ReadByte())
 
 	if br.Err() != nil {
 		return nil, br.Err()
