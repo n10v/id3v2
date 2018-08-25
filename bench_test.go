@@ -110,19 +110,6 @@ func setFrames(tag *Tag, encoding Encoding) {
 	}
 	tag.AddUnsynchronisedLyricsFrame(uslt)
 
-	udtf := UserDefinedTextFrame{
-		Encoding:    encoding,
-		Description: "MusicBrainz Album Id",
-		Value:       "fbd94fb6-2a74-42d0-acbc-81caf8b84984",
-	}
-	tag.AddUserDefinedTextFrame(udtf)
-
-	ufid := UFIDFrame{
-		OwnerIdentifier: "https://musicbrainz.org",
-		Identifier:      []byte("fbd94fb6-2a74-42d0-acbc-81caf8b84984"),
-	}
-	tag.AddUFIDFrame(ufid)
-
 	comm := CommentFrame{
 		Encoding:    encoding,
 		Language:    "eng",
