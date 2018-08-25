@@ -60,6 +60,7 @@ var (
 		Description: "MusicBrainz Album Id",
 		Value:       "fbd94fb6-2a74-42d0-acbc-81caf8b84984",
 	}
+
 	musicBrainzUF = UFIDFrame{
 		OwnerIdentifier: "https://musicbrainz.org",
 		Identifier:      []byte("fbd94fb6-2a74-42d0-acbc-81caf8b84984"),
@@ -145,7 +146,7 @@ func TestCountLenSize(t *testing.T) {
 	}
 
 	// Check len of tag.AllFrames().
-	if len(tag.AllFrames()) != 11 { // 11 - count of all ids
+	if len(tag.AllFrames()) != 11 {
 		t.Errorf("Expected: %v, got: %v", 11, len(tag.AllFrames()))
 	}
 
@@ -391,7 +392,7 @@ func TestEmptyTagWriteTo(t *testing.T) {
 		t.Fatal("buf is empty, but it must have tag")
 	}
 
-	parsedTag, err := ParseReader(buf, Options{Parse: true})
+	parsedTag, err := ParseReader(buf, parseOpts)
 	if err != nil {
 		t.Fatal("Error while parsing buf:", err)
 	}
@@ -510,7 +511,7 @@ func TestEncodedText(t *testing.T) {
 		t.Errorf("Expected WriteTo n==%v, got %v", tag.Size(), n)
 	}
 
-	tag, err = ParseReader(buf, Options{Parse: true})
+	tag, err = ParseReader(buf, parseOpts)
 	if err != nil {
 		t.Fatalf("Error by parsing the tag: %v", err)
 	}

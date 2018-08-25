@@ -153,13 +153,13 @@ func compareUSLTFrames(actual, expected UnsynchronisedLyricsFrame) error {
 }
 
 func testTXXXFrames(t *testing.T, tag *Tag) {
-	customFrames := tag.GetFrames(tag.CommonID("User defined text information frame"))
-	if len(customFrames) != 1 {
-		t.Fatalf("Expected TXXX frames: %v, got %v", 1, len(customFrames))
+	txxxFrames := tag.GetFrames(tag.CommonID("User defined text information frame"))
+	if len(txxxFrames) != 1 {
+		t.Fatalf("Expected TXXX frames: %v, got %v", 1, len(txxxFrames))
 	}
 
 	var parsedUserDefinedTextFrame UserDefinedTextFrame
-	for _, f := range customFrames {
+	for _, f := range txxxFrames {
 		txxx, ok := f.(UserDefinedTextFrame)
 		if !ok {
 			t.Fatal("Couldn't assert TXXX frame")

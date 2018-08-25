@@ -1,8 +1,6 @@
 package id3v2
 
-import (
-	"io"
-)
+import "io"
 
 // UserDefinedTextFrame is used to work with TXXX frames.
 // There can be many UserDefinedTextFrames but the Desciption fields need to be unique.
@@ -12,16 +10,16 @@ type UserDefinedTextFrame struct {
 	Value       string
 }
 
-func (uf UserDefinedTextFrame) Size() int {
-	return 1 + encodedSize(uf.Description, uf.Encoding) + len(uf.Encoding.TerminationBytes) + encodedSize(uf.Value, uf.Encoding)
+func (udtf UserDefinedTextFrame) Size() int {
+	return 1 + encodedSize(udtf.Description, udtf.Encoding) + len(udtf.Encoding.TerminationBytes) + encodedSize(udtf.Value, udtf.Encoding)
 }
 
-func (uf UserDefinedTextFrame) WriteTo(w io.Writer) (n int64, err error) {
+func (udtf UserDefinedTextFrame) WriteTo(w io.Writer) (n int64, err error) {
 	return useBufWriter(w, func(bw *bufWriter) {
-		bw.WriteByte(uf.Encoding.Key)
-		bw.EncodeAndWriteText(uf.Description, uf.Encoding)
-		bw.Write(uf.Encoding.TerminationBytes)
-		bw.EncodeAndWriteText(uf.Value, uf.Encoding)
+		bw.WriteByte(udtf.Encoding.Key)
+		bw.EncodeAndWriteText(udtf.Description, udtf.Encoding)
+		bw.Write(udtf.Encoding.TerminationBytes)
+		bw.EncodeAndWriteText(udtf.Value, udtf.Encoding)
 	})
 }
 
@@ -43,11 +41,11 @@ func parseUserDefinedTextFrame(br *bufReader) (Framer, error) {
 		return nil, err
 	}
 
-	uf := UserDefinedTextFrame{
+	udtf := UserDefinedTextFrame{
 		Encoding:    encoding,
 		Description: decodeText(description, encoding),
 		Value:       decodeText(value.Bytes(), encoding),
 	}
 
-	return uf, nil
+	return udtf, nil
 }
