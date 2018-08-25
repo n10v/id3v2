@@ -41,11 +41,8 @@ func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) 
 func parseUnsynchronisedLyricsFrame(br *bufReader) (Framer, error) {
 	encodingKey := br.ReadByte()
 	encoding := getEncoding(encodingKey)
-
 	language := br.Next(3)
-
-	contentDescriptor := br.ReadTillDelims(encoding.TerminationBytes)
-	br.Discard(len(encoding.TerminationBytes))
+	contentDescriptor := br.ReadText(encoding)
 
 	if br.Err() != nil {
 		return nil, br.Err()

@@ -10,9 +10,7 @@ import (
 	"testing"
 )
 
-var (
-	bs = []byte{0, 11, 22, 33, 44, 55, 77, 88, 55, 55, 66, 77, 88}
-)
+var bs = []byte{0, 11, 22, 33, 44, 55, 77, 88, 55, 55, 66, 77, 88}
 
 func TestReadTillDelim(t *testing.T) {
 	t.Parallel()
@@ -25,9 +23,9 @@ func TestReadTillDelim(t *testing.T) {
 	}
 	expected := bs[:firstIndexOf55]
 
-	read := bufReader.ReadTillDelim(55)
-	if bufReader.Err() != nil {
-		t.Fatal(bufReader.Err())
+	read, err := bufReader.readTillDelim(55)
+	if err != nil {
+		t.Fatal(err)
 	}
 	if !bytes.Equal(expected, read) {
 		t.Errorf("Expected: %v, got: %v", expected, read)
@@ -42,9 +40,9 @@ func TestReadTillZero(t *testing.T) {
 
 	bufReader := newBufReader(bytes.NewReader(bs))
 
-	read := bufReader.ReadTillDelim(0)
-	if bufReader.Err() != nil {
-		t.Fatal(bufReader.Err())
+	read, err := bufReader.readTillDelim(0)
+	if err != nil {
+		t.Fatal(err)
 	}
 	if !bytes.Equal([]byte{}, read) {
 		t.Errorf("Expected empty buffer, got %v", read)
@@ -79,9 +77,9 @@ func TestReadTillDelimEOF(t *testing.T) {
 	t.Parallel()
 
 	bufReader := newBufReader(bytes.NewReader(bs))
-	bufReader.ReadTillDelim(234)
-	if bufReader.Err() != io.EOF {
-		t.Errorf("Expected io.EOF, got %v", bufReader.Err())
+	_, err := bufReader.readTillDelim(234)
+	if err != io.EOF {
+		t.Errorf("Expected io.EOF, got %v", err)
 	}
 }
 
@@ -92,9 +90,9 @@ func TestReadTillDelims(t *testing.T) {
 	delims := []byte{55, 66}
 	expectedLen := 9
 
-	read := bufReader.ReadTillDelims(delims)
-	if bufReader.Err() != nil {
-		t.Fatal(bufReader.Err())
+	read, err := bufReader.readTillDelims(delims)
+	if err != nil {
+		t.Fatal(err)
 	}
 	if expectedLen != len(read) {
 		t.Errorf("Expected: %v, got: %v", expectedLen, len(read))

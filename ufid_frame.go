@@ -20,14 +20,12 @@ func (ufid UFIDFrame) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func parseUFIDFrame(br *bufReader) (Framer, error) {
-	owner := br.ReadTillDelims(EncodingISO.TerminationBytes)
-	br.Discard(len(EncodingISO.TerminationBytes))
+	owner := br.ReadText(EncodingISO)
+	ident := br.ReadAll()
 
 	if br.Err() != nil {
 		return nil, br.Err()
 	}
-
-	ident := br.ReadAll()
 
 	ufid := UFIDFrame{
 		OwnerIdentifier: decodeText(owner, EncodingISO),

@@ -100,21 +100,12 @@ func (br *bufReader) next(n int) ([]byte, error) {
 	return peeked, nil
 }
 
-// ReadTillDelim reads until the first occurrence of delim in the input,
+// readTillDelim reads until the first occurrence of delim in the input,
 // returning a slice containing the data up to and NOT including the delim.
 // If ReadTillDelim encounters an error before finding a delimiter,
 // it returns the data read before the error and the error itself.
 // ReadTillDelim returns err != nil if and only if ReadTillDelim didn't find
 // delim.
-func (br *bufReader) ReadTillDelim(delim byte) []byte {
-	if br.err != nil {
-		return nil
-	}
-	var b []byte
-	b, br.err = br.readTillDelim(delim)
-	return b
-}
-
 func (br *bufReader) readTillDelim(delim byte) ([]byte, error) {
 	read, err := br.buf.ReadBytes(delim)
 	if err != nil || len(read) == 0 {
@@ -124,21 +115,12 @@ func (br *bufReader) readTillDelim(delim byte) ([]byte, error) {
 	return read[:len(read)-1], err
 }
 
-// ReadTillDelims reads until the first occurrence of delims in the input,
+// readTillDelims reads until the first occurrence of delims in the input,
 // returning a slice containing the data up to and NOT including the delimiters.
 // If ReadTillDelims encounters an error before finding a delimiters,
 // it returns the data read before the error and the error itself.
 // ReadTillDelims returns err != nil if and only if ReadTillDelims didn't find
 // delims.
-func (br *bufReader) ReadTillDelims(delims []byte) []byte {
-	if br.err != nil {
-		return nil
-	}
-	var b []byte
-	b, br.err = br.readTillDelims(delims)
-	return b
-}
-
 func (br *bufReader) readTillDelims(delims []byte) ([]byte, error) {
 	if len(delims) == 0 {
 		return nil, nil
@@ -173,6 +155,22 @@ func (br *bufReader) readTillDelims(delims []byte) ([]byte, error) {
 	}
 
 	return result, nil
+}
+
+// ReadText reads until the first occurrence of delims in the input,
+// returning a slice containing the data up to and NOT including the delimiters.
+// But it discards then termination bytes according to provided encoding.
+func (br *bufReader) ReadText(encoding Encoding) []byte {
+	if br.err != nil {
+		return nil
+	}
+
+	var text []byte
+	delims := encoding.TerminationBytes
+	text, br.err = br.readTillDelims(delims)
+	br.Discard(len(delims))
+
+	return text
 }
 
 func (br *bufReader) Reset(rd io.Reader) {

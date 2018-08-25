@@ -41,15 +41,9 @@ func (pf PictureFrame) WriteTo(w io.Writer) (n int64, err error) {
 func parsePictureFrame(br *bufReader) (Framer, error) {
 	encodingKey := br.ReadByte()
 	encoding := getEncoding(encodingKey)
-
-	mimeType := br.ReadTillDelim(0)
-	br.Discard(1)
-
+	mimeType := br.ReadText(EncodingISO)
 	pictureType := br.ReadByte()
-
-	description := br.ReadTillDelims(encoding.TerminationBytes)
-	br.Discard(len(encoding.TerminationBytes))
-
+	description := br.ReadText(encoding)
 	picture := br.ReadAll()
 
 	if br.Err() != nil {
