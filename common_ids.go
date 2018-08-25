@@ -132,16 +132,16 @@ var (
 var parsers = map[string]func(*bufReader) (Framer, error){
 	"APIC": parsePictureFrame,
 	"COMM": parseCommentFrame,
-	"USLT": parseUnsynchronisedLyricsFrame,
 	"TXXX": parseUserDefinedTextFrame,
 	"UFID": parseUFIDFrame,
+	"USLT": parseUnsynchronisedLyricsFrame,
 }
 
 // mustFrameBeInSequence checks if frame with corresponding ID must
 // be added to sequence.
 func mustFrameBeInSequence(id string) bool {
 	switch id {
-	case "APIC", "COMM", "USLT":
+	case "APIC", "COMM", "TXXX", "USLT":
 		return true
 	}
 	return false

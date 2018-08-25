@@ -25,6 +25,8 @@ func (s *sequence) AddFrame(f Framer) {
 		id = pf.Description
 	} else if uslf, ok := f.(UnsynchronisedLyricsFrame); ok {
 		id = uslf.Language + uslf.ContentDescriptor
+	} else if udtf, ok := f.(UserDefinedTextFrame); ok {
+		id = udtf.Description
 	} else {
 		panic("sequence: unknown type of Framer")
 	}
