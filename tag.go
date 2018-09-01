@@ -194,8 +194,7 @@ func (tag *Tag) HasFrames() bool {
 }
 
 func (tag *Tag) Title() string {
-	f := tag.GetTextFrame(tag.CommonID("Title"))
-	return f.Text
+	return tag.GetTextFrame(tag.CommonID("Title")).Text
 }
 
 func (tag *Tag) SetTitle(title string) {
@@ -203,8 +202,7 @@ func (tag *Tag) SetTitle(title string) {
 }
 
 func (tag *Tag) Artist() string {
-	f := tag.GetTextFrame(tag.CommonID("Artist"))
-	return f.Text
+	return tag.GetTextFrame(tag.CommonID("Artist")).Text
 }
 
 func (tag *Tag) SetArtist(artist string) {
@@ -212,8 +210,7 @@ func (tag *Tag) SetArtist(artist string) {
 }
 
 func (tag *Tag) Album() string {
-	f := tag.GetTextFrame(tag.CommonID("Album/Movie/Show title"))
-	return f.Text
+	return tag.GetTextFrame(tag.CommonID("Album/Movie/Show title")).Text
 }
 
 func (tag *Tag) SetAlbum(album string) {
@@ -221,8 +218,7 @@ func (tag *Tag) SetAlbum(album string) {
 }
 
 func (tag *Tag) Year() string {
-	f := tag.GetTextFrame(tag.CommonID("Year"))
-	return f.Text
+	return tag.GetTextFrame(tag.CommonID("Year")).Text
 }
 
 func (tag *Tag) SetYear(year string) {
@@ -230,8 +226,7 @@ func (tag *Tag) SetYear(year string) {
 }
 
 func (tag *Tag) Genre() string {
-	f := tag.GetTextFrame(tag.CommonID("Content type"))
-	return f.Text
+	return tag.GetTextFrame(tag.CommonID("Content type")).Text
 }
 
 func (tag *Tag) SetGenre(genre string) {
