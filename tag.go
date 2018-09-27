@@ -48,14 +48,12 @@ func (tag *Tag) AddFrame(id string, f Framer) {
 
 // AddAttachedPicture adds the picture frame to tag.
 func (tag *Tag) AddAttachedPicture(pf PictureFrame) {
-	id := tag.CommonID("Attached picture")
-	tag.AddFrame(id, pf)
+	tag.AddFrame(tag.CommonID("Attached picture"), pf)
 }
 
 // AddCommentFrame adds the comment frame to tag.
 func (tag *Tag) AddCommentFrame(cf CommentFrame) {
-	id := tag.CommonID("Comments")
-	tag.AddFrame(id, cf)
+	tag.AddFrame(tag.CommonID("Comments"), cf)
 }
 
 // AddTextFrame creates the text frame with provided encoding and text
@@ -67,20 +65,17 @@ func (tag *Tag) AddTextFrame(id string, encoding Encoding, text string) {
 // AddUnsynchronisedLyricsFrame adds the unsynchronised lyrics/text frame
 // to tag.
 func (tag *Tag) AddUnsynchronisedLyricsFrame(uslf UnsynchronisedLyricsFrame) {
-	id := tag.CommonID("Unsynchronised lyrics/text transcription")
-	tag.AddFrame(id, uslf)
+	tag.AddFrame(tag.CommonID("Unsynchronised lyrics/text transcription"), uslf)
 }
 
 // AddUserDefinedTextFrame adds the custom frame (TXXX) to tag.
-func (tag *Tag) AddUserDefinedTextFrame(uf UserDefinedTextFrame) {
-	id := tag.CommonID("User defined text information frame")
-	tag.AddFrame(id, uf)
+func (tag *Tag) AddUserDefinedTextFrame(udtf UserDefinedTextFrame) {
+	tag.AddFrame(tag.CommonID("User defined text information frame"), udtf)
 }
 
 // AddUFIDFrame adds the unique file identifier frame (UFID) to tag.
-func (tag *Tag) AddUFIDFrame(uf UFIDFrame) {
-	id := tag.CommonID("Unique file identifier")
-	tag.AddFrame(id, uf)
+func (tag *Tag) AddUFIDFrame(ufid UFIDFrame) {
+	tag.AddFrame(tag.CommonID("Unique file identifier"), ufid)
 }
 
 // CommonID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
