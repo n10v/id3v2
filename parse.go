@@ -52,15 +52,7 @@ func (tag *Tag) init(rd io.Reader, originalSize int64, version byte) {
 	tag.reader = rd
 	tag.originalSize = originalSize
 	tag.version = version
-	tag.setDefaultEncoding(version)
-}
-
-func (tag *Tag) setDefaultEncoding(version byte) {
-	if version == 4 {
-		tag.defaultEncoding = EncodingUTF8
-	} else {
-		tag.defaultEncoding = EncodingISO
-	}
+	tag.setDefaultEncodingBasedOnVersion(version)
 }
 
 func (tag *Tag) parseFrames(opts Options) error {
