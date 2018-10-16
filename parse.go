@@ -15,6 +15,9 @@ const frameHeaderSize = 10
 var ErrUnsupportedVersion = errors.New("unsupported version of ID3 tag")
 var errBlankFrame = errors.New("id or size of frame are blank")
 
+// ErrBodyOverflow is returned when a frame has greater size than the remaining tag size
+var ErrBodyOverflow = errors.New("frame went over tag area")
+
 type frameHeader struct {
 	ID       string
 	BodySize int64
@@ -87,6 +90,9 @@ func (tag *Tag) parseFrames(opts Options) error {
 		id, bodySize := header.ID, header.BodySize
 
 		framesSize -= frameHeaderSize + bodySize
+		if framesSize < 0 {
+			return ErrBodyOverflow
+		}
 
 		bodyRd := getLimitedReader(tag.reader, bodySize)
 		defer putLimitedReader(bodyRd)
