@@ -27,6 +27,8 @@ func (s *sequence) AddFrame(f Framer) {
 		id = uslf.Language + uslf.ContentDescriptor
 	} else if udtf, ok := f.(UserDefinedTextFrame); ok {
 		id = udtf.Description
+	} else if cf, ok := f.(ChapterFrame); ok {
+		id = cf.ElementID
 	} else {
 		panic("sequence: unknown type of Framer")
 	}
