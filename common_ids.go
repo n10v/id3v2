@@ -8,6 +8,7 @@ package id3v2
 var (
 	V23CommonIDs = map[string]string{
 		"Attached picture":                   "APIC",
+		"Chapters":                           "CHAP",
 		"Comments":                           "COMM",
 		"Album/Movie/Show title":             "TALB",
 		"BPM":                                "TBPM",
@@ -59,6 +60,7 @@ var (
 
 	V24CommonIDs = map[string]string{
 		"Attached picture":                   "APIC",
+		"Chapters":                           "CHAP",
 		"Comments":                           "COMM",
 		"Album/Movie/Show title":             "TALB",
 		"BPM":                                "TBPM",
@@ -133,6 +135,7 @@ var (
 //	}
 var parsers = map[string]func(*bufReader) (Framer, error){
 	"APIC": parsePictureFrame,
+	"CHAP": parseChapterFrame,
 	"COMM": parseCommentFrame,
 	"TXXX": parseUserDefinedTextFrame,
 	"UFID": parseUFIDFrame,
@@ -143,7 +146,7 @@ var parsers = map[string]func(*bufReader) (Framer, error){
 // be added to sequence.
 func mustFrameBeInSequence(id string) bool {
 	switch id {
-	case "APIC", "COMM", "TXXX", "USLT":
+	case "APIC", "CHAP", "COMM", "TXXX", "USLT":
 		return true
 	}
 	return false
