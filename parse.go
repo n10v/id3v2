@@ -121,10 +121,6 @@ func (tag *Tag) parseFrames(opts Options) error {
 				break
 			}
 		}
-
-		if err == io.EOF {
-			break
-		}
 	}
 
 	return nil
