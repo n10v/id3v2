@@ -52,11 +52,6 @@ func TestSequenceUSLFsUniqueness(t *testing.T) {
 
 	s.AddFrame(UnsynchronisedLyricsFrame{Language: "B", ContentDescriptor: "B"})
 	testSequenceAB(t, s)
-
-	valueOfLastFrame := s.Frames()[1].(UnsynchronisedLyricsFrame).Value
-	if valueOfLastFrame != "C" {
-		t.Fatalf("Expected value of UserDefinedTextFrame %q, got %q", "C", valueOfLastFrame)
-	}
 }
 
 func TestSequenceUDTFsUniqueness(t *testing.T) {
