@@ -3,7 +3,7 @@ package id3v2
 import "io"
 
 // UserDefinedTextFrame is used to work with TXXX frames.
-// There can be many UserDefinedTextFrames but the Desciption fields need to be unique.
+// There can be many UserDefinedTextFrames but the Description fields need to be unique.
 type UserDefinedTextFrame struct {
 	Encoding    Encoding
 	Description string
@@ -12,6 +12,10 @@ type UserDefinedTextFrame struct {
 
 func (udtf UserDefinedTextFrame) Size() int {
 	return 1 + encodedSize(udtf.Description, udtf.Encoding) + len(udtf.Encoding.TerminationBytes) + encodedSize(udtf.Value, udtf.Encoding)
+}
+
+func (udtf UserDefinedTextFrame) UniqueIdentifier() string {
+	return udtf.Description
 }
 
 func (udtf UserDefinedTextFrame) WriteTo(w io.Writer) (n int64, err error) {

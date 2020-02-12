@@ -11,51 +11,44 @@ import (
 // sequence is used to manipulate with frames, which can be in tag
 // more than one (e.g. APIC, COMM, USLT and etc.)
 type sequence struct {
-	framers     map[string]Framer
-	framesCache []Framer
+	frames []Framer
 }
 
 func (s *sequence) AddFrame(f Framer) {
-	s.framesCache = s.framesCache[:0]
+	i := indexOfFrame(f, s.frames)
 
-	var id string
-	if cf, ok := f.(CommentFrame); ok {
-		id = cf.Language + cf.Description
-	} else if pf, ok := f.(PictureFrame); ok {
-		id = pf.Description
-	} else if uslf, ok := f.(UnsynchronisedLyricsFrame); ok {
-		id = uslf.Language + uslf.ContentDescriptor
-	} else if udtf, ok := f.(UserDefinedTextFrame); ok {
-		id = udtf.Description
+	if i == -1 {
+		s.frames = append(s.frames, f)
 	} else {
-		panic("sequence: unknown type of Framer")
+		s.frames[i] = f
 	}
+}
 
-	s.framers[id] = f
+func indexOfFrame(f Framer, fs []Framer) int {
+	for i, ff := range fs {
+		if f.UniqueIdentifier() == ff.UniqueIdentifier() {
+			return i
+		}
+	}
+	return -1
 }
 
 func (s *sequence) Count() int {
-	return len(s.framers)
+	return len(s.frames)
 }
 
 func (s *sequence) Frames() []Framer {
-	if len(s.framesCache) == 0 {
-		for _, f := range s.framers {
-			s.framesCache = append(s.framesCache, f)
-		}
-	}
-	return s.framesCache
+	return s.frames
 }
 
 var seqPool = sync.Pool{New: func() interface{} {
-	return &sequence{framers: make(map[string]Framer)}
+	return &sequence{frames: []Framer{}}
 }}
 
 func getSequence() *sequence {
 	s := seqPool.Get().(*sequence)
 	if s.Count() > 0 {
-		s.framers = make(map[string]Framer)
-		s.framesCache = s.framesCache[:0]
+		s.frames = []Framer{}
 	}
 	return s
 }

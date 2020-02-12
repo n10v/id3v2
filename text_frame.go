@@ -17,6 +17,10 @@ func (tf TextFrame) Size() int {
 	return 1 + encodedSize(tf.Text, tf.Encoding)
 }
 
+func (tf TextFrame) UniqueIdentifier() string {
+	return "ID"
+}
+
 func (tf TextFrame) WriteTo(w io.Writer) (int64, error) {
 	return useBufWriter(w, func(bw *bufWriter) {
 		bw.WriteByte(tf.Encoding.Key)

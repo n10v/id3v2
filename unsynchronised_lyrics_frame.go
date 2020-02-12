@@ -24,6 +24,10 @@ func (uslf UnsynchronisedLyricsFrame) Size() int {
 		+len(uslf.Encoding.TerminationBytes) + encodedSize(uslf.Lyrics, uslf.Encoding)
 }
 
+func (uslf UnsynchronisedLyricsFrame) UniqueIdentifier() string {
+	return uslf.Language + uslf.ContentDescriptor
+}
+
 func (uslf UnsynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) {
 	if len(uslf.Language) != 3 {
 		return n, ErrInvalidLanguageLength

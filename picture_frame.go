@@ -21,6 +21,10 @@ type PictureFrame struct {
 	Picture     []byte
 }
 
+func (pf PictureFrame) UniqueIdentifier() string {
+	return pf.Description
+}
+
 func (pf PictureFrame) Size() int {
 	return 1 + len(pf.MimeType) + 1 + 1 + encodedSize(pf.Description, pf.Encoding) +
 		len(pf.Encoding.TerminationBytes) + len(pf.Picture)

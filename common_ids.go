@@ -4,6 +4,8 @@
 
 package id3v2
 
+import "strings"
+
 // Common IDs for ID3v2.3 and ID3v2.4.
 var (
 	V23CommonIDs = map[string]string{
@@ -142,9 +144,15 @@ var parsers = map[string]func(*bufReader) (Framer, error){
 // mustFrameBeInSequence checks if frame with corresponding ID must
 // be added to sequence.
 func mustFrameBeInSequence(id string) bool {
-	switch id {
-	case "APIC", "COMM", "TXXX", "USLT":
-		return true
+	if id != "TXXX" && strings.HasPrefix(id, "T") {
+		return false
 	}
-	return false
+
+	switch id {
+	case "MCDI", "ETCO", "SYTC", "RVRB", "MLLT", "PCNT", "RBUF", "POSS", "OWNE", "SEEK", "ASPI":
+	case "IPLS", "RVAD": // Specifics ID3v2.3 frames
+		return false
+	}
+
+	return true
 }
