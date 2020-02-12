@@ -466,6 +466,8 @@ func TestParseReaderNil(t *testing.T) {
 	}
 }
 
+// https://github.com/bogem/id3v2/issues/13.
+// https://github.com/bogem/id3v2/commit/3845103da5b1698289b82a90f5d2559b770bd996
 func TestParseV3UnsafeSize(t *testing.T) {
 	t.Parallel()
 
@@ -480,9 +482,10 @@ func TestParseV3UnsafeSize(t *testing.T) {
 	}
 
 	titleFrameHeader := buf.Bytes()[tagHeaderSize : tagHeaderSize+frameHeaderSize]
-	bytesSize := titleFrameHeader[4:8]
-	if !bytes.Equal(bytesSize, []byte{0, 0, 0, 255}) {
-		t.Fatalf("bytesSize should be equal to [0 0 0 255], but it's %v", bytesSize)
+	expected := []byte{0, 0, 1, 0}
+	got := titleFrameHeader[4:8]
+	if !bytes.Equal(got, expected) {
+		t.Fatalf("Expected %v, got %v", expected, got)
 	}
 
 	parsedTag, err := ParseReader(buf, Options{Parse: true})

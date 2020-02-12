@@ -20,7 +20,7 @@ const (
 	frontCoverPath = "testdata/front_cover.jpg"
 	backCoverPath  = "testdata/back_cover.jpg"
 
-	framesSize    = 211943
+	framesSize    = 211948
 	tagSize       = tagHeaderSize + framesSize
 	musicSize     = 3840834
 	countOfFrames = 14
