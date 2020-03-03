@@ -130,8 +130,8 @@ var (
 // parsing of corresponding frame.
 // You should consider that there is no text frame parser. That's why you should
 // check at first, if it's a text frame:
-//	if id[0] == 'T' {
-//		// use parseTextFrame
+//	if strings.HasPrefix(id, "T") {
+//  	...
 //	}
 var parsers = map[string]func(*bufReader) (Framer, error){
 	"APIC": parsePictureFrame,
@@ -150,7 +150,7 @@ func mustFrameBeInSequence(id string) bool {
 
 	switch id {
 	case "MCDI", "ETCO", "SYTC", "RVRB", "MLLT", "PCNT", "RBUF", "POSS", "OWNE", "SEEK", "ASPI":
-	case "IPLS", "RVAD": // Specifics ID3v2.3 frames
+	case "IPLS", "RVAD": // Specific ID3v2.3 frames.
 		return false
 	}
 
