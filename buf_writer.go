@@ -9,7 +9,7 @@ import (
 type bufWriter struct {
 	err     error
 	w       *bufio.Writer
-	written int64
+	written int
 }
 
 func newBufWriter(w io.Writer) *bufWriter {
@@ -20,6 +20,7 @@ func (bw *bufWriter) EncodeAndWriteText(src string, to Encoding) {
 	if bw.err != nil {
 		return
 	}
+
 	bw.err = encodeWriteText(bw, src, to)
 }
 
@@ -59,7 +60,7 @@ func (bw *bufWriter) WriteString(s string) {
 	}
 	var n int
 	n, bw.err = bw.w.WriteString(s)
-	bw.written += int64(n)
+	bw.written += n
 }
 
 func (bw *bufWriter) Write(p []byte) (n int, err error) {
@@ -67,17 +68,17 @@ func (bw *bufWriter) Write(p []byte) (n int, err error) {
 		return 0, bw.err
 	}
 	n, err = bw.w.Write(p)
-	bw.written += int64(n)
+	bw.written += n
 	bw.err = err
 	return n, err
 }
 
-func (bw *bufWriter) Written() int64 {
+func (bw *bufWriter) Written() int {
 	return bw.written
 }
 
 func useBufWriter(w io.Writer, f func(*bufWriter)) (int64, error) {
-	var writtenBefore int64
+	var writtenBefore int
 	bw, ok := w.(*bufWriter)
 	if ok {
 		writtenBefore = bw.Written()
@@ -88,5 +89,5 @@ func useBufWriter(w io.Writer, f func(*bufWriter)) (int64, error) {
 
 	f(bw)
 
-	return bw.Written() - writtenBefore, bw.Flush()
+	return int64(bw.Written() - writtenBefore), bw.Flush()
 }

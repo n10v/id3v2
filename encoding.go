@@ -2,6 +2,7 @@ package id3v2
 
 import (
 	"bytes"
+	"io/ioutil"
 
 	xencoding "golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/charmap"
@@ -99,9 +100,11 @@ func encodedSize(src string, enc Encoding) int {
 		return len(src)
 	}
 
-	toXEncoding := resolveXEncoding(nil, enc)
-	encoded, _ := toXEncoding.Encoder().String(src)
-	return len(encoded)
+	bw := getBufWriter(ioutil.Discard)
+	encodeWriteText(bw, src, enc)
+
+	return bw.Written()
+
 }
 
 // decodeText decodes src from "from" encoding to UTF-8.
@@ -117,6 +120,13 @@ func decodeText(src []byte, from Encoding) string {
 	if err != nil {
 		return string(src)
 	}
+
+	// HACK: Delete REPLACEMENT CHARACTER (�) if encoding went wrong.
+	// See https://apps.timwhitlock.info/unicode/inspect?s=%EF%BF%BD
+	if from.Equals(EncodingUTF16) {
+		result = bytes.ReplaceAll(result, []byte{0xEF, 0xBF, 0xBD}, []byte{})
+	}
+
 	return string(result)
 }
 
@@ -132,7 +142,13 @@ func encodeWriteText(bw *bufWriter, src string, to Encoding) error {
 	if err != nil {
 		return err
 	}
+
 	bw.WriteString(encoded)
+
+	if to.Equals(EncodingUTF16) && !bytes.HasSuffix([]byte(encoded), []byte{0}) {
+		bw.WriteByte(0)
+	}
+
 	return nil
 }
 

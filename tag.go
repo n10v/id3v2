@@ -410,10 +410,10 @@ func (tag *Tag) WriteTo(w io.Writer) (n int64, err error) {
 	})
 	if err != nil {
 		bw.Flush()
-		return bw.Written(), err
+		return int64(bw.Written()), err
 	}
 
-	return bw.Written(), bw.Flush()
+	return int64(bw.Written()), bw.Flush()
 }
 
 func writeTagHeader(bw *bufWriter, framesSize uint, version byte) {

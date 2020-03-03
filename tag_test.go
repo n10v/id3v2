@@ -28,14 +28,14 @@ const (
 
 var (
 	frontCover = PictureFrame{
-		Encoding:    EncodingUTF8,
+		Encoding:    EncodingUTF16,
 		MimeType:    "image/jpeg",
 		PictureType: PTFrontCover,
 		Description: "Front cover",
 		Picture:     mustReadFile(frontCoverPath),
 	}
 	backCover = PictureFrame{
-		Encoding:    EncodingUTF8,
+		Encoding:    EncodingUTF16,
 		MimeType:    "image/jpeg",
 		PictureType: PTBackCover,
 		Description: "Back cover",
@@ -43,13 +43,13 @@ var (
 	}
 
 	engUSLF = UnsynchronisedLyricsFrame{
-		Encoding:          EncodingUTF8,
+		Encoding:          EncodingUTF16,
 		Language:          "eng",
 		ContentDescriptor: "Content descriptor",
 		Lyrics:            "bogem/id3v2",
 	}
 	gerUSLF = UnsynchronisedLyricsFrame{
-		Encoding:          EncodingUTF8,
+		Encoding:          EncodingUTF16,
 		Language:          "ger",
 		ContentDescriptor: "Inhaltsdeskriptor",
 		Lyrics:            "Einigkeit und Recht und Freiheit",
@@ -473,7 +473,7 @@ func TestConcurrent(t *testing.T) {
 }
 
 // TestEncodedText checks
-// if text of frames encoded with different encodings is correctly written.
+// if texts of frames encoded with different encodings are correctly written.
 func TestEncodedText(t *testing.T) {
 	t.Parallel()
 

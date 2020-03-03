@@ -168,6 +168,11 @@ func (br *bufReader) ReadText(encoding Encoding) []byte {
 	var text []byte
 	delims := encoding.TerminationBytes
 	text, br.err = br.readTillDelims(delims)
+
+	if encoding.Equals(EncodingUTF16) {
+		text = append(text, br.ReadByte())
+	}
+
 	br.Discard(len(delims))
 
 	return text
