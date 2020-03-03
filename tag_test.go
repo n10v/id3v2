@@ -28,14 +28,14 @@ const (
 
 var (
 	frontCover = PictureFrame{
-		Encoding:    EncodingUTF16,
+		Encoding:    EncodingUTF8,
 		MimeType:    "image/jpeg",
 		PictureType: PTFrontCover,
 		Description: "Front cover",
 		Picture:     mustReadFile(frontCoverPath),
 	}
 	backCover = PictureFrame{
-		Encoding:    EncodingUTF16,
+		Encoding:    EncodingUTF8,
 		MimeType:    "image/jpeg",
 		PictureType: PTBackCover,
 		Description: "Back cover",
@@ -43,13 +43,13 @@ var (
 	}
 
 	engUSLF = UnsynchronisedLyricsFrame{
-		Encoding:          EncodingUTF16,
+		Encoding:          EncodingUTF8,
 		Language:          "eng",
 		ContentDescriptor: "Content descriptor",
 		Lyrics:            "bogem/id3v2",
 	}
 	gerUSLF = UnsynchronisedLyricsFrame{
-		Encoding:          EncodingUTF16,
+		Encoding:          EncodingUTF8,
 		Language:          "ger",
 		ContentDescriptor: "Inhaltsdeskriptor",
 		Lyrics:            "Einigkeit und Recht und Freiheit",
