@@ -25,6 +25,9 @@ func (tf TextFrame) WriteTo(w io.Writer) (int64, error) {
 	return useBufWriter(w, func(bw *bufWriter) {
 		bw.WriteByte(tf.Encoding.Key)
 		bw.EncodeAndWriteText(tf.Text, tf.Encoding)
+
+		// https://github.com/bogem/id3v2/pull/52
+		// https://github.com/bogem/id3v2/pull/33
 		bw.Write(tf.Encoding.TerminationBytes)
 	})
 }
