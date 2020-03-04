@@ -124,7 +124,9 @@ func decodeText(src []byte, from Encoding) string {
 	// HACK: Delete REPLACEMENT CHARACTER (�) if encoding went wrong.
 	// See https://apps.timwhitlock.info/unicode/inspect?s=%EF%BF%BD
 	if from.Equals(EncodingUTF16) {
-		result = bytes.ReplaceAll(result, []byte{0xEF, 0xBF, 0xBD}, []byte{})
+		// bytes.Replace(s, old, new, -1) is the same as bytes.ReplaceAll(s, old, new),
+		// but bytes.ReplaceAll is only added in Go 1.12.
+		result = bytes.Replace(result, []byte{0xEF, 0xBF, 0xBD}, []byte{}, -1)
 	}
 
 	return string(result)
