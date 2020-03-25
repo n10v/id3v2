@@ -86,6 +86,10 @@ var (
 	xencodingUTF8       = newXEncodingWrapper(unicode.UTF8)
 )
 
+// BOM is used in UTF-16 encoded Unicode with BOM.
+// See https://en.wikipedia.org/wiki/Byte_order_mark.
+var BOM = []byte{0xFF, 0xFE}
+
 // getEncoding returns Encoding in accordance with ID3v2 key.
 func getEncoding(key byte) Encoding {
 	if key > 3 {
@@ -115,6 +119,11 @@ func decodeText(src []byte, from Encoding) string {
 		return string(src)
 	}
 
+	// If src is just BOM, then it's an empty string.
+	if from.Equals(EncodingUTF16) && bytes.Equal(src, BOM) {
+		return ""
+	}
+
 	fromXEncoding := resolveXEncoding(src, from)
 	result, err := fromXEncoding.Decoder().Bytes(src)
 	if err != nil {
@@ -122,7 +131,8 @@ func decodeText(src []byte, from Encoding) string {
 	}
 
 	// HACK: Delete REPLACEMENT CHARACTER (�) if encoding went wrong.
-	// See https://apps.timwhitlock.info/unicode/inspect?s=%EF%BF%BD
+	// See https://apps.timwhitlock.info/unicode/inspect?s=%EF%BF%BD.
+	// See https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8.
 	if from.Equals(EncodingUTF16) {
 		// bytes.Replace(s, old, new, -1) is the same as bytes.ReplaceAll(s, old, new),
 		// but bytes.ReplaceAll is only added in Go 1.12.
@@ -159,7 +169,7 @@ func resolveXEncoding(src []byte, encoding Encoding) xencodingWrapper {
 	case 0:
 		return xencodingISO
 	case 1:
-		if len(src) > 2 && src[0] == 0xFF && src[1] == 0xFE {
+		if len(src) > 2 && bytes.Equal(src[:2], BOM) {
 			return xencodingUTF16LEBOM
 		}
 		return xencodingUTF16BEBOM
