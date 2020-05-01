@@ -1,6 +1,6 @@
 # [id3v2](https://pkg.go.dev/github.com/bogem/id3v2)
 
-**Fast, simple and powerful ID3 library written completely in Go.**
+**Fast and powerful ID3 library written completely in Go.**
 
 Supported ID3 versions: 2.3, 2.4
 
