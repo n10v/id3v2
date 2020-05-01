@@ -61,7 +61,6 @@ for _, f := range pictures {
 	}
 
 	// Do something with picture frame.
-	// For example, print the description:
 	fmt.Println(pic.Description)
 }
 ```
