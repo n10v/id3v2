@@ -65,9 +65,10 @@ for _, f := range pictures {
 }
 ```
 
-## Work with encodings
+## Encodings
 
-For example, if you set comment frame with custom encoding and write it, you may do this:
+For example, if want to set comment frame with custom encoding and write it, 
+you may do the following:
 
 ```go
 tag := id3v2.NewEmptyTag()
