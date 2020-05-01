@@ -1,6 +1,6 @@
 # [id3v2](https://pkg.go.dev/github.com/bogem/id3v2)
 
-**Fast, simple and powerful ID3 decoding and encoding library written completely in Go.**
+**Fast, simple and powerful ID3 library written completely in Go.**
 
 Supported ID3 versions: 2.3, 2.4
 
@@ -29,9 +29,11 @@ func main() {
  	}
 	defer tag.Close()
 
+	// Read tags
 	fmt.Println(tag.Artist())
 	fmt.Println(tag.Title())
 
+	// Set tags
 	tag.SetArtist("Aphex Twin")
 	tag.SetTitle("Xtal")
 
@@ -43,6 +45,7 @@ func main() {
 	}
 	tag.AddCommentFrame(comment)
 
+	// Write tag to file.mp3
 	if err = tag.Save(); err != nil {
 		log.Fatal("Error while saving a tag: ", err)
 	}
