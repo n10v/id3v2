@@ -318,10 +318,10 @@ func TestParseOptionsParseFrames(t *testing.T) {
 		t.Errorf("tag should have only artist and title frames, but it has %v frames", tag.Count())
 	}
 	if tag.Artist() == "" {
-		t.Errorf("tag should have an artist, but it doesn't")
+		t.Error("tag should have an artist, but it doesn't")
 	}
 	if tag.Title() == "" {
-		t.Errorf("tag should have a title, but it doesn't")
+		t.Error("tag should have a title, but it doesn't")
 	}
 }
 

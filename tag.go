@@ -78,14 +78,14 @@ func (tag *Tag) AddUFIDFrame(ufid UFIDFrame) {
 	tag.AddFrame(tag.CommonID("Unique file identifier"), ufid)
 }
 
-// CommonID returns ID3v2.3 or ID3v2.4 (in appropriate to version of Tag) frame ID
-// from given description.
+// CommonID returns frame ID from given description.
 // For example, CommonID("Language") will return "TLAN".
 // If it can't find the ID with given description, it returns the description.
 //
 // All descriptions you can find in file common_ids.go
-// or in id3 documentation (for fourth version: http://id3.org/id3v2.4.0-frames;
-// for third version: http://id3.org/id3v2.3.0#Declared_ID3v2_frames).
+// or in id3 documentation.
+// v2.3: http://id3.org/id3v2.3.0#Declared_ID3v2_frames
+// v2.4: http://id3.org/id3v2.4.0-frames
 func (tag *Tag) CommonID(description string) string {
 	var ids map[string]string
 	if tag.version == 3 {
