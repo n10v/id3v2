@@ -1,4 +1,4 @@
-# [id3v2](https://godoc.org/github.com/bogem/id3v2)
+# [id3v2](https://pkg.go.dev/github.com/bogem/id3v2)
 
 **Fast, simple and powerful ID3 decoding and encoding library written in Go.**
 
