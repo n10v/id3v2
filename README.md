@@ -2,19 +2,23 @@
 
 **Fast, simple and powerful ID3 decoding and encoding library written in Go.**
 
-id3v2 can:
+id3v2 does:
 
-- ✅ support of ID3v2.3 and ID3v2.4 tags;
-- ✅ parse and write tags;
-- ✅ work with all available encodings;
-- ✅ set and read all text frames, unsynchronised lyrics/text (USLT),
-  comments, attached pictures, UFID and TXXX frames;
-- ✅ set and read frames, that can be used multiple times in tag;
-- ✅ be used in multiple goroutines.
+✅ support of ID3v2.3 and ID3v2.4 tags;
 
-id3v2 can't:
+✅ parse and write tags;
 
-- ❌ work with unsynchronisation, extended header, flags, padding, footer.
+✅ work with all available encodings;
+
+✅ set and read all text frames, unsynchronised lyrics/text (USLT), comments, attached pictures, UFID and TXXX frames;
+
+✅ set and read frames, that can be used multiple times in tag;
+
+✅ be used in multiple goroutines.
+
+id3v2 does not:
+
+❌ work with unsynchronisation, extended header, flags, padding, footer.
 
 If you want some functionality, that library can't do,
 or you have some questions, just write an issue. **And of course, pull requests are welcome!**
