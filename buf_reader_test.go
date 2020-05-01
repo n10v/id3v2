@@ -61,10 +61,10 @@ func TestReadTillZero(t *testing.T) {
 func TestReadTextUTF16WithLeadingEmptyString(t *testing.T) {
 	t.Parallel()
 
-	sampleText1 := append(BOM, EncodingUTF16.TerminationBytes...)
+	sampleText1 := append(bom, EncodingUTF16.TerminationBytes...)
 
 	utf16C := []byte{0x43, 0x00} // "C" char in UTF-16.
-	sampleText2 := append(BOM, append(utf16C, EncodingUTF16.TerminationBytes...)...)
+	sampleText2 := append(bom, append(utf16C, EncodingUTF16.TerminationBytes...)...)
 
 	sampleText := append(sampleText1, sampleText2...)
 
