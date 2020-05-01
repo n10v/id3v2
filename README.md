@@ -89,5 +89,4 @@ if err != nil {
 
 `Text` field will be automatically encoded with UTF-16BE with BOM and written to w.
 
-By default, if version of tag is 4 then UTF-8 is used for methods like
-`SetArtist`, `SetTitle`, `SetGenre` and etc, otherwise ISO-8859-1.
+UTF-8 is default for v2.4, ISO-8859-1 - for v2.3.
