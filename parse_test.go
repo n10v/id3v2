@@ -25,6 +25,7 @@ func TestParse(t *testing.T) {
 	defer tag.Close()
 
 	testTextFrames(t, tag)
+	testPopularimeterFrame(t, tag)
 	testPictureFrames(t, tag)
 	testUSLTFrames(t, tag)
 	testTXXXFrames(t, tag)
@@ -184,6 +185,26 @@ func compareTXXXFrames(actual, expected UserDefinedTextFrame) error {
 	}
 
 	return nil
+}
+
+func testPopularimeterFrame(t *testing.T, tag *Tag) {
+	actual := tag.GetLastFrame(tag.CommonID("Popularimeter")).(PopularimeterFrame)
+
+	if actual.Size() != popmFrame.Size() {
+		t.Errorf("Expected size: %d, got: %d", popmFrame.Size(), actual.Size())
+	}
+
+	if actual.Email != popmFrame.Email {
+		t.Errorf("Expected email: %v, got: %v", popmFrame.Email, actual.Email)
+	}
+
+	if actual.Rating != popmFrame.Rating {
+		t.Errorf("Expected rating: %v, got: %v", popmFrame.Rating, actual.Rating)
+	}
+
+	if actual.Counter.Text(16) != popmFrame.Counter.Text(16) {
+		t.Errorf("Expected counter: %s, got: %s", popmFrame.Counter.Text(16), actual.Counter.Text(16))
+	}
 }
 
 func testUFIDFrames(t *testing.T, tag *Tag) {
