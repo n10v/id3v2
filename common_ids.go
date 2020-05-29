@@ -34,6 +34,7 @@ var (
 		"Original lyricist/text writer":      "TOLY",
 		"Original artist/performer":          "TOPE",
 		"Original release year":              "TORY",
+		"Popularimeter":                      "POPM",
 		"File owner/licensee":                "TOWN",
 		"Lead artist/Lead performer/Soloist/Performing group": "TPE1",
 		"Band/Orchestra/Accompaniment":                        "TPE2",
@@ -90,6 +91,7 @@ var (
 		"Original filename":                  "TOFN",
 		"Original lyricist/text writer":      "TOLY",
 		"Original artist/performer":          "TOPE",
+		"Popularimeter":                      "POPM",
 		"File owner/licensee":                "TOWN",
 		"Lead artist/Lead performer/Soloist/Performing group": "TPE1",
 		"Band/Orchestra/Accompaniment":                        "TPE2",
@@ -136,6 +138,7 @@ var (
 var parsers = map[string]func(*bufReader) (Framer, error){
 	"APIC": parsePictureFrame,
 	"COMM": parseCommentFrame,
+	"POPM": parsePopularimeterFrame,
 	"TXXX": parseUserDefinedTextFrame,
 	"UFID": parseUFIDFrame,
 	"USLT": parseUnsynchronisedLyricsFrame,
