@@ -2,13 +2,13 @@
 
 Supported ID3 versions: 2.3, 2.4
 
-## Installation
+**Installation**
 
 ```
 go get -u github.com/bogem/id3v2
 ```
 
-## Usage example
+**Usage example**
 
 ```go
 package main
@@ -50,7 +50,7 @@ func main() {
 }
 ```
 
-## Read multiple frames
+**Read multiple frames**
 
 ```go
 pictures := tag.GetFrames(tag.CommonID("Attached picture"))
@@ -65,7 +65,7 @@ for _, f := range pictures {
 }
 ```
 
-## Encodings
+**Encodings**
 
 For example, if want to set comment frame with custom encoding and write it, 
 you may do the following:
