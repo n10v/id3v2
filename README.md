@@ -67,7 +67,7 @@ for _, f := range pictures {
 
 ## Encodings
 
-For example, if want to set comment frame with custom encoding and write it, 
+For example, if you want to set comment frame with custom encoding and write it, 
 you may do the following:
 
 ```go
