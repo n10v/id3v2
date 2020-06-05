@@ -70,4 +70,5 @@ func TestParseSynchUnsafeSizeUsingSynchSafeFlag(t *testing.T) {
 	if err != ErrInvalidSizeFormat {
 		t.Fatalf("Expected ErrInvalidSizeFormat, got %v", err)
 	}
+
 }
