@@ -105,6 +105,8 @@ func encodedSize(src string, enc Encoding) int {
 	}
 
 	bw := getBufWriter(ioutil.Discard)
+	defer putBufWriter(bw)
+
 	encodeWriteText(bw, src, enc)
 
 	return bw.Written()
