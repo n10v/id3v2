@@ -67,11 +67,10 @@ for _, f := range pictures {
 
 ## Encodings
 
-For example, if you want to set comment frame with custom encoding and write it, 
+For example, if you want to set comment frame with custom encoding, 
 you may do the following:
 
 ```go
-tag := id3v2.NewEmptyTag()
 comment := id3v2.CommentFrame{
 	Encoding:    id3v2.EncodingUTF16,
 	Language:    "ger",
@@ -79,11 +78,6 @@ comment := id3v2.CommentFrame{
 	Text:        "Der Löwe",
 }
 tag.AddCommentFrame(comment)
-
-_, err := tag.WriteTo(w)
-if err != nil {
-	log.Fatal(err)
-}
 ```
 
 `Text` field will be automatically encoded with UTF-16BE with BOM and written to w.
