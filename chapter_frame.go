@@ -23,19 +23,21 @@ type ChapterFrame struct {
 	EndTime     time.Duration
 	StartOffset uint32
 	EndOffset   uint32
-	Title       string
+	Title       *TextFrame
+	SubTitle    *TextFrame
 }
 
 func (cf ChapterFrame) Size() int {
-	titleFrame := TextFrame{
-		Encoding: EncodingUTF8,
-		Text:     cf.Title,
-	}
 	return encodedSize(cf.ElementID, EncodingISO) +
 		1 + // trailing zero after ElementID
 		4 + 4 + 4 + 4 + // (Start, End) (Time, Offset)
 		frameHeaderSize + // Title frame header size
-		titleFrame.Size()
+		cf.Title.Size() +
+		cf.SubTitle.Size()
+}
+
+func (cf ChapterFrame) UniqueIdentifier() string {
+	return cf.ElementID
 }
 
 func (cf ChapterFrame) WriteTo(w io.Writer) (n int64, err error) {
@@ -49,29 +51,38 @@ func (cf ChapterFrame) WriteTo(w io.Writer) (n int64, err error) {
 		binary.Write(bw, binary.BigEndian, cf.StartOffset)
 		binary.Write(bw, binary.BigEndian, cf.EndOffset)
 
-		titleFrame := TextFrame{
-			Encoding: EncodingUTF8,
-			Text:     cf.Title,
+		if cf.Title != nil {
+			writeFrame(bw, "TIT2", *cf.Title, true)
 		}
-		writeFrame(bw, "TIT2", titleFrame, true)
+
+		if cf.SubTitle != nil {
+			writeFrame(bw, "TIT3", cf.SubTitle, true)
+		}
 	})
 }
 
 func parseChapterFrame(br *bufReader) (Framer, error) {
 	ElementID := br.ReadText(EncodingISO)
-	chapterTime := make([]int32, 2)
-	for i := range chapterTime {
-		if err := binary.Read(br, binary.BigEndian, &chapterTime[i]); err != nil {
-			return nil, err
-		}
+	var startTime uint32
+	var startOffset uint32
+	var endTime uint32
+	var endOffset uint32
+
+	if err := binary.Read(br, binary.BigEndian, &startTime); err != nil {
+		return nil, err
 	}
-	chapterOffset := make([]uint32, 2)
-	for i := range chapterOffset {
-		if err := binary.Read(br, binary.BigEndian, &chapterOffset[i]); err != nil {
-			return nil, err
-		}
+	if err := binary.Read(br, binary.BigEndian, &endTime); err != nil {
+		return nil, err
 	}
-	var title string
+	if err := binary.Read(br, binary.BigEndian, &startOffset); err != nil {
+		return nil, err
+	}
+	if err := binary.Read(br, binary.BigEndian, &endOffset); err != nil {
+		return nil, err
+	}
+
+	var title TextFrame
+	var subTitle TextFrame
 
 	// borrowed from parse.go
 	buf := getByteSlice(32 * 1024)
@@ -95,7 +106,20 @@ func parseChapterFrame(br *bufReader) (Framer, error) {
 				putLimitedReader(bodyRd)
 				return nil, err
 			}
-			title = frame.(TextFrame).Text
+			title = frame.(TextFrame)
+
+			putLimitedReader(bodyRd)
+			break
+		}
+		if id == "TIT3" {
+			bodyRd := getLimitedReader(br, bodySize)
+			br3 := newBufReader(bodyRd)
+			frame, err := parseTextFrame(br3)
+			if err != nil {
+				putLimitedReader(bodyRd)
+				return nil, err
+			}
+			subTitle = frame.(TextFrame)
 
 			putLimitedReader(bodyRd)
 			break
@@ -106,11 +130,12 @@ func parseChapterFrame(br *bufReader) (Framer, error) {
 		ElementID: string(ElementID),
 		// StartTime is given in milliseconds, so we should convert it to nanoseconds
 		// for time.Duration
-		StartTime:   time.Duration(chapterTime[0] * nanosInMillis),
-		EndTime:     time.Duration(chapterTime[1] * nanosInMillis),
-		StartOffset: chapterOffset[0],
-		EndOffset:   chapterOffset[1],
-		Title:       title,
+		StartTime:   time.Duration(int64(startTime) * nanosInMillis),
+		EndTime:     time.Duration(int64(endTime) * nanosInMillis),
+		StartOffset: startOffset,
+		EndOffset:   endOffset,
+		Title:       &title,
+		SubTitle:    &subTitle,
 	}
 	return cf, nil
 }
