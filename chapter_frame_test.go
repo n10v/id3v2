@@ -65,8 +65,8 @@ func TestAddChapterFrame(t *testing.T) {
 	if frame.StartTime != 0 {
 		t.Errorf("expected: %d, but got %s", 0, frame.StartTime)
 	}
-	if frame.EndTime.Milliseconds() != 1000 {
-		t.Errorf("expected: %d, but got %d", 1000, frame.EndTime.Milliseconds())
+	if frame.EndTime.Seconds()*1000 != 1000 {
+		t.Errorf("expected: %d, but got %d", 1000, int(frame.EndTime.Seconds()*1000))
 	}
 }
 
