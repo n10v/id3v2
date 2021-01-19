@@ -25,6 +25,7 @@ func TestParse(t *testing.T) {
 	defer tag.Close()
 
 	testTextFrames(t, tag)
+	testPopularimeterFrame(t, tag)
 	testPictureFrames(t, tag)
 	testUSLTFrames(t, tag)
 	testTXXXFrames(t, tag)
@@ -186,6 +187,26 @@ func compareTXXXFrames(actual, expected UserDefinedTextFrame) error {
 	return nil
 }
 
+func testPopularimeterFrame(t *testing.T, tag *Tag) {
+	actual := tag.GetLastFrame(tag.CommonID("Popularimeter")).(PopularimeterFrame)
+
+	if actual.Size() != popmFrame.Size() {
+		t.Errorf("Expected size: %d, got: %d", popmFrame.Size(), actual.Size())
+	}
+
+	if actual.Email != popmFrame.Email {
+		t.Errorf("Expected email: %v, got: %v", popmFrame.Email, actual.Email)
+	}
+
+	if actual.Rating != popmFrame.Rating {
+		t.Errorf("Expected rating: %v, got: %v", popmFrame.Rating, actual.Rating)
+	}
+
+	if actual.Counter.Text(16) != popmFrame.Counter.Text(16) {
+		t.Errorf("Expected counter: %s, got: %s", popmFrame.Counter.Text(16), actual.Counter.Text(16))
+	}
+}
+
 func testUFIDFrames(t *testing.T, tag *Tag) {
 	ufidFrames := tag.GetFrames("UFID")
 	if len(ufidFrames) != 1 {
@@ -318,10 +339,10 @@ func TestParseOptionsParseFrames(t *testing.T) {
 		t.Errorf("tag should have only artist and title frames, but it has %v frames", tag.Count())
 	}
 	if tag.Artist() == "" {
-		t.Errorf("tag should have an artist, but it doesn't")
+		t.Error("tag should have an artist, but it doesn't")
 	}
 	if tag.Title() == "" {
-		t.Errorf("tag should have a title, but it doesn't")
+		t.Error("tag should have a title, but it doesn't")
 	}
 }
 
@@ -466,6 +487,8 @@ func TestParseReaderNil(t *testing.T) {
 	}
 }
 
+// https://github.com/bogem/id3v2/issues/13.
+// https://github.com/bogem/id3v2/commit/3845103da5b1698289b82a90f5d2559b770bd996
 func TestParseV3UnsafeSize(t *testing.T) {
 	t.Parallel()
 
@@ -480,9 +503,10 @@ func TestParseV3UnsafeSize(t *testing.T) {
 	}
 
 	titleFrameHeader := buf.Bytes()[tagHeaderSize : tagHeaderSize+frameHeaderSize]
-	bytesSize := titleFrameHeader[4:8]
-	if !bytes.Equal(bytesSize, []byte{0, 0, 0, 255}) {
-		t.Fatalf("bytesSize should be equal to [0 0 0 255], but it's %v", bytesSize)
+	expected := []byte{0, 0, 1, 0}
+	got := titleFrameHeader[4:8]
+	if !bytes.Equal(got, expected) {
+		t.Fatalf("Expected %v, got %v", expected, got)
 	}
 
 	parsedTag, err := ParseReader(buf, Options{Parse: true})

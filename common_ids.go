@@ -4,6 +4,8 @@
 
 package id3v2
 
+import "strings"
+
 // Common IDs for ID3v2.3 and ID3v2.4.
 var (
 	V23CommonIDs = map[string]string{
@@ -33,6 +35,7 @@ var (
 		"Original lyricist/text writer":      "TOLY",
 		"Original artist/performer":          "TOPE",
 		"Original release year":              "TORY",
+		"Popularimeter":                      "POPM",
 		"File owner/licensee":                "TOWN",
 		"Lead artist/Lead performer/Soloist/Performing group": "TPE1",
 		"Band/Orchestra/Accompaniment":                        "TPE2",
@@ -90,6 +93,7 @@ var (
 		"Original filename":                  "TOFN",
 		"Original lyricist/text writer":      "TOLY",
 		"Original artist/performer":          "TOPE",
+		"Popularimeter":                      "POPM",
 		"File owner/licensee":                "TOWN",
 		"Lead artist/Lead performer/Soloist/Performing group": "TPE1",
 		"Band/Orchestra/Accompaniment":                        "TPE2",
@@ -130,13 +134,14 @@ var (
 // parsing of corresponding frame.
 // You should consider that there is no text frame parser. That's why you should
 // check at first, if it's a text frame:
-//	if id[0] == 'T' {
-//		// use parseTextFrame
+//	if strings.HasPrefix(id, "T") {
+//  	...
 //	}
 var parsers = map[string]func(*bufReader) (Framer, error){
 	"APIC": parsePictureFrame,
 	"CHAP": parseChapterFrame,
 	"COMM": parseCommentFrame,
+	"POPM": parsePopularimeterFrame,
 	"TXXX": parseUserDefinedTextFrame,
 	"UFID": parseUFIDFrame,
 	"USLT": parseUnsynchronisedLyricsFrame,
@@ -145,9 +150,15 @@ var parsers = map[string]func(*bufReader) (Framer, error){
 // mustFrameBeInSequence checks if frame with corresponding ID must
 // be added to sequence.
 func mustFrameBeInSequence(id string) bool {
-	switch id {
-	case "APIC", "CHAP", "COMM", "TXXX", "USLT":
-		return true
+	if id != "TXXX" && strings.HasPrefix(id, "T") {
+		return false
 	}
-	return false
+
+	switch id {
+	case "MCDI", "ETCO", "SYTC", "RVRB", "MLLT", "PCNT", "RBUF", "POSS", "OWNE", "SEEK", "ASPI":
+	case "IPLS", "RVAD": // Specific ID3v2.3 frames.
+		return false
+	}
+
+	return true
 }

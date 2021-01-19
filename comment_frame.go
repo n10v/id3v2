@@ -24,6 +24,10 @@ func (cf CommentFrame) Size() int {
 		+len(cf.Encoding.TerminationBytes) + encodedSize(cf.Text, cf.Encoding)
 }
 
+func (cf CommentFrame) UniqueIdentifier() string {
+	return cf.Language + cf.Description
+}
+
 func (cf CommentFrame) WriteTo(w io.Writer) (n int64, err error) {
 	if len(cf.Language) != 3 {
 		return n, ErrInvalidLanguageLength

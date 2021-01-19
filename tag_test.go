@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"os"
 	"strings"
 	"sync"
@@ -20,10 +21,10 @@ const (
 	frontCoverPath = "testdata/front_cover.jpg"
 	backCoverPath  = "testdata/back_cover.jpg"
 
-	framesSize    = 211943
+	framesSize    = 211978
 	tagSize       = tagHeaderSize + framesSize
 	musicSize     = 3840834
-	countOfFrames = 14
+	countOfFrames = 15
 )
 
 var (
@@ -79,6 +80,12 @@ var (
 		Text:        "Der eigentliche Text",
 	}
 
+	popmFrame = PopularimeterFrame{
+		Email:   "foo@bar.com",
+		Rating:  128,
+		Counter: big.NewInt(10000000000000000),
+	}
+
 	unknownFrameID = "WPUB"
 	unknownFrame   = UnknownFrame{
 		Body: []byte("https://soundcloud.com/suicidepart2"),
@@ -117,6 +124,8 @@ func resetMP3Tag() error {
 	tag.AddUserDefinedTextFrame(musicBrainzUDTF)
 	tag.AddUFIDFrame(musicBrainzUF)
 
+	tag.AddFrame(tag.CommonID("Popularimeter"), popmFrame)
+
 	tag.AddCommentFrame(engComm)
 	tag.AddCommentFrame(gerComm)
 
@@ -146,7 +155,7 @@ func TestCountLenSize(t *testing.T) {
 	}
 
 	// Check len of tag.AllFrames().
-	if len(tag.AllFrames()) != 11 {
+	if len(tag.AllFrames()) != 12 {
 		t.Errorf("Expected: %v, got: %v", 11, len(tag.AllFrames()))
 	}
 
@@ -473,7 +482,7 @@ func TestConcurrent(t *testing.T) {
 }
 
 // TestEncodedText checks
-// if text of frames encoded with different encodings is correctly written.
+// if texts of frames encoded with different encodings are correctly written.
 func TestEncodedText(t *testing.T) {
 	t.Parallel()
 

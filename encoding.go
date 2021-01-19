@@ -1,6 +1,9 @@
 package id3v2
 
 import (
+	"bytes"
+	"io/ioutil"
+
 	xencoding "golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/encoding/unicode"
@@ -83,6 +86,10 @@ var (
 	xencodingUTF8       = newXEncodingWrapper(unicode.UTF8)
 )
 
+// bom is used in UTF-16 encoded Unicode with BOM.
+// See https://en.wikipedia.org/wiki/Byte_order_mark.
+var bom = []byte{0xFF, 0xFE}
+
 // getEncoding returns Encoding in accordance with ID3v2 key.
 func getEncoding(key byte) Encoding {
 	if key > 3 {
@@ -97,15 +104,26 @@ func encodedSize(src string, enc Encoding) int {
 		return len(src)
 	}
 
-	toXEncoding := resolveXEncoding(nil, enc)
-	encoded, _ := toXEncoding.Encoder().String(src)
-	return len(encoded)
+	bw := getBufWriter(ioutil.Discard)
+	defer putBufWriter(bw)
+
+	encodeWriteText(bw, src, enc)
+
+	return bw.Written()
+
 }
 
 // decodeText decodes src from "from" encoding to UTF-8.
 func decodeText(src []byte, from Encoding) string {
+	src = bytes.TrimSuffix(src, from.TerminationBytes) // See https://github.com/bogem/id3v2/issues/41
+
 	if from.Equals(EncodingUTF8) {
 		return string(src)
+	}
+
+	// If src is just BOM, then it's an empty string.
+	if from.Equals(EncodingUTF16) && bytes.Equal(src, bom) {
+		return ""
 	}
 
 	fromXEncoding := resolveXEncoding(src, from)
@@ -113,6 +131,16 @@ func decodeText(src []byte, from Encoding) string {
 	if err != nil {
 		return string(src)
 	}
+
+	// HACK: Delete REPLACEMENT CHARACTER (�) if encoding went wrong.
+	// See https://apps.timwhitlock.info/unicode/inspect?s=%EF%BF%BD.
+	// See https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8.
+	if from.Equals(EncodingUTF16) {
+		// bytes.Replace(s, old, new, -1) is the same as bytes.ReplaceAll(s, old, new),
+		// but bytes.ReplaceAll is only added in Go 1.12.
+		result = bytes.Replace(result, []byte{0xEF, 0xBF, 0xBD}, []byte{}, -1)
+	}
+
 	return string(result)
 }
 
@@ -128,7 +156,13 @@ func encodeWriteText(bw *bufWriter, src string, to Encoding) error {
 	if err != nil {
 		return err
 	}
+
 	bw.WriteString(encoded)
+
+	if to.Equals(EncodingUTF16) && !bytes.HasSuffix([]byte(encoded), []byte{0}) {
+		bw.WriteByte(0)
+	}
+
 	return nil
 }
 
@@ -137,7 +171,7 @@ func resolveXEncoding(src []byte, encoding Encoding) xencodingWrapper {
 	case 0:
 		return xencodingISO
 	case 1:
-		if len(src) > 2 && src[0] == 0xFF && src[1] == 0xFE {
+		if len(src) > 2 && bytes.Equal(src[:2], bom) {
 			return xencodingUTF16LEBOM
 		}
 		return xencodingUTF16BEBOM

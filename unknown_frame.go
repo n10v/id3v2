@@ -6,12 +6,24 @@ package id3v2
 
 import (
 	"io"
+	"math/rand"
+	"strconv"
+	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 // UnknownFrame is used for frames, which id3v2 so far doesn't know how to
 // parse and write it. It just contains an unparsed byte body of the frame.
 type UnknownFrame struct {
 	Body []byte
+}
+
+func (uf UnknownFrame) UniqueIdentifier() string {
+	// All unknown frames should have unique identifier, because we don't know their real identifiers.
+	return strconv.Itoa(rand.Int())
 }
 
 func (uf UnknownFrame) Size() int {

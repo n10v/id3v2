@@ -2,9 +2,14 @@ package id3v2
 
 import "io"
 
+// UFIDFrame is used for "Unique file identifier"
 type UFIDFrame struct {
 	OwnerIdentifier string
 	Identifier      []byte
+}
+
+func (ufid UFIDFrame) UniqueIdentifier() string {
+	return ufid.OwnerIdentifier
 }
 
 func (ufid UFIDFrame) Size() int {

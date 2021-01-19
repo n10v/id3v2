@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/big"
 	"os"
 	"sync"
 
@@ -267,4 +268,31 @@ func ExampleUnsynchronisedLyricsFrame_add() {
 		Lyrics:            "Einigkeit und Recht und Freiheit...",
 	}
 	tag.AddUnsynchronisedLyricsFrame(uslt)
+}
+
+func ExamplePopularimeterFrame_add() {
+	tag := id3v2.NewEmptyTag()
+
+	popmFrame := id3v2.PopularimeterFrame{
+		Email:   "foo@bar.com",
+		Rating:  128,
+		Counter: big.NewInt(10000000000000000),
+	}
+	tag.AddFrame(tag.CommonID("Popularimeter"), popmFrame)
+}
+
+func ExamplePopularimeterFrame_get() {
+	tag, err := id3v2.Open("file.mp3", id3v2.Options{Parse: true})
+	if tag == nil || err != nil {
+		log.Fatal("Error while opening mp3 file: ", err)
+	}
+
+	f := tag.GetLastFrame(tag.CommonID("Popularimeter"))
+	popm, ok := f.(id3v2.PopularimeterFrame)
+	if !ok {
+		log.Fatal("Couldn't assert POPM frame")
+	}
+
+	// do something with POPM Frame
+	fmt.Printf("Email: %s, Rating: %d, Counter: %d", popm.Email, popm.Rating, popm.Counter)
 }

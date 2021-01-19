@@ -168,6 +168,14 @@ func (br *bufReader) ReadText(encoding Encoding) []byte {
 	var text []byte
 	delims := encoding.TerminationBytes
 	text, br.err = br.readTillDelims(delims)
+
+	// See https://github.com/bogem/id3v2/issues/51.
+	if encoding.Equals(EncodingUTF16) &&
+		// See https://github.com/bogem/id3v2/issues/53#issuecomment-604038434.
+		!bytes.Equal(text, bom) {
+		text = append(text, br.ReadByte())
+	}
+
 	br.Discard(len(delims))
 
 	return text

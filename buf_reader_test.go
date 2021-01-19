@@ -52,6 +52,44 @@ func TestReadTillZero(t *testing.T) {
 	}
 }
 
+// TestReadTextUTF16WithLeadingEmptyString tests if string encoded in UTF16 with BOM
+// with leading empty string with same encoding is read correctly.
+//
+// E.g. this can happen in comment frame with empty description and encoded in UTF16 with BOM.
+//
+// See https://github.com/bogem/id3v2/issues/53.
+func TestReadTextUTF16WithLeadingEmptyString(t *testing.T) {
+	t.Parallel()
+
+	sampleText1 := append(bom, EncodingUTF16.TerminationBytes...)
+
+	utf16C := []byte{0x43, 0x00} // "C" char in UTF-16.
+	sampleText2 := append(bom, append(utf16C, EncodingUTF16.TerminationBytes...)...)
+
+	sampleText := append(sampleText1, sampleText2...)
+
+	bufReader := newBufReader(bytes.NewReader(sampleText))
+
+	text := decodeText(bufReader.ReadText(EncodingUTF16), EncodingUTF16)
+	if text != "" {
+		t.Errorf("Expected empty text, got: %v", text)
+	}
+	// bufReader should only read sampleText1, so Buffered() should return len of sampleText2.
+	if bufReader.buf.Buffered() != len(sampleText2) {
+		t.Errorf("Expected buffered: %v, got %v", len(sampleText2), bufReader.buf.Buffered())
+	}
+
+	text = decodeText(bufReader.ReadText(EncodingUTF16), EncodingUTF16)
+	utf8C := "C"
+	if text != utf8C {
+		t.Errorf("Expected text: %v, got: %v", utf8C, text)
+	}
+	// bufReader.buf should be empty, because it should read the whole sampleText.
+	if bufReader.buf.Buffered() != 0 {
+		t.Errorf("Expected buffered: 0, got %v", bufReader.buf.Buffered())
+	}
+}
+
 func TestNext(t *testing.T) {
 	t.Parallel()
 

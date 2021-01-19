@@ -17,6 +17,13 @@ type Framer interface {
 	// Size returns the size of frame body.
 	Size() int
 
+	// UniqueIdentifier returns the string that makes this frame unique from others.
+	// For example, some frames with same id can be added in tag, but they should be differ in other properties.
+	// E.g. It would be "Description" for TXXX and APIC.
+	//
+	// Frames that can be added only once with same id (e.g. all text frames) should return just "".
+	UniqueIdentifier() string
+
 	// WriteTo writes body slice into w.
 	WriteTo(w io.Writer) (n int64, err error)
 }
