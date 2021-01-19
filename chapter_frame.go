@@ -28,12 +28,20 @@ type ChapterFrame struct {
 }
 
 func (cf ChapterFrame) Size() int {
-	return encodedSize(cf.ElementID, EncodingISO) +
+	size := encodedSize(cf.ElementID, EncodingISO) +
 		1 + // trailing zero after ElementID
-		4 + 4 + 4 + 4 + // (Start, End) (Time, Offset)
-		frameHeaderSize + // Title frame header size
-		cf.Title.Size() +
-		cf.SubTitle.Size()
+		4 + 4 + 4 + 4 // (Start, End) (Time, Offset)
+	if cf.Title != nil {
+		size = size +
+			frameHeaderSize + // Title frame header size
+			cf.Title.Size()
+	}
+	if cf.SubTitle != nil {
+		size = size +
+			frameHeaderSize + // SubTitle frame header size
+			cf.SubTitle.Size()
+	}
+	return size
 }
 
 func (cf ChapterFrame) UniqueIdentifier() string {
