@@ -6,8 +6,10 @@ package id3v2
 
 import (
 	"bytes"
+	"encoding/binary"
 	"io"
-	"math/big"
+	// "math/big"
+	"strconv"
 )
 
 // SynchronisedLyricsFrame is used to work with USLT frames.
@@ -49,16 +51,16 @@ var (
 
 type SyncedText struct {
 	Text      string
-	Timestamp *big.Int
+	Timestamp int64
 }
 
 func (sylf SynchronisedLyricsFrame) Size() int {
 	// s := binary.Size(sylf.SynchronizedTextSpec)
 	var s int
 	for _, v := range sylf.SynchronizedTextSpec {
-		s += len(v.Text)
+		s += encodedSize(v.Text, sylf.Encoding)
 		s += len(sylf.Encoding.TerminationBytes)
-		s += len(v.counterBytes())
+		s += 8
 	}
 
 	return 1 + len(sylf.Language) + encodedSize(sylf.ContentDescriptor, sylf.Encoding) +
@@ -71,19 +73,19 @@ func (sylf SynchronisedLyricsFrame) UniqueIdentifier() string {
 }
 
 func (sy SyncedText) counterBytes() []byte {
-	bytes := sy.Timestamp.Bytes()
-	// bs := make([]byte, 4)
+	bs := make([]byte, 8)
+	binary.LittleEndian.PutUint64(bs, uint64(sy.Timestamp))
+	return bs
 
-	// binary.LittleEndian.PutUint64(bs, uint64(sy.Timestamp))
-
+	// bytes := sy.Timestamp.Bytes()
 	// Specification requires at least 4 bytes for counter, pad if necessary.
-	bytesNeeded := 4 - len(bytes)
-	if bytesNeeded > 0 {
-		padding := make([]byte, bytesNeeded)
-		bytes = append(padding, bytes...)
-	}
+	// bytesNeeded := 4 - len(bytes)
+	// if bytesNeeded > 0 {
+	// 	padding := make([]byte, bytesNeeded)
+	// 	bytes = append(padding, bytes...)
+	// }
 
-	return bytes
+	// return bytes
 }
 
 func (sylf SynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) {
@@ -129,9 +131,9 @@ func parseSynchronisedLyricsFrame(br *bufReader) (Framer, error) {
 		t := SyncedText{Text: d[:idx]}
 		d = d[idx+1:]
 
-		timeStampBigInt, _ := new(big.Int).SetString(d[:2], 10)
+		// timeStampBigInt, _ := new(big.Int).SetString(d[:2], 10)
 
-		t.Timestamp = timeStampBigInt
+		t.Timestamp, _ = strconv.ParseInt(d[:2], 10, 64)
 		d = d[2:]
 
 		y = append(y, t)
