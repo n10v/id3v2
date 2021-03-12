@@ -7,24 +7,23 @@ package id3v2
 import (
 	"bytes"
 	"encoding/binary"
+	// "fmt"
 	"io"
-	// "math/big"
-	"strconv"
 )
 
-// SynchronisedLyricsFrame is used to work with USLT frames.
-// The information about how to add unsynchronised lyrics/text frame to tag
-// you can see in the docs to tag.AddUnsynchronisedLyricsFrame function.
+// SynchronisedLyricsFrame is used to work with SYLT frames.
+// The information about how to add synchronised lyrics/text frame to tag
+// you can see in the docs to tag.AddSynchronisedLyricsFrame function.
 //
 // You must choose a three-letter language code from
 // ISO 639-2 code list: https://www.loc.gov/standards/iso639-2/php/code_list.php
 type SynchronisedLyricsFrame struct {
-	Encoding             Encoding
-	Language             string
-	TimestampFormat      byte
-	ContentType          byte
-	ContentDescriptor    string
-	SynchronizedTextSpec []SyncedText
+	Encoding          Encoding
+	Language          string
+	TimestampFormat   byte
+	ContentType       byte
+	ContentDescriptor string
+	SynchronizedTexts []SyncedText
 }
 
 type TimestampFormat int
@@ -51,16 +50,16 @@ var (
 
 type SyncedText struct {
 	Text      string
-	Timestamp int64
+	Timestamp uint32
 }
 
 func (sylf SynchronisedLyricsFrame) Size() int {
 	// s := binary.Size(sylf.SynchronizedTextSpec)
 	var s int
-	for _, v := range sylf.SynchronizedTextSpec {
+	for _, v := range sylf.SynchronizedTexts {
 		s += encodedSize(v.Text, sylf.Encoding)
 		s += len(sylf.Encoding.TerminationBytes)
-		s += 8
+		s += 4
 	}
 
 	return 1 + len(sylf.Language) + encodedSize(sylf.ContentDescriptor, sylf.Encoding) +
@@ -72,20 +71,14 @@ func (sylf SynchronisedLyricsFrame) UniqueIdentifier() string {
 	return sylf.Language + sylf.ContentDescriptor
 }
 
-func (sy SyncedText) counterBytes() []byte {
-	bs := make([]byte, 8)
-	binary.LittleEndian.PutUint64(bs, uint64(sy.Timestamp))
+func (sy SyncedText) intToBytes() []byte {
+	bs := make([]byte, 4)
+	binary.BigEndian.PutUint32(bs, uint32(sy.Timestamp))
 	return bs
+}
 
-	// bytes := sy.Timestamp.Bytes()
-	// Specification requires at least 4 bytes for counter, pad if necessary.
-	// bytesNeeded := 4 - len(bytes)
-	// if bytesNeeded > 0 {
-	// 	padding := make([]byte, bytesNeeded)
-	// 	bytes = append(padding, bytes...)
-	// }
-
-	// return bytes
+func bytesToInt(timeStampBytes []byte) uint32 {
+	return binary.BigEndian.Uint32(timeStampBytes)
 }
 
 func (sylf SynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) {
@@ -99,10 +92,10 @@ func (sylf SynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) {
 		bw.WriteByte(sylf.ContentType)
 		bw.EncodeAndWriteText(sylf.ContentDescriptor, sylf.Encoding)
 		bw.Write(sylf.Encoding.TerminationBytes)
-		for _, v := range sylf.SynchronizedTextSpec {
+		for _, v := range sylf.SynchronizedTexts {
 			bw.EncodeAndWriteText(v.Text, sylf.Encoding)
 			bw.Write(sylf.Encoding.TerminationBytes)
-			bw.Write(v.counterBytes())
+			bw.Write(v.intToBytes())
 		}
 	})
 }
@@ -124,31 +117,34 @@ func parseSynchronisedLyricsFrame(br *bufReader) (Framer, error) {
 	if _, err := lyrics.ReadFrom(br); err != nil {
 		return nil, err
 	}
-	d := decodeText(lyrics.Bytes(), encoding)
-	var y []SyncedText
+	// d := decodeText(lyrics.Bytes(), encoding)
+	d := lyrics.Bytes()
+	var s []SyncedText
 	for {
 		idx := bytes.IndexByte([]byte(d), '\x00')
-		t := SyncedText{Text: d[:idx]}
+		t := SyncedText{Text: decodeText(d[:idx], encoding)}
 		d = d[idx+1:]
 
-		// timeStampBigInt, _ := new(big.Int).SetString(d[:2], 10)
+		// timeStampInt := bytesToInt([]byte(d[:4]))
 
-		t.Timestamp, _ = strconv.ParseInt(d[:2], 10, 64)
-		d = d[2:]
+		t.Timestamp = bytesToInt([]byte(d[:4]))
+		// t.Timestamp = 0
+		d = d[4:]
 
-		y = append(y, t)
+		s = append(s, t)
 
-		if len(d) < 3 || bytes.IndexByte([]byte(d), '\x00') < 2 {
+		if len(d) < 5 || bytes.IndexByte([]byte(d), '\x00') < 4 {
 			break
 		}
 	}
+	// fmt.Println(y)
 	sylf := SynchronisedLyricsFrame{
-		Encoding:             encoding,
-		Language:             string(language),
-		TimestampFormat:      timestampFormat[0],
-		ContentType:          contentType[0],
-		ContentDescriptor:    decodeText(contentDescriptor, encoding),
-		SynchronizedTextSpec: y,
+		Encoding:          encoding,
+		Language:          string(language),
+		TimestampFormat:   timestampFormat[0],
+		ContentType:       contentType[0],
+		ContentDescriptor: decodeText(contentDescriptor, encoding),
+		SynchronizedTexts: s,
 	}
 
 	return sylf, nil
