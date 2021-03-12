@@ -5,7 +5,7 @@
 package id3v2
 
 import (
-	"bytes"
+	// "bytes"
 	"encoding/binary"
 	// "fmt"
 	"io"
@@ -54,7 +54,6 @@ type SyncedText struct {
 }
 
 func (sylf SynchronisedLyricsFrame) Size() int {
-	// s := binary.Size(sylf.SynchronizedTextSpec)
 	var s int
 	for _, v := range sylf.SynchronizedTexts {
 		s += encodedSize(v.Text, sylf.Encoding)
@@ -111,33 +110,18 @@ func parseSynchronisedLyricsFrame(br *bufReader) (Framer, error) {
 		return nil, br.Err()
 	}
 
-	lyrics := getBytesBuffer()
-	defer putBytesBuffer(lyrics)
-
-	if _, err := lyrics.ReadFrom(br); err != nil {
-		return nil, err
-	}
-	// d := decodeText(lyrics.Bytes(), encoding)
-	d := lyrics.Bytes()
 	var s []SyncedText
 	for {
-		idx := bytes.IndexByte([]byte(d), '\x00')
-		t := SyncedText{Text: decodeText(d[:idx], encoding)}
-		d = d[idx+1:]
-
-		// timeStampInt := bytesToInt([]byte(d[:4]))
-
-		t.Timestamp = bytesToInt([]byte(d[:4]))
-		// t.Timestamp = 0
-		d = d[4:]
-
-		s = append(s, t)
-
-		if len(d) < 5 || bytes.IndexByte([]byte(d), '\x00') < 4 {
+		textLyric, err := br.readTillDelims(encoding.TerminationBytes)
+		if err != nil {
 			break
 		}
+		t := SyncedText{Text: string(decodeText(textLyric, encoding))}
+		br.Next(len(encoding.TerminationBytes))
+		timeStamp := br.Next(4)
+		timeStampUint := bytesToInt(timeStamp)
+		t.Timestamp = timeStampUint
 	}
-	// fmt.Println(y)
 	sylf := SynchronisedLyricsFrame{
 		Encoding:          encoding,
 		Language:          string(language),
