@@ -70,9 +70,9 @@ func (sylf SynchronisedLyricsFrame) UniqueIdentifier() string {
 	return sylf.Language + sylf.ContentDescriptor
 }
 
-func (sy SyncedText) intToBytes() []byte {
+func (sy SyncedText) uintToBytes() []byte {
 	bs := make([]byte, 4)
-	binary.BigEndian.PutUint32(bs, uint32(sy.Timestamp))
+	binary.BigEndian.PutUint32(bs, sy.Timestamp)
 	return bs
 }
 
@@ -94,7 +94,7 @@ func (sylf SynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) {
 		for _, v := range sylf.SynchronizedTexts {
 			bw.EncodeAndWriteText(v.Text, sylf.Encoding)
 			bw.Write(sylf.Encoding.TerminationBytes)
-			bw.Write(v.intToBytes())
+			bw.Write(v.uintToBytes())
 		}
 	})
 }
@@ -102,8 +102,8 @@ func (sylf SynchronisedLyricsFrame) WriteTo(w io.Writer) (n int64, err error) {
 func parseSynchronisedLyricsFrame(br *bufReader) (Framer, error) {
 	encoding := getEncoding(br.ReadByte())
 	language := br.Next(3)
-	timestampFormat := br.Next(1)
-	contentType := br.Next(1)
+	timestampFormat := br.ReadByte()
+	contentType := br.ReadByte()
 	contentDescriptor := br.ReadText(encoding)
 
 	if br.Err() != nil {
@@ -116,17 +116,18 @@ func parseSynchronisedLyricsFrame(br *bufReader) (Framer, error) {
 		if err != nil {
 			break
 		}
-		t := SyncedText{Text: string(decodeText(textLyric, encoding))}
+		t := SyncedText{Text: decodeText(textLyric, encoding)}
 		br.Next(len(encoding.TerminationBytes))
 		timeStamp := br.Next(4)
 		timeStampUint := bytesToInt(timeStamp)
 		t.Timestamp = timeStampUint
+		s = append(s, t)
 	}
 	sylf := SynchronisedLyricsFrame{
 		Encoding:          encoding,
 		Language:          string(language),
-		TimestampFormat:   timestampFormat[0],
-		ContentType:       contentType[0],
+		TimestampFormat:   timestampFormat,
+		ContentType:       contentType,
 		ContentDescriptor: decodeText(contentDescriptor, encoding),
 		SynchronizedTexts: s,
 	}
