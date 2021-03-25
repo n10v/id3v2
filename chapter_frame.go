@@ -106,28 +106,20 @@ func parseChapterFrame(br *bufReader) (Framer, error) {
 			return nil, err
 		}
 		id, bodySize := header.ID, header.BodySize
-		if id == "TIT2" {
+		if id == "TIT2" || id == "TIT3" {
 			bodyRd := getLimitedReader(br, bodySize)
-			br2 := newBufReader(bodyRd)
-			frame, err := parseTextFrame(br2)
+			br := newBufReader(bodyRd)
+			frame, err := parseTextFrame(br)
 			if err != nil {
 				putLimitedReader(bodyRd)
 				return nil, err
 			}
-			title = frame.(TextFrame)
-
-			putLimitedReader(bodyRd)
-			break
-		}
-		if id == "TIT3" {
-			bodyRd := getLimitedReader(br, bodySize)
-			br3 := newBufReader(bodyRd)
-			frame, err := parseTextFrame(br3)
-			if err != nil {
-				putLimitedReader(bodyRd)
-				return nil, err
+			if id == "TIT2" {
+				title = frame.(TextFrame)
 			}
-			description = frame.(TextFrame)
+			if id == "TIT3" {
+				description = frame.(TextFrame)
+			}
 
 			putLimitedReader(bodyRd)
 			break
