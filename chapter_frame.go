@@ -122,7 +122,6 @@ func parseChapterFrame(br *bufReader) (Framer, error) {
 			}
 
 			putLimitedReader(bodyRd)
-			break
 		}
 	}
 

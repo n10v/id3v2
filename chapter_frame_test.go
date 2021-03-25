@@ -1,7 +1,6 @@
 package id3v2
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -27,6 +26,57 @@ func prepareTestFile() (*os.File, error) {
 		return nil, err
 	}
 	return tmpFile, nil
+}
+
+func TestAddChapterFrameWithTitleAndDescription(t *testing.T) {
+	tmpFile, err := prepareTestFile()
+	if err != nil {
+		t.Error(err)
+	}
+	defer os.Remove(tmpFile.Name())
+
+	tag, err := Open(tmpFile.Name(), Options{Parse: true})
+	if tag == nil || err != nil {
+		log.Fatal("Error while opening mp3 file: ", err)
+	}
+
+	chap := ChapterFrame{
+		ElementID:   "chap0",
+		StartTime:   0,
+		EndTime:     time.Duration(1000 * nanosInMillis),
+		StartOffset: 0,
+		EndOffset:   0,
+		Title: &TextFrame{
+			Encoding: EncodingUTF8,
+			Text:     "chapter 0 title",
+		},
+		Description: &TextFrame{
+			Encoding: EncodingUTF8,
+			Text:     "chapter 0 description",
+		},
+	}
+	tag.AddChapterFrame(chap)
+
+	if err := tag.Save(); err != nil {
+		t.Error(err)
+	}
+	tag.Close()
+
+	tag, err = Open(tmpFile.Name(), Options{Parse: true})
+	if tag == nil || err != nil {
+		log.Fatal("Error while opening mp3 file: ", err)
+	}
+	frame := tag.GetLastFrame("CHAP").(ChapterFrame)
+	if frame.ElementID != "chap0" {
+		t.Error(err)
+	}
+	if frame.Title.Text != "chapter 0 title" {
+		t.Errorf("expected: %s, but got %s", "chapter 0", frame.Title)
+	}
+	if frame.Description.Text != "chapter 0 description" {
+		t.Errorf("expected: %s, but got %s", "chapter 0", frame.Description.Text)
+	}
+
 }
 
 func TestAddChapterFrame(t *testing.T) {
@@ -153,8 +203,6 @@ func TestAddChapterFrameWithDescription(t *testing.T) {
 		t.Error(err)
 	}
 	if frame.Description.Text != "chapter 0" {
-		fmt.Printf("%+v\n", frame)
-		fmt.Printf("%+v\n", frame.Description)
 		t.Errorf("expected: %s, but got %s", "chapter 0", frame.Description.Text)
 	}
 }
