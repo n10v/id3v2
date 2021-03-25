@@ -24,7 +24,7 @@ type ChapterFrame struct {
 	StartOffset uint32
 	EndOffset   uint32
 	Title       *TextFrame
-	SubTitle    *TextFrame
+	Description *TextFrame
 }
 
 func (cf ChapterFrame) Size() int {
@@ -36,10 +36,10 @@ func (cf ChapterFrame) Size() int {
 			frameHeaderSize + // Title frame header size
 			cf.Title.Size()
 	}
-	if cf.SubTitle != nil {
+	if cf.Description != nil {
 		size = size +
-			frameHeaderSize + // SubTitle frame header size
-			cf.SubTitle.Size()
+			frameHeaderSize + // Description frame header size
+			cf.Description.Size()
 	}
 	return size
 }
@@ -63,8 +63,8 @@ func (cf ChapterFrame) WriteTo(w io.Writer) (n int64, err error) {
 			writeFrame(bw, "TIT2", *cf.Title, true)
 		}
 
-		if cf.SubTitle != nil {
-			writeFrame(bw, "TIT3", cf.SubTitle, true)
+		if cf.Description != nil {
+			writeFrame(bw, "TIT3", *cf.Description, true)
 		}
 	})
 }
@@ -90,7 +90,7 @@ func parseChapterFrame(br *bufReader) (Framer, error) {
 	}
 
 	var title TextFrame
-	var subTitle TextFrame
+	var description TextFrame
 
 	// borrowed from parse.go
 	buf := getByteSlice(32 * 1024)
@@ -127,7 +127,7 @@ func parseChapterFrame(br *bufReader) (Framer, error) {
 				putLimitedReader(bodyRd)
 				return nil, err
 			}
-			subTitle = frame.(TextFrame)
+			description = frame.(TextFrame)
 
 			putLimitedReader(bodyRd)
 			break
@@ -143,7 +143,7 @@ func parseChapterFrame(br *bufReader) (Framer, error) {
 		StartOffset: startOffset,
 		EndOffset:   endOffset,
 		Title:       &title,
-		SubTitle:    &subTitle,
+		Description: &description,
 	}
 	return cf, nil
 }

@@ -1,6 +1,7 @@
 package id3v2
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -113,7 +114,7 @@ func TestAddChapterFrameWithTitle(t *testing.T) {
 	}
 }
 
-func TestAddChapterFrameWithSubTitle(t *testing.T) {
+func TestAddChapterFrameWithDescription(t *testing.T) {
 	tmpFile, err := prepareTestFile()
 	if err != nil {
 		t.Error(err)
@@ -131,7 +132,7 @@ func TestAddChapterFrameWithSubTitle(t *testing.T) {
 		EndTime:     0,
 		StartOffset: 0,
 		EndOffset:   0,
-		SubTitle: &TextFrame{
+		Description: &TextFrame{
 			Encoding: EncodingUTF8,
 			Text:     "chapter 0",
 		},
@@ -151,7 +152,9 @@ func TestAddChapterFrameWithSubTitle(t *testing.T) {
 	if frame.ElementID != "chap0" {
 		t.Error(err)
 	}
-	if frame.SubTitle.Text != "chapter 0" {
-		t.Errorf("expected: %s, but got %s", "chapter 0", frame.Title)
+	if frame.Description.Text != "chapter 0" {
+		fmt.Printf("%+v\n", frame)
+		fmt.Printf("%+v\n", frame.Description)
+		t.Errorf("expected: %s, but got %s", "chapter 0", frame.Description.Text)
 	}
 }
