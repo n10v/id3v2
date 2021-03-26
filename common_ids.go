@@ -137,7 +137,7 @@ var (
 //	if strings.HasPrefix(id, "T") {
 //  	...
 //	}
-var parsers = map[string]func(*bufReader) (Framer, error){
+var parsers = map[string]func(*bufReader, byte) (Framer, error){
 	"APIC": parsePictureFrame,
 	"CHAP": parseChapterFrame,
 	"COMM": parseCommentFrame,
