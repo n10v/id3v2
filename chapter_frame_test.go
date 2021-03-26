@@ -28,181 +28,135 @@ func prepareTestFile() (*os.File, error) {
 	return tmpFile, nil
 }
 
-func TestAddChapterFrameWithTitleAndDescription(t *testing.T) {
-	tmpFile, err := prepareTestFile()
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.Remove(tmpFile.Name())
-
-	tag, err := Open(tmpFile.Name(), Options{Parse: true})
-	if tag == nil || err != nil {
-		log.Fatal("Error while opening mp3 file: ", err)
-	}
-
-	chap := ChapterFrame{
-		ElementID:   "chap0",
-		StartTime:   0,
-		EndTime:     time.Duration(1000 * nanosInMillis),
-		StartOffset: 0,
-		EndOffset:   0,
-		Title: &TextFrame{
-			Encoding: EncodingUTF8,
-			Text:     "chapter 0 title",
-		},
-		Description: &TextFrame{
-			Encoding: EncodingUTF8,
-			Text:     "chapter 0 description",
-		},
-	}
-	tag.AddChapterFrame(chap)
-
-	if err := tag.Save(); err != nil {
-		t.Error(err)
-	}
-	tag.Close()
-
-	tag, err = Open(tmpFile.Name(), Options{Parse: true})
-	if tag == nil || err != nil {
-		log.Fatal("Error while opening mp3 file: ", err)
-	}
-	frame := tag.GetLastFrame("CHAP").(ChapterFrame)
-	if frame.ElementID != "chap0" {
-		t.Error(err)
-	}
-	if frame.Title.Text != "chapter 0 title" {
-		t.Errorf("expected: %s, but got %s", "chapter 0", frame.Title)
-	}
-	if frame.Description.Text != "chapter 0 description" {
-		t.Errorf("expected: %s, but got %s", "chapter 0", frame.Description.Text)
-	}
-
-}
-
 func TestAddChapterFrame(t *testing.T) {
-	tmpFile, err := prepareTestFile()
-	if err != nil {
-		t.Error(err)
+	type fields struct {
+		ElementID   string
+		StartTime   time.Duration
+		EndTime     time.Duration
+		StartOffset uint32
+		EndOffset   uint32
+		Title       *TextFrame
+		Description *TextFrame
 	}
-	defer os.Remove(tmpFile.Name())
-
-	tag, err := Open(tmpFile.Name(), Options{Parse: true})
-	if tag == nil || err != nil {
-		log.Fatal("Error while opening mp3 file: ", err)
-	}
-
-	chap := ChapterFrame{
-		ElementID:   "chap0",
-		StartTime:   0,
-		EndTime:     time.Duration(1000 * nanosInMillis),
-		StartOffset: 0,
-		EndOffset:   0,
-	}
-	tag.AddChapterFrame(chap)
-
-	if err := tag.Save(); err != nil {
-		t.Error(err)
-	}
-	tag.Close()
-
-	tag, err = Open(tmpFile.Name(), Options{Parse: true})
-	if tag == nil || err != nil {
-		log.Fatal("Error while opening mp3 file: ", err)
-	}
-	frame := tag.GetLastFrame("CHAP").(ChapterFrame)
-	if frame.ElementID != "chap0" {
-		t.Error(err)
-	}
-	if frame.StartTime != 0 {
-		t.Errorf("expected: %d, but got %s", 0, frame.StartTime)
-	}
-	if frame.EndTime.Seconds()*1000 != 1000 {
-		t.Errorf("expected: %d, but got %d", 1000, int(frame.EndTime.Seconds()*1000))
-	}
-}
-
-func TestAddChapterFrameWithTitle(t *testing.T) {
-	tmpFile, err := prepareTestFile()
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.Remove(tmpFile.Name())
-
-	tag, err := Open(tmpFile.Name(), Options{Parse: true})
-	if tag == nil || err != nil {
-		log.Fatal("Error while opening mp3 file: ", err)
-	}
-
-	chap := ChapterFrame{
-		ElementID:   "chap0",
-		StartTime:   0,
-		EndTime:     0,
-		StartOffset: 0,
-		EndOffset:   0,
-		Title: &TextFrame{
-			Encoding: EncodingUTF8,
-			Text:     "chapter 0",
+	tests := []struct {
+		name            string
+		fields          fields
+		wantElementId   string
+		wantTitle       string
+		wantDescription string
+	}{
+		{
+			name: "",
+			fields: fields{
+				ElementID:   "chap0",
+				StartTime:   0,
+				EndTime:     time.Duration(1000 * nanosInMillis),
+				StartOffset: 0,
+				EndOffset:   0,
+			},
+			wantElementId:   "chap0",
+			wantTitle:       "",
+			wantDescription: "",
+		},
+		{
+			name: "",
+			fields: fields{
+				ElementID:   "chap0",
+				StartTime:   0,
+				EndTime:     time.Duration(1000 * nanosInMillis),
+				StartOffset: 0,
+				EndOffset:   0,
+				Title: &TextFrame{
+					Encoding: EncodingUTF8,
+					Text:     "chapter 0",
+				},
+			},
+			wantElementId:   "chap0",
+			wantTitle:       "chapter 0",
+			wantDescription: "",
+		},
+		{
+			name: "",
+			fields: fields{
+				ElementID:   "chap0",
+				StartTime:   0,
+				EndTime:     time.Duration(1000 * nanosInMillis),
+				StartOffset: 0,
+				EndOffset:   0,
+				Description: &TextFrame{
+					Encoding: EncodingUTF8,
+					Text:     "chapter 0",
+				},
+			},
+			wantElementId:   "chap0",
+			wantTitle:       "",
+			wantDescription: "chapter 0",
+		},
+		{
+			name: "",
+			fields: fields{
+				ElementID:   "chap0",
+				StartTime:   0,
+				EndTime:     time.Duration(1000 * nanosInMillis),
+				StartOffset: 0,
+				EndOffset:   0,
+				Title: &TextFrame{
+					Encoding: EncodingUTF8,
+					Text:     "chapter 0 title",
+				},
+				Description: &TextFrame{
+					Encoding: EncodingUTF8,
+					Text:     "chapter 0 description",
+				},
+			},
+			wantElementId:   "chap0",
+			wantTitle:       "chapter 0 title",
+			wantDescription: "chapter 0 description",
 		},
 	}
-	tag.AddChapterFrame(chap)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tmpFile, err := prepareTestFile()
+			if err != nil {
+				t.Error(err)
+			}
+			defer os.Remove(tmpFile.Name())
 
-	if err := tag.Save(); err != nil {
-		t.Error(err)
-	}
-	tag.Close()
+			tag, err := Open(tmpFile.Name(), Options{Parse: true})
+			if tag == nil || err != nil {
+				log.Fatal("Error while opening mp3 file: ", err)
+			}
 
-	tag, err = Open(tmpFile.Name(), Options{Parse: true})
-	if tag == nil || err != nil {
-		log.Fatal("Error while opening mp3 file: ", err)
-	}
-	frame := tag.GetLastFrame("CHAP").(ChapterFrame)
-	if frame.ElementID != "chap0" {
-		t.Error(err)
-	}
-	if frame.Title.Text != "chapter 0" {
-		t.Errorf("expected: %s, but got %s", "chapter 0", frame.Title)
-	}
-}
+			cf := ChapterFrame{
+				ElementID:   tt.fields.ElementID,
+				StartTime:   tt.fields.StartTime,
+				EndTime:     tt.fields.EndTime,
+				StartOffset: tt.fields.StartOffset,
+				EndOffset:   tt.fields.EndOffset,
+				Title:       tt.fields.Title,
+				Description: tt.fields.Description,
+			}
+			tag.AddChapterFrame(cf)
 
-func TestAddChapterFrameWithDescription(t *testing.T) {
-	tmpFile, err := prepareTestFile()
-	if err != nil {
-		t.Error(err)
-	}
-	defer os.Remove(tmpFile.Name())
+			if err := tag.Save(); err != nil {
+				t.Error(err)
+			}
+			tag.Close()
 
-	tag, err := Open(tmpFile.Name(), Options{Parse: true})
-	if tag == nil || err != nil {
-		log.Fatal("Error while opening mp3 file: ", err)
-	}
-
-	chap := ChapterFrame{
-		ElementID:   "chap0",
-		StartTime:   0,
-		EndTime:     0,
-		StartOffset: 0,
-		EndOffset:   0,
-		Description: &TextFrame{
-			Encoding: EncodingUTF8,
-			Text:     "chapter 0",
-		},
-	}
-	tag.AddChapterFrame(chap)
-
-	if err := tag.Save(); err != nil {
-		t.Error(err)
-	}
-	tag.Close()
-
-	tag, err = Open(tmpFile.Name(), Options{Parse: true})
-	if tag == nil || err != nil {
-		log.Fatal("Error while opening mp3 file: ", err)
-	}
-	frame := tag.GetLastFrame("CHAP").(ChapterFrame)
-	if frame.ElementID != "chap0" {
-		t.Error(err)
-	}
-	if frame.Description.Text != "chapter 0" {
-		t.Errorf("expected: %s, but got %s", "chapter 0", frame.Description.Text)
+			tag, err = Open(tmpFile.Name(), Options{Parse: true})
+			if tag == nil || err != nil {
+				log.Fatal("Error while opening mp3 file: ", err)
+			}
+			frame := tag.GetLastFrame("CHAP").(ChapterFrame)
+			if frame.ElementID != tt.wantElementId {
+				t.Errorf("expected: %s, but got %s", tt.wantElementId, frame.ElementID)
+			}
+			if frame.Title.Text != tt.wantTitle {
+				t.Errorf("expected: %s, but got %s", tt.wantTitle, frame.Title)
+			}
+			if frame.Description.Text != tt.wantDescription {
+				t.Errorf("expected: %s, but got %s", tt.wantDescription, frame.Description.Text)
+			}
+		})
 	}
 }
