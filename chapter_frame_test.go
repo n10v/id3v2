@@ -113,6 +113,19 @@ func TestAddChapterFrame(t *testing.T) {
 			wantTitle:       "chapter 0 title",
 			wantDescription: "chapter 0 description",
 		},
+		{
+			name: "",
+			fields: fields{
+				ElementID:   "chap0",
+				StartTime:   time.Duration(1000 * nanosInMillis),
+				EndTime:     time.Duration(1000 * nanosInMillis),
+				StartOffset: 10,
+				EndOffset:   10,
+			},
+			wantElementId:   "chap0",
+			wantTitle:       "",
+			wantDescription: "",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -156,6 +169,18 @@ func TestAddChapterFrame(t *testing.T) {
 			}
 			if frame.Description.Text != tt.wantDescription {
 				t.Errorf("expected: %s, but got %s", tt.wantDescription, frame.Description.Text)
+			}
+			if frame.StartTime != tt.fields.StartTime {
+				t.Errorf("expected: %s, but got %s", tt.fields.StartTime, frame.StartTime)
+			}
+			if frame.EndTime != tt.fields.EndTime {
+				t.Errorf("expected: %s, but got %s", tt.fields.EndTime, frame.EndTime)
+			}
+			if frame.StartOffset != tt.fields.StartOffset {
+				t.Errorf("expected: %d, but got %d", tt.fields.StartOffset, frame.StartOffset)
+			}
+			if frame.EndOffset != tt.fields.EndOffset {
+				t.Errorf("expected: %d, but got %d", tt.fields.EndOffset, frame.EndOffset)
 			}
 		})
 	}
