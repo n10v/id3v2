@@ -46,7 +46,7 @@ func TestAddChapterFrame(t *testing.T) {
 		wantDescription string
 	}{
 		{
-			name: "",
+			name: "element id only",
 			fields: fields{
 				ElementID:   "chap0",
 				StartTime:   0,
@@ -59,7 +59,7 @@ func TestAddChapterFrame(t *testing.T) {
 			wantDescription: "",
 		},
 		{
-			name: "",
+			name: "with title",
 			fields: fields{
 				ElementID:   "chap0",
 				StartTime:   0,
@@ -76,7 +76,7 @@ func TestAddChapterFrame(t *testing.T) {
 			wantDescription: "",
 		},
 		{
-			name: "",
+			name: "with description",
 			fields: fields{
 				ElementID:   "chap0",
 				StartTime:   0,
@@ -93,7 +93,7 @@ func TestAddChapterFrame(t *testing.T) {
 			wantDescription: "chapter 0",
 		},
 		{
-			name: "",
+			name: "with title and description",
 			fields: fields{
 				ElementID:   "chap0",
 				StartTime:   0,
@@ -114,7 +114,7 @@ func TestAddChapterFrame(t *testing.T) {
 			wantDescription: "chapter 0 description",
 		},
 		{
-			name: "",
+			name: "non-zero time and offset",
 			fields: fields{
 				ElementID:   "chap0",
 				StartTime:   time.Duration(1000 * nanosInMillis),
