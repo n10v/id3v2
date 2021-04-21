@@ -120,8 +120,7 @@ func parseChapterFrame(br *bufReader, version byte) (Framer, error) {
 			}
 			if id == "TIT2" {
 				title = frame.(TextFrame)
-			}
-			if id == "TIT3" {
+			} else if id == "TIT3" {
 				description = frame.(TextFrame)
 			}
 
