@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -22,7 +23,7 @@ type PictureFrame struct {
 }
 
 func (pf PictureFrame) UniqueIdentifier() string {
-	return pf.Description
+	return fmt.Sprintf("%02X%s", pf.PictureType, pf.Description)
 }
 
 func (pf PictureFrame) Size() int {
