@@ -70,7 +70,7 @@ func (cf ChapterFrame) WriteTo(w io.Writer) (n int64, err error) {
 }
 
 func parseChapterFrame(br *bufReader, version byte) (Framer, error) {
-	ElementID := br.ReadText(EncodingISO)
+	elementID := br.ReadText(EncodingISO)
 	synchSafe := version == 4
 	var startTime uint32
 	var startOffset uint32
@@ -125,7 +125,7 @@ func parseChapterFrame(br *bufReader, version byte) (Framer, error) {
 	}
 
 	cf := ChapterFrame{
-		ElementID: string(ElementID),
+		ElementID: string(elementID),
 		// StartTime is given in milliseconds, so we should convert it to nanoseconds
 		// for time.Duration
 		StartTime:   time.Duration(int64(startTime) * nanosInMillis),
