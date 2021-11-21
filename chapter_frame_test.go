@@ -174,7 +174,7 @@ func TestAddChapterFrame(t *testing.T) {
 				t.Errorf("Expected start time: %s, but got %s", tt.fields.StartTime, frame.StartTime)
 			}
 			if frame.EndTime != tt.fields.EndTime {
-				t.Errorf("expected: %s, but got %s", tt.fields.EndTime, frame.EndTime)
+				t.Errorf("Expected end time: %s, but got %s", tt.fields.EndTime, frame.EndTime)
 			}
 			if frame.StartOffset != tt.fields.StartOffset {
 				t.Errorf("Expected start offset: %d, but got %d", tt.fields.StartOffset, frame.StartOffset)
