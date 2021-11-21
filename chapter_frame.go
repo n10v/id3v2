@@ -71,7 +71,7 @@ func (cf ChapterFrame) WriteTo(w io.Writer) (n int64, err error) {
 
 func parseChapterFrame(br *bufReader, version byte) (Framer, error) {
 	ElementID := br.ReadText(EncodingISO)
-	var synchSafe bool
+	synchSafe := version == 4
 	var startTime uint32
 	var startOffset uint32
 	var endTime uint32
@@ -96,11 +96,7 @@ func parseChapterFrame(br *bufReader, version byte) (Framer, error) {
 	// borrowed from parse.go
 	buf := getByteSlice(32 * 1024)
 	defer putByteSlice(buf)
-	if version == 4 {
-		synchSafe = true
-	} else {
-		synchSafe = false
-	}
+
 	for {
 		header, err := parseFrameHeader(buf, br, synchSafe)
 		if err == io.EOF || err == errBlankFrame || err == ErrInvalidSizeFormat {
