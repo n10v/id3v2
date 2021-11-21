@@ -165,7 +165,7 @@ func TestAddChapterFrame(t *testing.T) {
 				t.Errorf("Expected element ID: %s, but got %s", tt.wantElementId, frame.ElementID)
 			}
 			if frame.Title.Text != tt.wantTitle {
-				t.Errorf("expected: %s, but got %s", tt.wantTitle, frame.Title)
+				t.Errorf("Expected title: %s, but got %s", tt.wantTitle, frame.Title)
 			}
 			if frame.Description.Text != tt.wantDescription {
 				t.Errorf("expected: %s, but got %s", tt.wantDescription, frame.Description.Text)
