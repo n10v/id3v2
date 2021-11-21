@@ -52,7 +52,6 @@ func (cf ChapterFrame) WriteTo(w io.Writer) (n int64, err error) {
 	return useBufWriter(w, func(bw *bufWriter) {
 		bw.EncodeAndWriteText(cf.ElementID, EncodingISO)
 		bw.WriteByte(0)
-		// nanoseconds => milliseconds
 		binary.Write(bw, binary.BigEndian, int32(cf.StartTime/nanosInMillis))
 		binary.Write(bw, binary.BigEndian, int32(cf.EndTime/nanosInMillis))
 
