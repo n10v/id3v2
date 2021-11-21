@@ -162,7 +162,7 @@ func TestAddChapterFrame(t *testing.T) {
 			}
 			frame := tag.GetLastFrame("CHAP").(ChapterFrame)
 			if frame.ElementID != tt.wantElementId {
-				t.Errorf("expected: %s, but got %s", tt.wantElementId, frame.ElementID)
+				t.Errorf("Expected element ID: %s, but got %s", tt.wantElementId, frame.ElementID)
 			}
 			if frame.Title.Text != tt.wantTitle {
 				t.Errorf("expected: %s, but got %s", tt.wantTitle, frame.Title)
