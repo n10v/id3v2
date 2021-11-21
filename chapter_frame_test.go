@@ -171,7 +171,7 @@ func TestAddChapterFrame(t *testing.T) {
 				t.Errorf("Expected description: %s, but got %s", tt.wantDescription, frame.Description.Text)
 			}
 			if frame.StartTime != tt.fields.StartTime {
-				t.Errorf("expected: %s, but got %s", tt.fields.StartTime, frame.StartTime)
+				t.Errorf("Expected start time: %s, but got %s", tt.fields.StartTime, frame.StartTime)
 			}
 			if frame.EndTime != tt.fields.EndTime {
 				t.Errorf("expected: %s, but got %s", tt.fields.EndTime, frame.EndTime)
