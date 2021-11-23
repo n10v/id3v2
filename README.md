@@ -5,7 +5,7 @@ Supported ID3 versions: 2.3, 2.4
 ## Installation
 
 ```
-go get -u github.com/bogem/id3v2
+go get -u github.com/bogem/id3v2/v2
 ```
 
 ## Usage example
@@ -17,7 +17,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/bogem/id3v2"
+	"github.com/bogem/id3v2/v2"
 )
 
 func main() {
@@ -67,7 +67,7 @@ for _, f := range pictures {
 
 ## Encodings
 
-For example, if you want to set comment frame with custom encoding, 
+For example, if you want to set comment frame with custom encoding,
 you may do the following:
 
 ```go
