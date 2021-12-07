@@ -1,4 +1,4 @@
-# [id3v2](https://pkg.go.dev/github.com/bogem/id3v2)
+# [id3v2](https://pkg.go.dev/github.com/bogem/id3v2/v2)
 
 Supported ID3 versions: 2.3, 2.4
 
