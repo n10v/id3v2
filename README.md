@@ -1,4 +1,4 @@
-# [id3v2](https://pkg.go.dev/github.com/bogem/id3v2/v2)
+# id3v2
 
 Supported ID3 versions: 2.3, 2.4
 
@@ -7,6 +7,10 @@ Supported ID3 versions: 2.3, 2.4
 ```
 go get -u github.com/bogem/id3v2/v2
 ```
+
+## Documentation
+
+https://pkg.go.dev/github.com/bogem/id3v2/v2
 
 ## Usage example
 
