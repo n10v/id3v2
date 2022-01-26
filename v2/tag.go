@@ -56,6 +56,10 @@ func (tag *Tag) AddChapterFrame(cf ChapterFrame) {
 	tag.AddFrame(tag.CommonID("Chapters"), cf)
 }
 
+func (tag *Tag) AddChapterTocFrame(ctf ChapterTocFrame) {
+	tag.AddFrame(tag.CommonID("Chapters TOC"), ctf)
+}
+
 // AddCommentFrame adds the comment frame to tag.
 func (tag *Tag) AddCommentFrame(cf CommentFrame) {
 	tag.AddFrame(tag.CommonID("Comments"), cf)
