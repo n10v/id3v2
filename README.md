@@ -31,11 +31,11 @@ func main() {
  	}
 	defer tag.Close()
 
-	// Read tags.
+	// Read tags
 	fmt.Println(tag.Artist())
 	fmt.Println(tag.Title())
 
-	// Set tags.
+	// Set tags
 	tag.SetArtist("Aphex Twin")
 	tag.SetTitle("Xtal")
 
@@ -47,7 +47,7 @@ func main() {
 	}
 	tag.AddCommentFrame(comment)
 
-	// Write tag to file.mp3.
+	// Write tag to file.mp3
 	if err = tag.Save(); err != nil {
 		log.Fatal("Error while saving a tag: ", err)
 	}
@@ -64,7 +64,7 @@ for _, f := range pictures {
 		log.Fatal("Couldn't assert picture frame")
 	}
 
-	// Do something with picture frame.
+	// Do something with picture frame
 	fmt.Println(pic.Description)
 }
 ```
