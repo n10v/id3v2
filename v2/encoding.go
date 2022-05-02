@@ -30,12 +30,15 @@ func (e Encoding) String() string {
 type xencodingWrapper struct {
 	decoder *xencoding.Decoder
 	encoder *xencoding.Encoder
+
+	encoding xencoding.Encoding
 }
 
 func newXEncodingWrapper(e xencoding.Encoding) xencodingWrapper {
 	return xencodingWrapper{
-		decoder: e.NewDecoder(),
-		encoder: e.NewEncoder(),
+		decoder:  e.NewDecoder(),
+		encoder:  e.NewEncoder(),
+		encoding: e,
 	}
 }
 
@@ -127,7 +130,8 @@ func decodeText(src []byte, from Encoding) string {
 	}
 
 	fromXEncoding := resolveXEncoding(src, from)
-	result, err := fromXEncoding.Decoder().Bytes(src)
+	//result, err := fromXEncoding.Decoder().Bytes(src)
+	result, err := fromXEncoding.encoding.NewDecoder().Bytes(src)
 	if err != nil {
 		return string(src)
 	}
