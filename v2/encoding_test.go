@@ -61,9 +61,7 @@ func TestDecodeTextParallel(t *testing.T) {
 
 		tc := tc
 		go func() {
-			defer func() {
-				wg.Done()
-			}()
+			defer wg.Done()
 			got := decodeText(tc.src, tc.from)
 			if got != tc.utf8 {
 				t.Errorf("Expected %q from %v encoding, got %q", tc.utf8, tc.from, got)
