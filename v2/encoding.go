@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 
-	xencoding "golang.org/x/text/encoding"
+	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/encoding/unicode"
 )
@@ -22,29 +22,6 @@ func (e Encoding) Equals(other Encoding) bool {
 
 func (e Encoding) String() string {
 	return e.Name
-}
-
-// xencodingWrapper is a struct that stores decoder and encoder for
-// appropriate x/text/encoding. It's used to reduce allocations
-// through creating decoder and encoder only one time and storing it.
-type xencodingWrapper struct {
-	decoder *xencoding.Decoder
-	encoder *xencoding.Encoder
-}
-
-func newXEncodingWrapper(e xencoding.Encoding) xencodingWrapper {
-	return xencodingWrapper{
-		decoder: e.NewDecoder(),
-		encoder: e.NewEncoder(),
-	}
-}
-
-func (e *xencodingWrapper) Decoder() *xencoding.Decoder {
-	return e.decoder
-}
-
-func (e *xencodingWrapper) Encoder() *xencoding.Encoder {
-	return e.encoder
 }
 
 // Available encodings.
@@ -79,11 +56,11 @@ var (
 
 	encodings = []Encoding{EncodingISO, EncodingUTF16, EncodingUTF16BE, EncodingUTF8}
 
-	xencodingISO        = newXEncodingWrapper(charmap.ISO8859_1)
-	xencodingUTF16BEBOM = newXEncodingWrapper(unicode.UTF16(unicode.BigEndian, unicode.ExpectBOM))
-	xencodingUTF16LEBOM = newXEncodingWrapper(unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM))
-	xencodingUTF16BE    = newXEncodingWrapper(unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM))
-	xencodingUTF8       = newXEncodingWrapper(unicode.UTF8)
+	xencodingISO        = charmap.ISO8859_1
+	xencodingUTF16BEBOM = unicode.UTF16(unicode.BigEndian, unicode.ExpectBOM)
+	xencodingUTF16LEBOM = unicode.UTF16(unicode.LittleEndian, unicode.ExpectBOM)
+	xencodingUTF16BE    = unicode.UTF16(unicode.BigEndian, unicode.IgnoreBOM)
+	xencodingUTF8       = unicode.UTF8
 )
 
 // bom is used in UTF-16 encoded Unicode with BOM.
@@ -127,7 +104,7 @@ func decodeText(src []byte, from Encoding) string {
 	}
 
 	fromXEncoding := resolveXEncoding(src, from)
-	result, err := fromXEncoding.Decoder().Bytes(src)
+	result, err := fromXEncoding.NewDecoder().Bytes(src)
 	if err != nil {
 		return string(src)
 	}
@@ -152,7 +129,7 @@ func encodeWriteText(bw *bufWriter, src string, to Encoding) error {
 	}
 
 	toXEncoding := resolveXEncoding(nil, to)
-	encoded, err := toXEncoding.Encoder().String(src)
+	encoded, err := toXEncoding.NewEncoder().String(src)
 	if err != nil {
 		return err
 	}
@@ -166,7 +143,7 @@ func encodeWriteText(bw *bufWriter, src string, to Encoding) error {
 	return nil
 }
 
-func resolveXEncoding(src []byte, encoding Encoding) xencodingWrapper {
+func resolveXEncoding(src []byte, encoding Encoding) encoding.Encoding {
 	switch encoding.Key {
 	case 0:
 		return xencodingISO
