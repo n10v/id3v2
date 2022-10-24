@@ -26,6 +26,7 @@ func TestDecodeText(t *testing.T) {
 	}
 }
 
+// See https://github.com/bogem/id3v2/pull/74
 func TestDecodeTextParallel(t *testing.T) {
 	testCases := []struct {
 		src  []byte
