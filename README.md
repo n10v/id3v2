@@ -1,6 +1,6 @@
 # id3v2
 
-Supported ID3 versions: 2.3, 2.4
+Implementation of ID3 v2.3 and v2.4 in native Go.
 
 ## Installation
 
