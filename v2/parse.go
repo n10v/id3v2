@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -145,17 +146,17 @@ func parseFrameHeader(buf []byte, rd io.Reader, synchSafe bool) (frameHeader, er
 		return header, err
 	}
 
-	id := string(fhBuf[:4])
+	id := fhBuf[:4]
 	bodySize, err := parseSize(fhBuf[4:8], synchSafe)
 	if err != nil {
 		return header, err
 	}
 
-	if id == "" || bodySize == 0 {
+	if bytes.Equal(id, []byte{0, 0, 0, 0}) || bodySize == 0 {
 		return header, errBlankFrame
 	}
 
-	header.ID = id
+	header.ID = string(id)
 	header.BodySize = bodySize
 	return header, nil
 }
