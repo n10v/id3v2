@@ -11,6 +11,7 @@ var (
 	V23CommonIDs = map[string]string{
 		"Attached picture":                   "APIC",
 		"Chapters":                           "CHAP",
+		"Chapters TOC":                       "CTOC",
 		"Comments":                           "COMM",
 		"Album/Movie/Show title":             "TALB",
 		"BPM":                                "TBPM",
@@ -64,6 +65,7 @@ var (
 	V24CommonIDs = map[string]string{
 		"Attached picture":                   "APIC",
 		"Chapters":                           "CHAP",
+		"Chapters TOC":                       "CTOC",
 		"Comments":                           "COMM",
 		"Album/Movie/Show title":             "TALB",
 		"BPM":                                "TBPM",
@@ -140,6 +142,7 @@ var (
 var parsers = map[string]func(*bufReader, byte) (Framer, error){
 	"APIC": parsePictureFrame,
 	"CHAP": parseChapterFrame,
+	"CTOC": parseChapterTocFrame,
 	"COMM": parseCommentFrame,
 	"POPM": parsePopularimeterFrame,
 	"TXXX": parseUserDefinedTextFrame,
