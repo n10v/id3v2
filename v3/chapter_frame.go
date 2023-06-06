@@ -108,7 +108,7 @@ func parseChapterFrame(br *bufReader, version byte) (Framer, error) {
 		if id == "TIT2" || id == "TIT3" {
 			bodyRd := getLimitedReader(br, bodySize)
 			br := newBufReader(bodyRd)
-			frame, err := parseTextFrame(br)
+			frame, err := parseTextFrame(br.ReadAll())
 			if err != nil {
 				putLimitedReader(bodyRd)
 				return nil, err

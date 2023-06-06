@@ -64,7 +64,7 @@ func (tag *Tag) AddCommentFrame(cf CommentFrame) {
 // AddTextFrame creates the text frame with provided encoding and text
 // and adds to tag.
 func (tag *Tag) AddTextFrame(id string, encoding Encoding, text string) {
-	tag.AddFrame(id, TextFrame{Encoding: encoding, Text: text})
+	tag.AddFrame(id, NewTextFrame(encoding, []byte(text)))
 }
 
 // AddUnsynchronisedLyricsFrame adds the unsynchronised lyrics/text frame
@@ -223,7 +223,9 @@ func (tag *Tag) HasFrames() bool {
 }
 
 func (tag *Tag) Title() string {
-	return tag.GetTextFrame(tag.CommonID("Title")).Text
+	frame := tag.GetTextFrame(tag.CommonID("Title"))
+	title, _ := frame.GetInformation()
+	return title
 }
 
 func (tag *Tag) SetTitle(title string) {
@@ -231,7 +233,9 @@ func (tag *Tag) SetTitle(title string) {
 }
 
 func (tag *Tag) Artist() string {
-	return tag.GetTextFrame(tag.CommonID("Artist")).Text
+	frame := tag.GetTextFrame(tag.CommonID("Artist"))
+	artist, _ := frame.GetInformation()
+	return artist
 }
 
 func (tag *Tag) SetArtist(artist string) {
@@ -239,7 +243,9 @@ func (tag *Tag) SetArtist(artist string) {
 }
 
 func (tag *Tag) Album() string {
-	return tag.GetTextFrame(tag.CommonID("Album/Movie/Show title")).Text
+	frame := tag.GetTextFrame(tag.CommonID("Album/Movie/Show title"))
+	album, _ := frame.GetInformation()
+	return album
 }
 
 func (tag *Tag) SetAlbum(album string) {
@@ -247,7 +253,9 @@ func (tag *Tag) SetAlbum(album string) {
 }
 
 func (tag *Tag) Year() string {
-	return tag.GetTextFrame(tag.CommonID("Year")).Text
+	frame := tag.GetTextFrame(tag.CommonID("Year"))
+	year, _ := frame.GetInformation()
+	return year
 }
 
 func (tag *Tag) SetYear(year string) {
@@ -255,7 +263,9 @@ func (tag *Tag) SetYear(year string) {
 }
 
 func (tag *Tag) Genre() string {
-	return tag.GetTextFrame(tag.CommonID("Content type")).Text
+	frame := tag.GetTextFrame(tag.CommonID("Content type"))
+	genre, _ := frame.GetInformation()
+	return genre
 }
 
 func (tag *Tag) SetGenre(genre string) {

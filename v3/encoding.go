@@ -76,20 +76,55 @@ func getEncoding(key byte) Encoding {
 }
 
 // encodedSize counts length of UTF-8 src if it's encoded to enc.
-func encodedSize(src string, enc Encoding) int {
-	if enc.Equals(EncodingUTF8) {
+func encodedSize(src string, encoding Encoding) int {
+	if encoding.Equals(EncodingUTF8) {
 		return len(src)
 	}
 
 	bw := getBufWriter(ioutil.Discard)
 	defer putBufWriter(bw)
 
-	encodeWriteText(bw, src, enc)
+	encodeWriteText(bw, src, encoding)
 
 	return bw.Written()
-
 }
 
+func encodeBytes(src []byte, to Encoding) ([]byte, error) {
+	xencoding := resolveXEncoding(src, to)
+	return xencoding.NewEncoder().Bytes(src)
+}
+
+func decodeBytes(src []byte, from Encoding) (string, error) {
+	if from.Equals(EncodingUTF8) {
+		return string(src), nil
+	}
+
+	// If src is just BOM, then it's an empty string.
+	if from.Equals(EncodingUTF16) && bytes.Equal(src, bom) {
+		return "", nil
+	}
+
+	fromXEncoding := resolveXEncoding(src, from)
+	result, err := fromXEncoding.NewDecoder().Bytes(src)
+	if err != nil {
+		return "", err
+	}
+
+	// HACK: Delete REPLACEMENT CHARACTER (�) if encoding went wrong.
+	// See https://apps.timwhitlock.info/unicode/inspect?s=%EF%BF%BD.
+	// See https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8.
+	if from.Equals(EncodingUTF16) {
+		// bytes.Replace(s, old, new, -1) is the same as bytes.ReplaceAll(s, old, new),
+		// but bytes.ReplaceAll is only added in Go 1.12.
+		result = bytes.Replace(result, []byte{0xEF, 0xBF, 0xBD}, []byte{}, -1)
+	}
+
+	result = bytes.TrimSuffix(result, from.TerminationBytes) // See https://github.com/bogem/id3v2/issues/41
+
+	return string(result), nil
+}
+
+// DEPRECATED
 // decodeText decodes src from "from" encoding to UTF-8.
 func decodeText(src []byte, from Encoding) string {
 	src = bytes.TrimSuffix(src, from.TerminationBytes) // See https://github.com/bogem/id3v2/issues/41

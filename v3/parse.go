@@ -5,6 +5,7 @@
 package id3v2
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -81,24 +82,26 @@ func (tag *Tag) parseFrames(opts Options) error {
 			return err
 		}
 		id, bodySize := header.ID, header.BodySize
+		fmt.Println(id, framesSize, bodySize)
 
 		framesSize -= frameHeaderSize + bodySize
 		if framesSize < 0 {
 			return ErrBodyOverflow
 		}
 
-		bodyRd := getLimitedReader(tag.reader, bodySize)
-		defer putLimitedReader(bodyRd)
-
 		if isParseFramesProvided && !parseableIDs[id] {
-			if err := skipReaderBuf(bodyRd, buf); err != nil {
+			if _, err := io.CopyN(io.Discard, tag.reader, bodySize); err != nil {
 				return err
 			}
 			continue
 		}
 
-		br.Reset(bodyRd)
-		frame, err := parseFrameBody(id, br, tag.version)
+		body := make([]byte, bodySize)
+		if _, err := tag.reader.Read(body); err != nil {
+			return err
+		}
+
+		frame, err := parseFrameBody(id, newBufReader(bytes.NewReader(body)), tag.version)
 		if err != nil && err != io.EOF {
 			return err
 		}
@@ -160,23 +163,9 @@ func parseFrameHeader(buf []byte, rd io.Reader, synchSafe bool) (frameHeader, er
 	return header, nil
 }
 
-// skipReaderBuf just reads rd until io.EOF.
-func skipReaderBuf(rd io.Reader, buf []byte) error {
-	for {
-		_, err := rd.Read(buf)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func parseFrameBody(id string, br *bufReader, version byte) (Framer, error) {
 	if id[0] == 'T' && id != "TXXX" {
-		return parseTextFrame(br)
+		return parseTextFrame(br.ReadAll())
 	}
 
 	if parseFunc, exists := parsers[id]; exists {

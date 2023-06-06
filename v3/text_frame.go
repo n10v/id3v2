@@ -4,50 +4,106 @@
 
 package id3v2
 
-import "io"
+import (
+	"bufio"
+	"bytes"
+	"io"
+)
 
 // TextFrame is used to work with all text frames
 // (all T*** frames like TIT2 (title), TALB (album) and so on).
 type TextFrame struct {
-	Encoding Encoding
-	Text     string
+	encoding         Encoding
+	informationBytes []byte
+}
+
+func NewTextFrame(encoding Encoding, informationBytes []byte) *TextFrame {
+	return &TextFrame{encoding: encoding, informationBytes: informationBytes}
+}
+
+// TODO: Docs
+func (tf *TextFrame) GetEncoding() Encoding {
+	return tf.encoding
+}
+
+func (tf *TextFrame) GetInformation() (string, error) {
+	return decodeBytes(tf.informationBytes, tf.encoding)
+}
+
+func (tf *TextFrame) GetInformationBytes() []byte {
+	return tf.informationBytes
+}
+
+// Information must be valid UTF-8 string.
+func (tf *TextFrame) SetInformationFromString(information string) {
+	tf.encoding = EncodingUTF8
+	tf.informationBytes = []byte(information)
+}
+
+func (tf *TextFrame) SetInformationFromBytes(informationBytes []byte, encoding Encoding) {
+	tf.encoding = encoding
+	tf.informationBytes = informationBytes
+}
+
+func (tf *TextFrame) EncodeWith(encoding Encoding) error {
+	var err error
+	tf.informationBytes, err = encodeBytes(tf.informationBytes, encoding)
+	if err != nil {
+		return err
+	}
+
+	tf.encoding = encoding
+
+	return nil
 }
 
 func (tf TextFrame) Size() int {
-	return 1 + encodedSize(tf.Text, tf.Encoding) + len(tf.Encoding.TerminationBytes)
+	encodingKeySize := 1
+
+	terminationBytesLength := 0
+	if tf.shouldAddTerminationBytes() {
+		terminationBytesLength = len(tf.encoding.TerminationBytes)
+	}
+
+	return encodingKeySize + len(tf.informationBytes) + terminationBytesLength
 }
 
 func (tf TextFrame) UniqueIdentifier() string {
-	return "ID"
+	return ""
 }
 
 func (tf TextFrame) WriteTo(w io.Writer) (int64, error) {
-	return useBufWriter(w, func(bw *bufWriter) {
-		bw.WriteByte(tf.Encoding.Key)
-		bw.EncodeAndWriteText(tf.Text, tf.Encoding)
+	bw := bufio.NewWriter(w)
 
-		// https://github.com/bogem/id3v2/pull/52
-		// https://github.com/bogem/id3v2/pull/33
-		bw.Write(tf.Encoding.TerminationBytes)
-	})
+	if err := bw.WriteByte(tf.encoding.Key); err != nil {
+		return 0, err
+	}
+
+	if _, err := bw.Write(tf.informationBytes); err != nil {
+		return 0, err
+	}
+
+	if tf.shouldAddTerminationBytes() {
+		if _, err := bw.Write(tf.encoding.TerminationBytes); err != nil {
+			return 0, err
+		}
+	}
+
+	if err := bw.Flush(); err != nil {
+		return 0, err
+	}
+
+	return int64(bw.Size()), nil
 }
 
-func parseTextFrame(br *bufReader) (Framer, error) {
-	encoding := getEncoding(br.ReadByte())
+func (tf TextFrame) shouldAddTerminationBytes() bool {
+	return !bytes.HasSuffix(tf.informationBytes, tf.encoding.TerminationBytes)
+}
 
-	if br.Err() != nil {
-		return nil, br.Err()
-	}
-
-	buf := getBytesBuffer()
-	defer putBytesBuffer(buf)
-	if _, err := buf.ReadFrom(br); err != nil {
-		return nil, err
-	}
-
+func parseTextFrame(body []byte) (Framer, error) {
 	tf := TextFrame{
-		Encoding: encoding,
-		Text:     decodeText(buf.Bytes(), encoding),
+		encoding:         getEncoding(body[0]),
+		informationBytes: body[1:],
 	}
 
 	return tf, nil
