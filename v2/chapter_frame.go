@@ -25,6 +25,7 @@ type ChapterFrame struct {
 	EndOffset   uint32
 	Title       *TextFrame
 	Description *TextFrame
+	Artwork     *PictureFrame
 }
 
 func (cf ChapterFrame) Size() int {
@@ -91,6 +92,7 @@ func parseChapterFrame(br *bufReader, version byte) (Framer, error) {
 
 	var title TextFrame
 	var description TextFrame
+	var artwork PictureFrame
 
 	// borrowed from parse.go
 	buf := getByteSlice(32 * 1024)
@@ -121,6 +123,17 @@ func parseChapterFrame(br *bufReader, version byte) (Framer, error) {
 
 			putLimitedReader(bodyRd)
 		}
+		if id == "APIC" {
+			bodyRd := getLimitedReader(br, bodySize)
+			br := newBufReader(bodyRd)
+			frame, err := parsePictureFrame(br, version)
+			if err != nil {
+				putLimitedReader(bodyRd)
+				return nil, err
+			}
+			artwork = frame.(PictureFrame)
+			putLimitedReader(bodyRd)
+		}
 	}
 
 	cf := ChapterFrame{
@@ -133,6 +146,7 @@ func parseChapterFrame(br *bufReader, version byte) (Framer, error) {
 		EndOffset:   endOffset,
 		Title:       &title,
 		Description: &description,
+		Artwork:     &artwork,
 	}
 	return cf, nil
 }
