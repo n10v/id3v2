@@ -12,6 +12,7 @@ import (
 )
 
 func init() {
+	// TODO: Create separate rand.seed
 	rand.Seed(time.Now().UnixNano())
 }
 
