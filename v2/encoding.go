@@ -121,6 +121,18 @@ func decodeText(src []byte, from Encoding) string {
 	return string(result)
 }
 
+// decodeMulti decodes multi valued src from "from" encoding to UTF-8.
+func decodeMulti(src []byte, from Encoding) []string {
+	src = bytes.TrimSuffix(src, from.TerminationBytes) // See https://github.com/bogem/id3v2/issues/41
+	splitted := bytes.Split(src, from.TerminationBytes)
+
+	var res []string
+	for _, s := range splitted {
+		res = append(res, decodeText(s, from))
+	}
+	return res
+}
+
 // encodeWriteText encodes src from UTF-8 to "to" encoding and writes to bw.
 func encodeWriteText(bw *bufWriter, src string, to Encoding) error {
 	if to.Equals(EncodingUTF8) {

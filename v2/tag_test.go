@@ -18,6 +18,7 @@ import (
 
 const (
 	mp3Path        = "testdata/test.mp3"
+	multiMp3Path   = "testdata/test_multi.mp3"
 	frontCoverPath = "testdata/front_cover.jpg"
 	backCoverPath  = "testdata/back_cover.jpg"
 
@@ -60,6 +61,16 @@ var (
 		Encoding:    EncodingUTF8,
 		Description: "MusicBrainz Album Id",
 		Value:       "fbd94fb6-2a74-42d0-acbc-81caf8b84984",
+	}
+
+	multiUDTF = UserDefinedTextFrame{
+		Encoding:    EncodingUTF8,
+		Description: "multi",
+		Value:       "val1",
+		Multi: []string{
+			"val1",
+			"val2",
+		},
 	}
 
 	musicBrainzUF = UFIDFrame{

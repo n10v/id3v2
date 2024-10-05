@@ -34,6 +34,45 @@ func TestParse(t *testing.T) {
 	testUnknownFrames(t, tag)
 }
 
+// TestParse compares parsed frames with expected frames.
+func TestMultiParse(t *testing.T) {
+	tag, err := Open(multiMp3Path, parseOpts)
+	if tag == nil || err != nil {
+		t.Error("Error while opening mp3 file:", err)
+	}
+	defer tag.Close()
+
+	testMultiTextFrames(t, tag)
+	testMultiTXXXFrames(t, tag)
+}
+
+func testMultiTextFrames(t *testing.T, tag *Tag) {
+	if err := compareTwoStrings(tag.Artist(), "artist1"); err != nil {
+		t.Error(err)
+	}
+	artistFrames := tag.GetFrames(tag.CommonID("Artist"))
+	if len(artistFrames) != 1 {
+		t.Fatalf("Expected artist frames: %v, got %v", 1, len(artistFrames))
+	}
+
+	artistFrame, ok := artistFrames[0].(TextFrame)
+	if !ok {
+		t.Fatal("Couldn't assert artist frame")
+	}
+
+	if len(artistFrame.Multi) != 2 {
+		t.Fatalf("Expected artist values: %v, got %v", 2, len(artistFrame.Multi))
+	}
+
+	if err := compareTwoStrings(artistFrame.Multi[0], "artist1"); err != nil {
+		t.Error(err)
+	}
+
+	if err := compareTwoStrings(artistFrame.Multi[1], "artist2"); err != nil {
+		t.Error(err)
+	}
+}
+
 func testTextFrames(t *testing.T, tag *Tag) {
 	if err := compareTwoStrings(tag.Artist(), "Artist"); err != nil {
 		t.Error(err)
@@ -169,6 +208,27 @@ func testTXXXFrames(t *testing.T, tag *Tag) {
 	}
 
 	if err := compareTXXXFrames(parsedUserDefinedTextFrame, musicBrainzUDTF); err != nil {
+		t.Error(err)
+	}
+}
+
+func testMultiTXXXFrames(t *testing.T, tag *Tag) {
+	txxxFrames := tag.GetFrames(tag.CommonID("User defined text information frame"))
+	if len(txxxFrames) != 1 {
+		t.Fatalf("Expected TXXX frames: %v, got %v", 1, len(txxxFrames))
+	}
+
+	var parsedUserDefinedTextFrame UserDefinedTextFrame
+	for _, f := range txxxFrames {
+		txxx, ok := f.(UserDefinedTextFrame)
+		if !ok {
+			t.Fatal("Couldn't assert TXXX frame")
+		}
+		parsedUserDefinedTextFrame = txxx
+		fmt.Printf("%s\n", txxx.Description)
+	}
+
+	if err := compareTXXXFrames(parsedUserDefinedTextFrame, multiUDTF); err != nil {
 		t.Error(err)
 	}
 }

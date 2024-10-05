@@ -11,6 +11,7 @@ import "io"
 type TextFrame struct {
 	Encoding Encoding
 	Text     string
+	Multi    []string
 }
 
 func (tf TextFrame) Size() int {
@@ -45,9 +46,16 @@ func parseTextFrame(br *bufReader) (Framer, error) {
 		return nil, err
 	}
 
+	values := decodeMulti(buf.Bytes(), encoding)
+	var first string
+	if len(values) > 0 {
+		first = values[0]
+	}
+
 	tf := TextFrame{
 		Encoding: encoding,
-		Text:     decodeText(buf.Bytes(), encoding),
+		Text:     first,
+		Multi:    values,
 	}
 
 	return tf, nil

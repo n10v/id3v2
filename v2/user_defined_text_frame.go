@@ -8,6 +8,7 @@ type UserDefinedTextFrame struct {
 	Encoding    Encoding
 	Description string
 	Value       string
+	Multi       []string
 }
 
 func (udtf UserDefinedTextFrame) Size() int {
@@ -42,10 +43,17 @@ func parseUserDefinedTextFrame(br *bufReader, version byte) (Framer, error) {
 		return nil, err
 	}
 
+	values := decodeMulti(value.Bytes(), encoding)
+	var first string
+	if len(values) > 0 {
+		first = values[0]
+	}
+
 	udtf := UserDefinedTextFrame{
 		Encoding:    encoding,
 		Description: decodeText(description, encoding),
-		Value:       decodeText(value.Bytes(), encoding),
+		Value:       first,
+		Multi:       values,
 	}
 
 	return udtf, nil
