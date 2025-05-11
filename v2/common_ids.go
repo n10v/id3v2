@@ -54,6 +54,7 @@ var (
 		"User defined text information frame":      "TXXX",
 		"Unique file identifier":                   "UFID",
 		"Unsynchronised lyrics/text transcription": "USLT",
+		"Synchronised lyrics/text":                 "SYLT",
 
 		// Just for convenience.
 		"Artist": "TPE1",
@@ -114,6 +115,7 @@ var (
 		"User defined text information frame":      "TXXX",
 		"Unique file identifier":                   "UFID",
 		"Unsynchronised lyrics/text transcription": "USLT",
+		"Synchronised lyrics/text":                 "SYLT",
 
 		// Deprecated frames of ID3v2.3.
 		"Date":                  "TDRC",
@@ -145,6 +147,7 @@ var parsers = map[string]func(*bufReader, byte) (Framer, error){
 	"TXXX": parseUserDefinedTextFrame,
 	"UFID": parseUFIDFrame,
 	"USLT": parseUnsynchronisedLyricsFrame,
+	"SYLT": parseSynchronisedLyricsFrame,
 }
 
 // mustFrameBeInSequence checks if frame with corresponding ID must
