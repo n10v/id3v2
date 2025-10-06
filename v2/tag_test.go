@@ -21,10 +21,10 @@ const (
 	frontCoverPath = "testdata/front_cover.jpg"
 	backCoverPath  = "testdata/back_cover.jpg"
 
-	framesSize    = 211978
+	framesSize    = 212001
 	tagSize       = tagHeaderSize + framesSize
 	musicSize     = 3840834
-	countOfFrames = 15
+	countOfFrames = 16
 )
 
 var (
@@ -111,6 +111,7 @@ func resetMP3Tag() error {
 
 	tag.SetTitle("Title")
 	tag.SetArtist("Artist")
+	tag.SetAlbumArtist("AlbumArtist")
 	tag.SetAlbum("Album")
 	tag.SetYear("2016")
 	tag.SetGenre("Genre")
@@ -155,8 +156,8 @@ func TestCountLenSize(t *testing.T) {
 	}
 
 	// Check len of tag.AllFrames().
-	if len(tag.AllFrames()) != 12 {
-		t.Errorf("Expected: %v, got: %v", 11, len(tag.AllFrames()))
+	if len(tag.AllFrames()) != 13 {
+		t.Errorf("Expected: %v, got: %v", 13, len(tag.AllFrames()))
 	}
 
 	// Check saved tag size by reading the 6:10 bytes of mp3 file.
@@ -391,6 +392,7 @@ func TestEmptyTagWriteTo(t *testing.T) {
 
 	tag := NewEmptyTag()
 	tag.SetArtist("Artist")
+	tag.SetAlbumArtist("AlbumArtist")
 	tag.SetTitle("Title")
 
 	buf := new(bytes.Buffer)
@@ -407,6 +409,9 @@ func TestEmptyTagWriteTo(t *testing.T) {
 	}
 	if parsedTag.Artist() != "Artist" {
 		t.Error("Expected Artist, got", parsedTag.Artist())
+	}
+	if parsedTag.AlbumArtist() != "AlbumArtist" {
+		t.Error("Expected AlbumArtist, got", parsedTag.Artist())
 	}
 	if parsedTag.Title() != "Title" {
 		t.Error("Expected Title, got", parsedTag.Title())
