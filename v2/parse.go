@@ -72,7 +72,10 @@ func (tag *Tag) parseFrames(opts Options) error {
 	buf := getByteSlice(32 * 1024)
 	defer putByteSlice(buf)
 
-	for framesSize > 0 {
+	// stop when fewer than a frame header remains: the rest is
+	// padding, and reading a header there would consume audio data
+	// past the tag area and fail with "frame went over tag area"
+	for framesSize >= frameHeaderSize {
 		header, err := parseFrameHeader(buf, tag.reader, synchSafe)
 		if err == io.EOF || err == errBlankFrame || err == ErrInvalidSizeFormat {
 			break
